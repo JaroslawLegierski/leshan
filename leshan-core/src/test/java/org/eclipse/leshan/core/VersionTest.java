@@ -15,7 +15,8 @@
  *******************************************************************************/
 package org.eclipse.leshan.core;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.eclipse.leshan.core.LwM2m.LwM2mVersion;
 import org.eclipse.leshan.core.LwM2m.Version;
@@ -25,7 +26,7 @@ public class VersionTest {
     @Test
     public void is_supported_tests() {
         assertTrue(LwM2mVersion.isSupported("1.0"));
-        assertTrue(LwM2mVersion.isSupported("1.1"));
+        assertTrue(LwM2mVersion.isSupported("1.1zdzd"));
         assertFalse(LwM2mVersion.isSupported("1.2"));
         assertFalse(LwM2mVersion.isSupported(""));
         assertFalse(LwM2mVersion.isSupported(null));
