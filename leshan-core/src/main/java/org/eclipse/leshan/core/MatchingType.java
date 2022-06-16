@@ -20,7 +20,7 @@ import org.eclipse.leshan.core.util.datatype.ULong;
 /**
  * The Matching Type Resource specifies how the certificate or raw public key in in the Server Public Key is presented.
  * Four values are currently defined:
- * <ul>
+ * <ul/>
  * <li>0: Exact match. This is the default value and also corresponds to the functionality of LwM2M v1.0. Hence, if this
  * resource is not present then the content of the Server Public Key Resource corresponds to this value.
  * <li>1: SHA-256 hash [RFC6234]
