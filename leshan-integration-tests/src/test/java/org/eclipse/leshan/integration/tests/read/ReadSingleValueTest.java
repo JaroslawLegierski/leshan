@@ -15,7 +15,8 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests.read;
 
-import static org.eclipse.leshan.core.ResponseCode.*;
+import static org.eclipse.leshan.core.ResponseCode.BAD_REQUEST;
+import static org.eclipse.leshan.core.ResponseCode.CONTENT;
 import static org.eclipse.leshan.integration.tests.util.TestUtil.assertContentFormat;
 import static org.junit.Assert.assertEquals;
 
@@ -23,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.eclipse.leshan.client.object.LwM2mTestObject;
+import org.eclipse.leshan.core.ResponseCode;
 import org.eclipse.leshan.core.node.LwM2mResource;
 import org.eclipse.leshan.core.node.LwM2mResourceInstance;
 import org.eclipse.leshan.core.request.ContentFormat;
@@ -82,7 +84,7 @@ public class ReadSingleValueTest {
                 new ReadRequest(contentFormat, 3, 0, 1));
 
         // verify result
-        assertEquals(CONTENT, response.getCode());
+        assertEquals(ResponseCode.NOT_FOUND, response.getCode());
         assertContentFormat(contentFormat, response);
 
         LwM2mResource resource = (LwM2mResource) response.getContent();
