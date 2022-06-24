@@ -60,6 +60,17 @@ Contributors:
         <module>leshan-bsserver-demo</module>
     </modules>
 
+    <profiles>
+        <profile>
+            <id>allPom</id>
+            <modules>
+                <module>build-config</module>
+                <module>build-config/lib-build-config</module>
+                <module>build-config/demo-build-config</module>
+            </modules>
+        </profile>
+    </profiles>
+
     <scm>
         <developerConnection>scm:git:ssh://git@github.com/eclipse/leshan.git</developerConnection>
         <url>https://github.com/eclipse/leshan.git</url>
