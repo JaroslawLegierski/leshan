@@ -23,6 +23,8 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.jmdns.JmDNS;
@@ -39,12 +41,17 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.leshan.core.demo.LwM2mDemoConstant;
 import org.eclipse.leshan.core.demo.cli.ShortErrorMessageHandler;
+import org.eclipse.leshan.core.link.attributes.AttributeModel;
+import org.eclipse.leshan.core.link.attributes.Attributes;
+import org.eclipse.leshan.core.link.lwm2m.DefaultLwM2mLinkParser;
+import org.eclipse.leshan.core.link.lwm2m.attributes.LwM2mAttributes;
 import org.eclipse.leshan.core.model.ObjectLoader;
 import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.server.californium.LeshanServer;
 import org.eclipse.leshan.server.californium.LeshanServerBuilder;
 import org.eclipse.leshan.server.core.demo.json.servlet.SecurityServlet;
 import org.eclipse.leshan.server.demo.cli.LeshanServerDemoCLI;
+import org.eclipse.leshan.server.demo.model.SpecificObjectVersionAttributeModel;
 import org.eclipse.leshan.server.demo.servlet.ClientServlet;
 import org.eclipse.leshan.server.demo.servlet.EventServlet;
 import org.eclipse.leshan.server.demo.servlet.ObjectSpecServlet;
@@ -138,6 +145,19 @@ public class LeshanServerDemo {
         // Create CoAP Config
         File configFile = new File(CF_CONFIGURATION_FILENAME);
         Configuration coapConfig = LeshanServerBuilder.createDefaultCoapConfiguration();
+
+        // Specific ObjectVersionAttributeModel with not standard attributes binding
+        Collection<AttributeModel<?>> supportedAttributes = new ArrayList<AttributeModel<?>>();
+        supportedAttributes.addAll(Attributes.ALL);
+        supportedAttributes.addAll(LwM2mAttributes.ALL);
+        // Change the object_version one
+        supportedAttributes.remove(LwM2mAttributes.OBJECT_VERSION);
+        // Custom model which support to assign OBJECT_VERSION To OBJECT and OBJECT_INSTANCE level instance.
+        supportedAttributes.add(new SpecificObjectVersionAttributeModel());
+
+        // Add the new LinkParser
+        builder.setLinkParser(new DefaultLwM2mLinkParser(supportedAttributes));
+
         // these configuration values are always overwritten by CLI
         // therefore set them to transient.
         coapConfig.setTransient(DtlsConfig.DTLS_RECOMMENDED_CIPHER_SUITES_ONLY);
