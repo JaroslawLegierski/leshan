@@ -92,6 +92,6 @@ public class SpecificObjectVersionAttributeModel extends LwM2mAttributeModel<Ver
     }
 
     protected boolean tolerateQuote() {
-        return false;
+        return true; // Allowing using quotes e.g. in ver attributes: </3>;ver="1.0"
     }
 }
