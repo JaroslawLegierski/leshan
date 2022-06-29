@@ -25,8 +25,12 @@ import org.eclipse.californium.core.coap.Response;
 import org.eclipse.californium.core.network.interceptors.MessageInterceptor;
 import org.eclipse.leshan.server.registration.Registration;
 import org.eclipse.leshan.server.registration.RegistrationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CoapMessageTracer implements MessageInterceptor {
+
+    private static final Logger LOG = LoggerFactory.getLogger(CoapMessageTracer.class);
 
     private final Map<String, CoapMessageListener> listeners = new ConcurrentHashMap<>();
 
@@ -60,6 +64,19 @@ public class CoapMessageTracer implements MessageInterceptor {
         if (listener != null) {
             listener.trace(new CoapMessage(request, false));
         }
+        LOG.info("\n"+"UDP QOS SendRequest: \n"
+                + "MID: "+request.getMID() +"\n"
+                + "endpoint: "+ request.getURI() +"\n"
+                + "msg: "+request.getType() +"\n"
+                + "rejected: "+request.isRejected() +"\n"
+                + "acknowledge: "+ request.acknowledge() + "\n"
+                + "timeout: " +  request.isTimedOut()+"\n"
+                + "duplicated: "+request.isDuplicate()+"\n"
+                + "token: "+ request.getTokenString()+"\n"
+                + "timestamp: " + request.getNanoTimestamp()+"\n"
+                + "payload: "+ request.getPayloadString()
+        );
+
     }
 
     @Override
@@ -69,6 +86,17 @@ public class CoapMessageTracer implements MessageInterceptor {
         if (listener != null) {
             listener.trace(new CoapMessage(response, false));
         }
+        LOG.info("\n"+"UDP QOS SendResponse: \n"
+                + "MID: "+response.getMID() +"\n"
+                + "msg: "+response.getType() +"\n"
+                + "rejected: "+response.isRejected() +"\n"
+                + "acknowledge: "+ response.acknowledge() + "\n"
+                + "timeout: " +  response.isTimedOut()+"\n"
+                + "duplicated: "+response.isDuplicate()+"\n"
+                + "token: "+ response.getTokenString()+"\n"
+                + "timestamp: " + response.getNanoTimestamp()+"\n"
+                + "payload: "+ response.getPayloadString()
+        );
     }
 
     @Override
@@ -85,6 +113,18 @@ public class CoapMessageTracer implements MessageInterceptor {
         if (listener != null) {
             listener.trace(new CoapMessage(request, true));
         }
+        LOG.info("\n"+"UDP QOS ReceiveRequest: \n"
+                + "MID: "+request.getMID() +"\n"
+                + "endpoint: "+ request.getURI() +"\n"
+                + "msg: "+request.getType() +"\n"
+                + "rejected: "+request.isRejected() +"\n"
+                + "acknowledge: "+ request.acknowledge() + "\n"
+                + "timeout: " +  request.isTimedOut()+"\n"
+                + "duplicated: "+request.isDuplicate()+"\n"
+                + "token: "+ request.getTokenString()+"\n"
+                + "timestamp: " + request.getNanoTimestamp()+"\n"
+                + "payload: "+ request.getPayloadString()
+        );
 
     }
 
@@ -94,6 +134,17 @@ public class CoapMessageTracer implements MessageInterceptor {
         if (listener != null) {
             listener.trace(new CoapMessage(response, true));
         }
+        LOG.info("\n"+"UDP QOS ReceiveResponse: \n"
+                + "MID: "+response.getMID() +"\n"
+                + "msg: "+response.getType() +"\n"
+                + "rejected: "+response.isRejected() +"\n"
+                + "acknowledge: "+ response.acknowledge() + "\n"
+                + "timeout: " +  response.isTimedOut()+"\n"
+                + "duplicated: "+response.isDuplicate()+"\n"
+                + "token: "+ response.getTokenString()+"\n"
+                + "timestamp: " + response.getNanoTimestamp()+"\n"
+                + "payload: "+ response.getPayloadString()
+        );
 
     }
 
