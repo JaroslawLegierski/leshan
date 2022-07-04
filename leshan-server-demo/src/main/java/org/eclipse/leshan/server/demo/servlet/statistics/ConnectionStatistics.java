@@ -29,6 +29,9 @@ public class ConnectionStatistics {
     }
 
     private synchronized void flushData() {
+        if(cachedStatistics.isEmpty()) {
+            return;
+        }
         statisticsDataProxy.collectDataFromCache(cachedStatistics);
         cachedStatistics.clear();
     }

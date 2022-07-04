@@ -48,7 +48,7 @@ import org.eclipse.leshan.server.demo.servlet.log.CoapMessage;
 import org.eclipse.leshan.server.demo.servlet.log.CoapMessageListener;
 import org.eclipse.leshan.server.demo.servlet.log.CoapMessageTracer;
 import org.eclipse.leshan.server.demo.servlet.statistics.ConnectionStatistics;
-import org.eclipse.leshan.server.demo.servlet.statistics.StatisticsLogger;
+import org.eclipse.leshan.server.demo.servlet.statistics.StatisticsDataSender;
 import org.eclipse.leshan.server.observation.ObservationListener;
 import org.eclipse.leshan.server.queue.PresenceListener;
 import org.eclipse.leshan.server.registration.Registration;
@@ -291,7 +291,7 @@ public class EventServlet extends EventSourceServlet {
         server.getSendService().addListener(this.sendListener);
 
         // add an interceptor to each endpoint to trace all CoAP messages
-        connectionStatistics = new ConnectionStatistics(new StatisticsLogger(), 5000);
+        connectionStatistics = new ConnectionStatistics(new StatisticsDataSender(), 5000);
         coapMessageTracer = new CoapMessageTracer(server.getRegistrationService(), connectionStatistics);
         for (Endpoint endpoint : server.coap().getServer().getEndpoints()) {
             endpoint.addInterceptor(coapMessageTracer);
