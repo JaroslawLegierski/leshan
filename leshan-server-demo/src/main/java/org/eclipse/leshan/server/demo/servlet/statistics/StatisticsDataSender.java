@@ -31,7 +31,8 @@ public class StatisticsDataSender implements StatisticsDataProxy {
         for(Map<String, String> map : data) {
             stringBuilder.append('{');
             for(Map.Entry<String, String> entry : map.entrySet()) {
-                stringBuilder.append(String.format("\"%s\":\"%s\",", entry.getKey(), entry.getValue()));
+                String valueWithEscapedQuotes = entry.getValue().replace("\"","\\\"");
+                stringBuilder.append(String.format("\"%s\":\"%s\",", entry.getKey(), valueWithEscapedQuotes));
             }
             stringBuilder.deleteCharAt(stringBuilder.length() - 1);
             stringBuilder.append("},");
