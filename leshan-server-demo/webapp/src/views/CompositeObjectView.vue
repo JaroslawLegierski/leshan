@@ -49,9 +49,9 @@
         </span>
       </h4>
       <!-- root case -->
-      <span v-if="node.path.type == 'root'" class="text-body-2">
-        Root Path is not yet supported by Leshan.
-      </span>
+            <span v-if="node.path.type == 'root'" class="text-body-2">
+              Root Path is not yet supported by Leshan.
+            </span>
       <!-- object case -->
       <span v-else-if="node.unknowObject" class="text-body-2">
         Client does not report it supports Object {{ node.path.objectid }} OR

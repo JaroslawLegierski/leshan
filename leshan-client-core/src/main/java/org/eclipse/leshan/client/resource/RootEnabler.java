@@ -73,11 +73,27 @@ public class RootEnabler implements LwM2mRootEnabler {
 
     @Override
     public ReadCompositeResponse read(ServerIdentity identity, ReadCompositeRequest request) {
-        List<LwM2mPath> paths = request.getPaths();
+                List<LwM2mPath> paths = request.getPaths();
+
+
+
         if (paths.size() == 1 && paths.get(0).isRoot()) {
-            // TODO implement read for "/" use case.
-            return ReadCompositeResponse.internalServerError("Not implemented yet");
+            // read for "/" use case.
+            Map<Integer, LwM2mObjectEnabler> enablers=tree.getObjectEnablers();
+            Map<LwM2mPath, LwM2mNode> content = new HashMap<>();
+            paths.clear();
+
+            for ( Map.Entry<Integer, LwM2mObjectEnabler> entry: enablers.entrySet()) {
+                Integer objectId = entry.getValue().getId();
+                if (objectId!=0)
+                {
+                    LwM2mPath newpath =new LwM2mPath(objectId);
+                    paths.add(newpath);
+                }
+            }
+
         }
+
 
         // Read Nodes
         Map<LwM2mPath, LwM2mNode> content = new HashMap<>();

@@ -33,15 +33,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.leshan.core.LwM2m;
 import org.eclipse.leshan.core.link.Link;
 import org.eclipse.leshan.core.link.attributes.InvalidAttributeException;
 import org.eclipse.leshan.core.link.lwm2m.attributes.DefaultLwM2mAttributeParser;
 import org.eclipse.leshan.core.link.lwm2m.attributes.LwM2mAttributeParser;
 import org.eclipse.leshan.core.link.lwm2m.attributes.LwM2mAttributeSet;
-import org.eclipse.leshan.core.node.LwM2mNode;
-import org.eclipse.leshan.core.node.LwM2mObjectInstance;
-import org.eclipse.leshan.core.node.LwM2mPath;
-import org.eclipse.leshan.core.node.LwM2mSingleResource;
+import org.eclipse.leshan.core.node.*;
 import org.eclipse.leshan.core.node.codec.CodecException;
 import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.core.request.CreateRequest;
@@ -190,8 +188,26 @@ public class ClientServlet extends HttpServlet {
                             : null;
 
                     // create & process request
-                    ReadCompositeRequest request = new ReadCompositeRequest(pathContentFormat, nodeContentFormat,
-                            paths);
+                    ReadCompositeRequest request;
+
+                    if (paths.get(0).equals("/")) {
+                        List<String> newpaths= new ArrayList<>();
+                        registration.getSupportedObject();
+                        for (Map.Entry<Integer, LwM2m.Version> object : registration.getSupportedObject().entrySet())
+                        {
+                            LwM2mPath newpath =new LwM2mPath(object.getKey());
+                            newpaths.add(newpath.toString());
+                        }
+
+                        request = new ReadCompositeRequest(pathContentFormat, nodeContentFormat,
+                                newpaths);
+                    }
+                    else {
+
+                         request = new ReadCompositeRequest(pathContentFormat, nodeContentFormat,
+                                paths);
+
+                    }
                     ReadCompositeResponse cResponse = server.send(registration, request, extractTimeout(req));
                     processDeviceResponse(req, resp, cResponse);
                 } else {
