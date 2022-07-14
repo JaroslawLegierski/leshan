@@ -73,27 +73,19 @@ public class RootEnabler implements LwM2mRootEnabler {
 
     @Override
     public ReadCompositeResponse read(ServerIdentity identity, ReadCompositeRequest request) {
-                List<LwM2mPath> paths = request.getPaths();
-
-
+        List<LwM2mPath> paths = request.getPaths();
 
         if (paths.size() == 1 && paths.get(0).isRoot()) {
             // read for "/" use case.
-            Map<Integer, LwM2mObjectEnabler> enablers=tree.getObjectEnablers();
-            Map<LwM2mPath, LwM2mNode> content = new HashMap<>();
             paths.clear();
-
-            for ( Map.Entry<Integer, LwM2mObjectEnabler> entry: enablers.entrySet()) {
-                Integer objectId = entry.getValue().getId();
-                if (objectId!=0)
-                {
-                    LwM2mPath newpath =new LwM2mPath(objectId);
-                    paths.add(newpath);
+            Map<Integer, LwM2mObjectEnabler> enablers = tree.getObjectEnablers();
+            for (Integer objectId : enablers.keySet()) {
+                if (objectId != 0) {
+                    paths.add(new LwM2mPath(objectId));
                 }
             }
 
         }
-
 
         // Read Nodes
         Map<LwM2mPath, LwM2mNode> content = new HashMap<>();
@@ -239,20 +231,17 @@ public class RootEnabler implements LwM2mRootEnabler {
             LwM2mNode node = null;
             if (objectEnabler != null) {
                 ReadResponse response = objectEnabler.observe(identity,
-                        new ObserveRequest(request.getResponseContentFormat(), path, request.getCoapRequest())
-                );
+                        new ObserveRequest(request.getResponseContentFormat(), path, request.getCoapRequest()));
                 if (response.isSuccess()) {
                     node = response.getContent();
                     isEmpty = false;
                 } else {
-                    LOG.debug("Server {} try to read node {} in a Observe-Composite Request {} but it failed for {} " +
-                            "{}", identity, path, paths, response.getCode(), response.getErrorMessage()
-                    );
+                    LOG.debug("Server {} try to read node {} in a Observe-Composite Request {} but it failed for {} "
+                            + "{}", identity, path, paths, response.getCode(), response.getErrorMessage());
                 }
             } else {
-                LOG.debug("Server {} try to read node {} in a Observe-Composite Request {} but it failed because " +
-                        "Object {} is not supported", identity, path, paths, objectId
-                );
+                LOG.debug("Server {} try to read node {} in a Observe-Composite Request {} but it failed because "
+                        + "Object {} is not supported", identity, path, paths, objectId);
             }
 
             content.put(path, node);
