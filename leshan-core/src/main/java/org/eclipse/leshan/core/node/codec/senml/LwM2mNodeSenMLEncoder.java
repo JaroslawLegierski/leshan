@@ -32,6 +32,7 @@ import org.eclipse.leshan.core.node.LwM2mObjectInstance;
 import org.eclipse.leshan.core.node.LwM2mPath;
 import org.eclipse.leshan.core.node.LwM2mResource;
 import org.eclipse.leshan.core.node.LwM2mResourceInstance;
+import org.eclipse.leshan.core.node.LwM2mRoot;
 import org.eclipse.leshan.core.node.ObjectLink;
 import org.eclipse.leshan.core.node.TimestampedLwM2mNode;
 import org.eclipse.leshan.core.node.TimestampedLwM2mNodes;
@@ -204,8 +205,26 @@ public class LwM2mNodeSenMLEncoder implements TimestampedNodeEncoder, MultiNodeE
         // visitor output
         private ArrayList<SenMLRecord> records = new ArrayList<>();
 
-        @Override
-        public void visit(LwM2mObject object) {
+        @Override public void visit(LwM2mRoot root) {
+            LOG.trace("Encoding Root into SenML");
+            // Validate request path
+            if (!requestPath.isRoot()) {
+                throw new CodecException("Invalid request path %s for root encoding", requestPath);
+            }
+
+            // Create SenML records
+            for (LwM2mObject object : root.getObjects().values()) {
+                for (LwM2mObjectInstance instance : object.getInstances().values()) {
+                    for (LwM2mResource resource : instance.getResources().values()) {
+                        String prefixPath = object.getId() + "/" + instance.getId() + "/" + resource.getId();
+                        this.objectId = object.getId();
+                        lwM2mResourceToSenMLRecord(prefixPath, resource);
+                    }
+                }
+            }
+        }
+
+        @Override public void visit(LwM2mObject object) {
             LOG.trace("Encoding Object {} into SenML", object);
             // Validate request path
             if (!requestPath.isObject()) {
@@ -298,7 +317,7 @@ public class LwM2mNodeSenMLEncoder implements TimestampedNodeEncoder, MultiNodeE
             String n = recordName == null ? "" : recordName;
 
             // Add slash if necessary
-            if (!n.isEmpty()) {
+            if (!n.isEmpty() && !bn.equals("/")) {
                 bn += "/";
             }
 

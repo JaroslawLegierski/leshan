@@ -28,6 +28,7 @@ public class LwM2mRoot implements LwM2mNode {
 
     @Override public void accept(LwM2mNodeVisitor visitor) {
         //TODO: visitors currently don't support a visit from LwM2mRoot
+        visitor.visit(this);
     }
 
     @Override public String toPrettyString(LwM2mPath path) {
@@ -37,6 +38,10 @@ public class LwM2mRoot implements LwM2mNode {
     @Override public StringBuilder appendPrettyNode(StringBuilder b, LwM2mPath path) {
         return null;
     }
-    
+
+    public Map<Integer, LwM2mObject> getObjects() {
+        return objects;
+    }
+
     //TODO: add compare and other stuff that a LwM2m node should have
 }

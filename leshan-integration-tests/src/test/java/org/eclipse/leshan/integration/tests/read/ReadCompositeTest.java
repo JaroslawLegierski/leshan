@@ -21,10 +21,15 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.leshan.core.model.ResourceModel.Type;
 import org.eclipse.leshan.core.node.LwM2mObject;
+import org.eclipse.leshan.core.node.LwM2mPath;
 import org.eclipse.leshan.core.node.LwM2mResourceInstance;
+import org.eclipse.leshan.core.node.LwM2mRoot;
 import org.eclipse.leshan.core.node.LwM2mSingleResource;
 import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.core.request.ReadCompositeRequest;
@@ -77,8 +82,18 @@ public class ReadCompositeTest {
 
     @Test
     public void can_read_root() throws InterruptedException {
+        //read root object
         ReadCompositeResponse response = helper.server.send(helper.getCurrentRegistration(),
                 new ReadCompositeRequest(requestContentFormat, responseContentFormat, "/"));
+
+        // verify result
+        assertEquals(CONTENT, response.getCode());
+        assertContentFormat(responseContentFormat, response);
+
+        LwM2mRoot root = (LwM2mRoot) response.getContent("/");
+        Set<Integer> objectIdsFromRootObject = root.getObjects().keySet();
+        Set<Integer> objectIdsFromObjectTree = new HashSet<>(Arrays.asList(1, 3, 3442));
+        assertEquals(objectIdsFromObjectTree, objectIdsFromRootObject);
     }
 
     @Test

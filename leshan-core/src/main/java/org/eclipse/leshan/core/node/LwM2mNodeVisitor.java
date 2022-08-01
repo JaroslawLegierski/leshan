@@ -28,4 +28,7 @@ public interface LwM2mNodeVisitor {
 
     void visit(LwM2mResourceInstance instance);
 
+    default void visit(LwM2mRoot root) {
+    }
+
 }
