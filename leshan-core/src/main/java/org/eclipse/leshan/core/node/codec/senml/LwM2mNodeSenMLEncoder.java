@@ -196,7 +196,7 @@ public class LwM2mNodeSenMLEncoder implements TimestampedNodeEncoder, MultiNodeE
 
     private class InternalEncoder implements LwM2mNodeVisitor {
         // visitor inputs
-        private int objectId;
+        private Integer objectId;
         private LwM2mModel model;
         private LwM2mPath requestPath;
         private LwM2mValueConverter converter;

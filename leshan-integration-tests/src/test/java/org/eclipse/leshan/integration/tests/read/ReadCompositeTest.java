@@ -76,6 +76,12 @@ public class ReadCompositeTest {
     }
 
     @Test
+    public void can_read_root() throws InterruptedException {
+        ReadCompositeResponse response = helper.server.send(helper.getCurrentRegistration(),
+                new ReadCompositeRequest(requestContentFormat, responseContentFormat, "/"));
+    }
+
+    @Test
     public void can_read_resources() throws InterruptedException {
         // read device model number
         ReadCompositeResponse response = helper.server.send(helper.getCurrentRegistration(),
