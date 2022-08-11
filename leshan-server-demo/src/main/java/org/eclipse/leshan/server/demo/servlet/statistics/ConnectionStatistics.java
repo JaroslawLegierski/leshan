@@ -47,7 +47,6 @@ public class ConnectionStatistics {
         messageData.put("duplicated", String.valueOf(message.isDuplicate()));
         messageData.put("token", message.getTokenString());
         messageData.put("timestamp", String.valueOf(message.getNanoTimestamp()));
-        messageData.put("payload", message.getPayloadString());
         putDataInCache(messageData);
     }
 
