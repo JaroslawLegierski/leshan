@@ -38,16 +38,16 @@ public class ConnectionStatistics {
 
     private void reportMessage(MessageType type, Message message) {
         Map<String, String> messageData = new LinkedHashMap<>();
-        messageData.put("TYPE", type.toString());
-        messageData.put("MID", String.valueOf(message.getMID()));
-        messageData.put("MSG", message.getType().toString());
-        messageData.put("REJECTED", String.valueOf(message.isRejected()));
-        messageData.put("ACKNOWLEDGED", String.valueOf(message.acknowledge()));
-        messageData.put("TIMEOUT", String.valueOf(message.isTimedOut()));
-        messageData.put("DUPLICATED", String.valueOf(message.isDuplicate()));
-        messageData.put("TOKEN", message.getTokenString());
-        messageData.put("TIMESTAMP", String.valueOf(message.getNanoTimestamp()));
-        messageData.put("PAYLOAD", message.getPayloadString());
+        messageData.put("type", type.toString());
+        messageData.put("mid", String.valueOf(message.getMID()));
+        messageData.put("msg", message.getType().toString());
+        messageData.put("rejected", String.valueOf(message.isRejected()));
+        messageData.put("acknowledged", String.valueOf(message.acknowledge()));
+        messageData.put("timeout", String.valueOf(message.isTimedOut()));
+        messageData.put("duplicated", String.valueOf(message.isDuplicate()));
+        messageData.put("token", message.getTokenString());
+        messageData.put("timestamp", String.valueOf(message.getNanoTimestamp()));
+        messageData.put("payload", message.getPayloadString());
         putDataInCache(messageData);
     }
 
