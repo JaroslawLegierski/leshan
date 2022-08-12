@@ -4,6 +4,7 @@ import org.eclipse.californium.core.coap.Message;
 import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.core.coap.Response;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class ConnectionStatistics {
@@ -38,6 +39,7 @@ public class ConnectionStatistics {
 
     private void reportMessage(MessageType type, Message message) {
         Map<String, String> messageData = new LinkedHashMap<>();
+        messageData.put("messageTime", LocalDateTime.now().toString());
         messageData.put("type", type.toString());
         messageData.put("mid", String.valueOf(message.getMID()));
         messageData.put("msg", message.getType().toString());
