@@ -64,7 +64,7 @@ public class CoapMessageTracer implements MessageInterceptor {
         if (listener != null) {
             listener.trace(new CoapMessage(request, false));
         }
-        connectionStatistics.reportSendRequest(request);
+        connectionStatistics.reportSendRequest(request, listener);
     }
 
     @Override
@@ -74,7 +74,7 @@ public class CoapMessageTracer implements MessageInterceptor {
         if (listener != null) {
             listener.trace(new CoapMessage(response, false));
         }
-        connectionStatistics.reportSendResponse(response);
+        connectionStatistics.reportSendResponse(response, listener);
     }
 
     @Override
@@ -91,7 +91,7 @@ public class CoapMessageTracer implements MessageInterceptor {
         if (listener != null) {
             listener.trace(new CoapMessage(request, true));
         }
-        connectionStatistics.reportReceiveRequest(request);
+        connectionStatistics.reportReceiveRequest(request, listener);
     }
 
     @Override
@@ -100,7 +100,7 @@ public class CoapMessageTracer implements MessageInterceptor {
         if (listener != null) {
             listener.trace(new CoapMessage(response, true));
         }
-        connectionStatistics.reportReceiveResponse(response);
+        connectionStatistics.reportReceiveResponse(response, listener);
     }
 
     @Override

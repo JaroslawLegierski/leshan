@@ -339,6 +339,11 @@ public class EventServlet extends EventSourceServlet {
             }
         }
 
+        @Override
+        public String getEndpoint() {
+            return endpoint;
+        }
+
     }
 
     private void cleanCoapListener(String endpoint) {
