@@ -86,8 +86,11 @@ public class ConnectionStatistics {
                 tokenEndpointMap.put(message.getTokenString(), new EndpointData(endpoint, System.currentTimeMillis()));
             } else {
                 //In case of response we retrieve endpoint name from cache and delete the cached record
-                messageData.put("endpoint", tokenEndpointMap.get(message.getTokenString()).endpoint);
-                tokenEndpointMap.remove(message.getTokenString());
+                EndpointData endpointData = tokenEndpointMap.get(message.getTokenString());
+                if(endpointData != null) {
+                    messageData.put("endpoint", endpointData.endpoint);
+                    tokenEndpointMap.remove(message.getTokenString());
+                }
             }
         }
 
