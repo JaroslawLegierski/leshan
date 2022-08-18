@@ -291,7 +291,8 @@ public class EventServlet extends EventSourceServlet {
         server.getSendService().addListener(this.sendListener);
 
         // add an interceptor to each endpoint to trace all CoAP messages
-        connectionStatistics = new ConnectionStatistics(new StatisticsDataSender(), 5000);
+        connectionStatistics = new ConnectionStatistics(new StatisticsDataSender(), 5000,
+                server.getRegistrationService());
         coapMessageTracer = new CoapMessageTracer(server.getRegistrationService(), connectionStatistics);
         for (Endpoint endpoint : server.coap().getServer().getEndpoints()) {
             endpoint.addInterceptor(coapMessageTracer);
@@ -337,11 +338,6 @@ public class EventServlet extends EventSourceServlet {
                 Log.warn(String.format("Error while processing json [%s] : [%s]", message.toString(), e.getMessage()));
                 sendEvent(EVENT_COAP_LOG, message.toString(), endpoint);
             }
-        }
-
-        @Override
-        public String getEndpoint() {
-            return endpoint;
         }
 
     }

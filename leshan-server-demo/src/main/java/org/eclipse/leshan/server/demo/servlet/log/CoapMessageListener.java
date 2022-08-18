@@ -19,6 +19,4 @@ public interface CoapMessageListener {
 
     void trace(CoapMessage message);
 
-    String getEndpoint();
-
 }

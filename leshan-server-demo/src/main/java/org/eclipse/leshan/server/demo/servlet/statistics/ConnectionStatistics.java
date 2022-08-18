@@ -1,10 +1,14 @@
 package org.eclipse.leshan.server.demo.servlet.statistics;
 
+import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.core.coap.Message;
 import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.core.coap.Response;
-import org.eclipse.leshan.server.demo.servlet.log.CoapMessageListener;
+import org.eclipse.leshan.server.registration.Registration;
+import org.eclipse.leshan.server.registration.RegistrationService;
+import org.eclipse.leshan.server.registration.RegistrationServiceImpl;
 
+import java.net.InetSocketAddress;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -23,10 +27,12 @@ public class ConnectionStatistics {
 
     private final Map<String, EndpointData> tokenEndpointMap = new ConcurrentHashMap<>();
     private final List<Map<String, String>> cachedStatistics = new ArrayList<>();
+    private final RegistrationServiceImpl registrationService;
     private final StatisticsDataProxy statisticsDataProxy;
     private final Timer periodicFlushTimer;
 
-    public ConnectionStatistics(StatisticsDataProxy statisticsDataProxy, long periodBetweenFlushMs) {
+    public ConnectionStatistics(StatisticsDataProxy statisticsDataProxy, long periodBetweenFlushMs,
+            RegistrationService registry) {
         this.statisticsDataProxy = statisticsDataProxy;
 
         periodicFlushTimer = new Timer();
@@ -36,6 +42,12 @@ public class ConnectionStatistics {
                 clearOldTokenEndpointMapRecords();
             }
         }, periodBetweenFlushMs, periodBetweenFlushMs);
+
+        if (registry instanceof RegistrationServiceImpl) {
+            this.registrationService = (RegistrationServiceImpl) registry;
+        } else {
+            this.registrationService = null;
+        }
     }
 
     private synchronized void putDataInCache(Map<String, String> messageData) {
@@ -60,7 +72,7 @@ public class ConnectionStatistics {
         tokens.forEach(tokenEndpointMap::remove);
     }
 
-    private void reportMessage(MessageType type, Message message, CoapMessageListener coapMessageListener) {
+    private void reportMessage(MessageType type, Message message, InetSocketAddress peerAddress) {
         Map<String, String> messageData = new LinkedHashMap<>();
         messageData.put("messageTime", LocalDateTime.now(ZoneOffset.UTC).toString());
         messageData.put("type", type.toString());
@@ -73,44 +85,55 @@ public class ConnectionStatistics {
         messageData.put("token", message.getTokenString());
         messageData.put("timestamp", String.valueOf(message.getNanoTimestamp()));
 
-        if (coapMessageListener != null) {
-            messageData.put("endpoint", coapMessageListener.getEndpoint());
+        if (registrationService != null
+                && registrationService.getStore().getRegistrationByAdress(peerAddress) != null) {
+            //This is the case for most messages
+            Registration registration = registrationService.getStore().getRegistrationByAdress(peerAddress);
+            messageData.put("endpoint", registration.getEndpoint());
+
+            if (message instanceof Request && ((Request) message).getCode().equals(CoAP.Code.DELETE)) {
+                //In this case we know it's de-registration request
+                tokenEndpointMap.put(message.getTokenString(),
+                        new EndpointData(registration.getEndpoint(), System.currentTimeMillis()));
+            }
         } else {
-            //In this case we know it's registration request/response.
+            //In this case we know it's registration request or de-registration response.
             Optional<String> endpointOptional = message.getOptions().getUriQuery().stream()
                     .filter(item -> item.startsWith("ep=")).findFirst();
             if (endpointOptional.isPresent()) {
-                //Only requests carry endpoint name, so we cache it and wait for response report
+                //This is registration request, it carries endpoint name inside its URI query
                 String endpoint = endpointOptional.get().substring(3);
                 messageData.put("endpoint", endpoint);
-                tokenEndpointMap.put(message.getTokenString(), new EndpointData(endpoint, System.currentTimeMillis()));
             } else {
-                //In case of response we retrieve endpoint name from cache and delete the cached record
+                //This is de-registration response, it doesn't contain any information about the endpoint,
+                //so we have to retrieve it from cache using its token
                 EndpointData endpointData = tokenEndpointMap.get(message.getTokenString());
-                if(endpointData != null) {
+                if (endpointData != null) {
                     messageData.put("endpoint", endpointData.endpoint);
                     tokenEndpointMap.remove(message.getTokenString());
                 }
             }
         }
 
+        System.out.println("###: " + tokenEndpointMap.size());
+
         putDataInCache(messageData);
     }
 
-    public void reportSendRequest(Request request, CoapMessageListener coapMessageListener) {
-        reportMessage(MessageType.SEND_REQUEST, request, coapMessageListener);
+    public void reportSendRequest(Request request, InetSocketAddress peerAddress) {
+        reportMessage(MessageType.SEND_REQUEST, request, peerAddress);
     }
 
-    public void reportSendResponse(Response response, CoapMessageListener coapMessageListener) {
-        reportMessage(MessageType.SEND_RESPONSE, response, coapMessageListener);
+    public void reportSendResponse(Response response, InetSocketAddress peerAddress) {
+        reportMessage(MessageType.SEND_RESPONSE, response, peerAddress);
     }
 
-    public void reportReceiveRequest(Request request, CoapMessageListener coapMessageListener) {
-        reportMessage(MessageType.RECEIVE_REQUEST, request, coapMessageListener);
+    public void reportReceiveRequest(Request request, InetSocketAddress peerAddress) {
+        reportMessage(MessageType.RECEIVE_REQUEST, request, peerAddress);
     }
 
-    public void reportReceiveResponse(Response response, CoapMessageListener coapMessageListener) {
-        reportMessage(MessageType.RECEIVE_RESPONSE, response, coapMessageListener);
+    public void reportReceiveResponse(Response response, InetSocketAddress peerAddress) {
+        reportMessage(MessageType.RECEIVE_RESPONSE, response, peerAddress);
     }
 
     private static class EndpointData {

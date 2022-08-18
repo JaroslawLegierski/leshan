@@ -26,6 +26,7 @@ import org.eclipse.californium.core.network.interceptors.MessageInterceptor;
 import org.eclipse.leshan.server.demo.servlet.statistics.ConnectionStatistics;
 import org.eclipse.leshan.server.registration.Registration;
 import org.eclipse.leshan.server.registration.RegistrationService;
+import org.eclipse.leshan.server.registration.RegistrationServiceImpl;
 
 public class CoapMessageTracer implements MessageInterceptor {
 
@@ -64,7 +65,7 @@ public class CoapMessageTracer implements MessageInterceptor {
         if (listener != null) {
             listener.trace(new CoapMessage(request, false));
         }
-        connectionStatistics.reportSendRequest(request, listener);
+        connectionStatistics.reportSendRequest(request, request.getDestinationContext().getPeerAddress());
     }
 
     @Override
@@ -74,7 +75,7 @@ public class CoapMessageTracer implements MessageInterceptor {
         if (listener != null) {
             listener.trace(new CoapMessage(response, false));
         }
-        connectionStatistics.reportSendResponse(response, listener);
+        connectionStatistics.reportSendResponse(response, response.getDestinationContext().getPeerAddress());
     }
 
     @Override
@@ -91,7 +92,7 @@ public class CoapMessageTracer implements MessageInterceptor {
         if (listener != null) {
             listener.trace(new CoapMessage(request, true));
         }
-        connectionStatistics.reportReceiveRequest(request, listener);
+        connectionStatistics.reportReceiveRequest(request, request.getSourceContext().getPeerAddress());
     }
 
     @Override
@@ -100,7 +101,7 @@ public class CoapMessageTracer implements MessageInterceptor {
         if (listener != null) {
             listener.trace(new CoapMessage(response, true));
         }
-        connectionStatistics.reportReceiveResponse(response, listener);
+        connectionStatistics.reportReceiveResponse(response, response.getSourceContext().getPeerAddress());
     }
 
     @Override
