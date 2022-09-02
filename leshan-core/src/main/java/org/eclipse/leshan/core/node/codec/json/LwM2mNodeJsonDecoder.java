@@ -110,14 +110,14 @@ public class LwM2mNodeJsonDecoder implements TimestampedNodeDecoder {
         LOG.trace("Parsing JSON content for path {}: {}", requestPath, jsonObject);
 
         // Group JSON entry by time-stamp
-        Map<Long, Collection<JsonArrayEntry>> jsonEntryByTimestamp = groupJsonEntryByTimestamp(jsonObject);
+        Map<Float, Collection<JsonArrayEntry>> jsonEntryByTimestamp = groupJsonEntryByTimestamp(jsonObject);
 
         // Extract baseName
         String baseName = jsonObject.getBaseName() == null ? "" : jsonObject.getBaseName();
 
         // fill time-stamped nodes collection
         List<TimestampedLwM2mNode> timestampedNodes = new ArrayList<>();
-        for (Entry<Long, Collection<JsonArrayEntry>> entryByTimestamp : jsonEntryByTimestamp.entrySet()) {
+        for (Entry<Float, Collection<JsonArrayEntry>> entryByTimestamp : jsonEntryByTimestamp.entrySet()) {
 
             // Group JSON entry by instance
             Map<Integer, Collection<JsonArrayEntry>> jsonEntryByInstanceId = groupJsonEntryByInstanceId(
@@ -194,7 +194,7 @@ public class LwM2mNodeJsonDecoder implements TimestampedNodeDecoder {
             }
 
             // compute time-stamp
-            Long timestamp = computeTimestamp(jsonObject.getBaseTime(), entryByTimestamp.getKey());
+            Float timestamp = computeTimestamp(jsonObject.getBaseTime(), entryByTimestamp.getKey());
 
             // add time-stamped node
             timestampedNodes.add(new TimestampedLwM2mNode(timestamp, node));
@@ -204,8 +204,8 @@ public class LwM2mNodeJsonDecoder implements TimestampedNodeDecoder {
 
     }
 
-    private Long computeTimestamp(Long baseTime, Long time) {
-        Long timestamp;
+    private Float computeTimestamp(Float baseTime, Float time) {
+        Float timestamp;
         if (baseTime != null) {
             if (time != null) {
                 timestamp = baseTime + time;
@@ -227,20 +227,20 @@ public class LwM2mNodeJsonDecoder implements TimestampedNodeDecoder {
      *
      * @return a map (relativeTimestamp => collection of JsonArrayEntry)
      */
-    private SortedMap<Long, Collection<JsonArrayEntry>> groupJsonEntryByTimestamp(JsonRootObject jsonObject) {
-        SortedMap<Long, Collection<JsonArrayEntry>> result = new TreeMap<>(new Comparator<Long>() {
+    private SortedMap<Float, Collection<JsonArrayEntry>> groupJsonEntryByTimestamp(JsonRootObject jsonObject) {
+        SortedMap<Float, Collection<JsonArrayEntry>> result = new TreeMap<>(new Comparator<Float>() {
             @Override
-            public int compare(Long o1, Long o2) {
+            public int compare(Float o1, Float o2) {
                 // comparator which
                 // - supports null (time null means 0 if there is a base time)
                 // - reverses natural order (most recent value in first)
-                return Long.compare(o2 == null ? 0 : o2, o1 == null ? 0 : o1);
+                return Float.compare(o2 == null ? 0 : o2, o1 == null ? 0 : o1);
             }
         });
 
         for (JsonArrayEntry e : jsonObject.getResourceList()) {
             // Get time for this entry
-            Long time = e.getTime();
+            Float time = e.getTime();
 
             // Get jsonArray for this time-stamp
             Collection<JsonArrayEntry> jsonArray = result.get(time);
@@ -255,7 +255,7 @@ public class LwM2mNodeJsonDecoder implements TimestampedNodeDecoder {
 
         // Ensure there is at least one entry for null timestamp
         if (result.isEmpty()) {
-            result.put((Long) null, new ArrayList<JsonArrayEntry>());
+            result.put((Float) null, new ArrayList<JsonArrayEntry>());
         }
 
         return result;

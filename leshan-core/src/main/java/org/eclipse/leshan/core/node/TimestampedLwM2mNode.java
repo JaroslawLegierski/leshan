@@ -19,17 +19,17 @@ import org.eclipse.leshan.core.util.Validate;
 
 public class TimestampedLwM2mNode {
 
-    private final Long timestamp;
+    private final Float timestamp;
 
     private final LwM2mNode node;
 
-    public TimestampedLwM2mNode(Long timestamp, LwM2mNode node) {
+    public TimestampedLwM2mNode(Float timestamp, LwM2mNode node) {
         Validate.notNull(node);
         this.timestamp = timestamp;
         this.node = node;
     }
 
-    public Long getTimestamp() {
+    public Float getTimestamp() {
         return timestamp;
     }
 

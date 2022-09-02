@@ -219,9 +219,9 @@ public class LwM2mNodeEncoderTest {
     @Test
     public void json_encode_timestamped_resources() throws CodecException {
         List<TimestampedLwM2mNode> data = new ArrayList<>();
-        data.add(new TimestampedLwM2mNode(500L, LwM2mSingleResource.newFloatResource(1, 22.9)));
-        data.add(new TimestampedLwM2mNode(510L, LwM2mSingleResource.newFloatResource(1, 22.4)));
-        data.add(new TimestampedLwM2mNode(520L, LwM2mSingleResource.newFloatResource(1, 24.1)));
+        data.add(new TimestampedLwM2mNode(500f, LwM2mSingleResource.newFloatResource(1, 22.9)));
+        data.add(new TimestampedLwM2mNode(510f, LwM2mSingleResource.newFloatResource(1, 22.4)));
+        data.add(new TimestampedLwM2mNode(520f, LwM2mSingleResource.newFloatResource(1, 24.1)));
 
         byte[] encoded = encoder.encodeTimestampedData(data, ContentFormat.JSON, new LwM2mPath(1024, 0, 1), model);
 
@@ -238,9 +238,9 @@ public class LwM2mNodeEncoderTest {
     @Test
     public void json_timestamped_resource_instances() throws CodecException {
         List<TimestampedLwM2mNode> data = new ArrayList<>();
-        data.add(new TimestampedLwM2mNode(500L, LwM2mResourceInstance.newFloatInstance(0, 22.9)));
-        data.add(new TimestampedLwM2mNode(510L, LwM2mResourceInstance.newFloatInstance(0, 22.4)));
-        data.add(new TimestampedLwM2mNode(520L, LwM2mResourceInstance.newFloatInstance(0, 24.1)));
+        data.add(new TimestampedLwM2mNode(500f, LwM2mResourceInstance.newFloatInstance(0, 22.9)));
+        data.add(new TimestampedLwM2mNode(510f, LwM2mResourceInstance.newFloatInstance(0, 22.4)));
+        data.add(new TimestampedLwM2mNode(520f, LwM2mResourceInstance.newFloatInstance(0, 24.1)));
 
         byte[] encoded = encoder.encodeTimestampedData(data, ContentFormat.JSON, new LwM2mPath(1024, 0, 1, 0), model);
 
@@ -263,9 +263,9 @@ public class LwM2mNodeEncoderTest {
                 LwM2mSingleResource.newStringResource(0, "a string"));
         LwM2mObjectInstance instanceAt130 = new LwM2mObjectInstance(0, LwM2mSingleResource.newFloatResource(1, 24.1));
 
-        data.add(new TimestampedLwM2mNode(110L, instanceAt110));
-        data.add(new TimestampedLwM2mNode(120L, instanceAt120));
-        data.add(new TimestampedLwM2mNode(130L, instanceAt130));
+        data.add(new TimestampedLwM2mNode(110f, instanceAt110));
+        data.add(new TimestampedLwM2mNode(120f, instanceAt120));
+        data.add(new TimestampedLwM2mNode(130f, instanceAt130));
 
         byte[] encoded = encoder.encodeTimestampedData(data, ContentFormat.JSON, new LwM2mPath(1024, 0), model);
 
@@ -295,9 +295,9 @@ public class LwM2mNodeEncoderTest {
         LwM2mObject objetAt230 = new LwM2mObject(1204,
                 new LwM2mObjectInstance(0, LwM2mSingleResource.newFloatResource(1, 24.1)));
 
-        data.add(new TimestampedLwM2mNode(210L, objectAt210));
-        data.add(new TimestampedLwM2mNode(220L, objectAt220));
-        data.add(new TimestampedLwM2mNode(230L, objetAt230));
+        data.add(new TimestampedLwM2mNode(210f, objectAt210));
+        data.add(new TimestampedLwM2mNode(220f, objectAt220));
+        data.add(new TimestampedLwM2mNode(230f, objetAt230));
 
         byte[] encoded = encoder.encodeTimestampedData(data, ContentFormat.JSON, new LwM2mPath(1024), model);
 
@@ -364,9 +364,9 @@ public class LwM2mNodeEncoderTest {
     @Test
     public void senml_encode_timestamped_resources() throws CodecException {
         List<TimestampedLwM2mNode> data = new ArrayList<>();
-        data.add(new TimestampedLwM2mNode(268_500_000L, LwM2mSingleResource.newFloatResource(1, 22.9)));
-        data.add(new TimestampedLwM2mNode(268_500_010L, LwM2mSingleResource.newFloatResource(1, 22.4)));
-        data.add(new TimestampedLwM2mNode(268_500_020L, LwM2mSingleResource.newFloatResource(1, 24.1)));
+        data.add(new TimestampedLwM2mNode(268_500_000f, LwM2mSingleResource.newFloatResource(1, 22.9)));
+        data.add(new TimestampedLwM2mNode(268_500_010f, LwM2mSingleResource.newFloatResource(1, 22.4)));
+        data.add(new TimestampedLwM2mNode(268_500_020f, LwM2mSingleResource.newFloatResource(1, 24.1)));
 
         byte[] encoded = encoder.encodeTimestampedData(data, ContentFormat.SENML_JSON, new LwM2mPath(1024, 0, 1),
                 model);
@@ -383,8 +383,8 @@ public class LwM2mNodeEncoderTest {
     @Test
     public void senml_json_encode_timestamped_nodes() throws CodecException {
         TimestampedLwM2mNodes timestampedLwM2mNodes = TimestampedLwM2mNodes.builder()
-                .put(500_000_001L, new LwM2mPath(0, 0, 0), LwM2mSingleResource.newStringResource(0, "TestString"))
-                .put(500_000_002L, new LwM2mPath(0, 1),
+                .put(500_000_001f, new LwM2mPath(0, 0, 0), LwM2mSingleResource.newStringResource(0, "TestString"))
+                .put(500_000_002f, new LwM2mPath(0, 1),
                         new LwM2mObjectInstance(1, Arrays.asList(LwM2mSingleResource.newBooleanResource(1, true),
                                 LwM2mSingleResource.newIntegerResource(2, 123))))
                 .build();
@@ -403,9 +403,9 @@ public class LwM2mNodeEncoderTest {
     @Test
     public void senml_cbor_encode_timestamped_nodes() throws CodecException {
         TimestampedLwM2mNodes timestampedLwM2mNodes = TimestampedLwM2mNodes.builder()
-                .put(500_000_004L, new LwM2mPath(0, 0, 0), LwM2mSingleResource.newStringResource(0, "SampleString"))
-                .put(500_000_005L, new LwM2mPath(0, 0, 1), LwM2mSingleResource.newBooleanResource(1, false))
-                .put(500_000_006L, new LwM2mPath(0, 0, 2), LwM2mSingleResource.newIntegerResource(2, 456)).build();
+                .put(500_000_004f, new LwM2mPath(0, 0, 0), LwM2mSingleResource.newStringResource(0, "SampleString"))
+                .put(500_000_005f, new LwM2mPath(0, 0, 1), LwM2mSingleResource.newBooleanResource(1, false))
+                .put(500_000_006f, new LwM2mPath(0, 0, 2), LwM2mSingleResource.newIntegerResource(2, 456)).build();
 
         byte[] encoded = encoder.encodeTimestampedNodes(timestampedLwM2mNodes, ContentFormat.SENML_CBOR, model);
 

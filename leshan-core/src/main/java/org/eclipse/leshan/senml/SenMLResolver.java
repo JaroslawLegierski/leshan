@@ -26,7 +26,7 @@ public abstract class SenMLResolver<T extends ResolvedSenMLRecord> {
 
     private long currentTimestamp = System.currentTimeMillis();
     private String currentBasename = null;
-    private Long currentBasetime = null;
+    private Float currentBasetime = null;
 
     public T resolve(SenMLRecord record) throws SenMLException {
         // Resolve SenML name (see https://tools.ietf.org/html/rfc8428#section-4.5.1)
@@ -40,11 +40,11 @@ public abstract class SenMLResolver<T extends ResolvedSenMLRecord> {
         }
 
         // Resolve SenML time (https://tools.ietf.org/html/rfc8428#section-4.5.3)
-        Long resolvedTimestamp = null;
+        Float resolvedTimestamp = null;
         if (record.getBaseTime() != null)
             currentBasetime = record.getBaseTime();
         if (currentBasetime != null || record.getTime() != null) {
-            Long basetime = currentBasetime != null ? currentBasetime : 0l;
+            Float basetime = currentBasetime != null ? currentBasetime : 0l;
             resolvedTimestamp = record.getTime() != null ? basetime + record.getTime() : basetime;
 
             // Values less than 268,435,456 (2**28) represent time relative to the current time.
@@ -61,6 +61,6 @@ public abstract class SenMLResolver<T extends ResolvedSenMLRecord> {
         return createResolvedRecord(record, resolvedName, resolvedTimestamp);
     }
 
-    protected abstract T createResolvedRecord(SenMLRecord record, String resolvedName, Long resolvedTimestamp)
+    protected abstract T createResolvedRecord(SenMLRecord record, String resolvedName, Float resolvedTimestamp)
             throws SenMLException;
 }

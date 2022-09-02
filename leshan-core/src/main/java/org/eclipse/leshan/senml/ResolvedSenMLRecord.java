@@ -22,9 +22,9 @@ package org.eclipse.leshan.senml;
 public class ResolvedSenMLRecord {
     private SenMLRecord record;
     private String name;
-    private Long timestamp;
+    private Float timestamp;
 
-    public ResolvedSenMLRecord(SenMLRecord unresolvedRecord, String resolvedName, Long resolvedTimestamp) {
+    public ResolvedSenMLRecord(SenMLRecord unresolvedRecord, String resolvedName, Float resolvedTimestamp) {
         super();
         this.record = unresolvedRecord;
         this.name = resolvedName;
@@ -50,7 +50,7 @@ public class ResolvedSenMLRecord {
      * @return the resolved timestamp (see
      *         <a href="https://tools.ietf.org/html/rfc8428#section-4.5.3">rfc8428#section-4.5.3</a>)
      */
-    public Long getTimeStamp() {
+    public Float getTimeStamp() {
         return timestamp;
     }
 }

@@ -32,7 +32,7 @@ public class JsonArrayEntry {
 
     private String stringValue;
 
-    private Long time;
+    private Float time;
 
     public ResourceModel.Type getType() {
         if (booleanValue != null) {
@@ -58,11 +58,11 @@ public class JsonArrayEntry {
         this.name = name;
     }
 
-    public Long getTime() {
+    public Float getTime() {
         return time;
     }
 
-    public void setTime(Long time) {
+    public void setTime(Float time) {
         this.time = time;
     }
 

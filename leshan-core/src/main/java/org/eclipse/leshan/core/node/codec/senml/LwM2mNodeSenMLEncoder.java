@@ -164,7 +164,7 @@ public class LwM2mNodeSenMLEncoder implements TimestampedNodeEncoder, MultiNodeE
         Validate.notEmpty(timestampedNodes.getTimestamps());
 
         SenMLPack pack = new SenMLPack();
-        for (Long timestamp : timestampedNodes.getTimestamps()) {
+        for (Float timestamp : timestampedNodes.getTimestamps()) {
             Map<LwM2mPath, LwM2mNode> nodesAtTimestamp = timestampedNodes.getNodesAt(timestamp);
             for (Entry<LwM2mPath, LwM2mNode> entry : nodesAtTimestamp.entrySet()) {
                 LwM2mPath path = entry.getKey();

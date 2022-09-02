@@ -95,7 +95,7 @@ public class JsonArrayEntrySerDes extends JacksonJsonSerDes<JsonArrayEntry> {
 
         JsonNode t = o.get("t");
         if (t != null && t.isNumber())
-            jae.setTime(t.asLong());
+            jae.setTime(t.floatValue());
 
         JsonNode v = o.get("v");
         if (v != null && v.isNumber())

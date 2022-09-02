@@ -1330,10 +1330,10 @@ public class LwM2mNodeDecoderTest {
 
         // then
         TimestampedLwM2mNodes.Builder expectedResult = new TimestampedLwM2mNodes.Builder()
-                .put(268600000L, new LwM2mPath("/3/0/7/0"), LwM2mResourceInstance.newIntegerInstance(0, 3800))
-                .put(268600001L, new LwM2mPath("/4/0/0"), LwM2mSingleResource.newIntegerResource(0, 1))
-                .put(268600002L, new LwM2mPath("/4/0/1"), LwM2mSingleResource.newIntegerResource(1, 2))
-                .put(268600003L, new LwM2mPath("/4/0/1"), LwM2mSingleResource.newIntegerResource(1, 3));
+                .put(268600000f, new LwM2mPath("/3/0/7/0"), LwM2mResourceInstance.newIntegerInstance(0, 3800))
+                .put(268600001f, new LwM2mPath("/4/0/0"), LwM2mSingleResource.newIntegerResource(0, 1))
+                .put(268600002f, new LwM2mPath("/4/0/1"), LwM2mSingleResource.newIntegerResource(1, 2))
+                .put(268600003f, new LwM2mPath("/4/0/1"), LwM2mSingleResource.newIntegerResource(1, 3));
 
         assertEquals(expectedResult.build(), data);
     }

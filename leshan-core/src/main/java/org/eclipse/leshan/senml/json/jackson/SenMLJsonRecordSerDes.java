@@ -134,7 +134,7 @@ public class SenMLJsonRecordSerDes extends JacksonJsonSerDes<SenMLRecord> {
 
         JsonNode bt = o.get("bt");
         if (bt != null && bt.isNumber())
-            record.setBaseTime(bt.asLong());
+            record.setBaseTime(bt.floatValue());
 
         JsonNode n = o.get("n");
         if (n != null && n.isTextual())
@@ -142,7 +142,7 @@ public class SenMLJsonRecordSerDes extends JacksonJsonSerDes<SenMLRecord> {
 
         JsonNode t = o.get("t");
         if (t != null && t.isNumber())
-            record.setTime(t.asLong());
+            record.setTime(t.floatValue());
 
         JsonNode v = o.get("v");
         boolean hasValue = false;

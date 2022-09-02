@@ -30,10 +30,10 @@ public class SenMLRecord {
     }
 
     private String baseName = null;
-    private Long baseTime;
+    private Float baseTime;
 
     private String name;
-    private Long time;
+    private Float time;
 
     private Number numberValue;
     private Boolean booleanValue;
@@ -60,11 +60,11 @@ public class SenMLRecord {
         return null;
     }
 
-    public void setTime(Long time) {
+    public void setTime(Float time) {
         this.time = time;
     }
 
-    public Long getTime() {
+    public Float getTime() {
         return time;
     }
 
@@ -124,11 +124,11 @@ public class SenMLRecord {
         this.baseName = baseName;
     }
 
-    public Long getBaseTime() {
+    public Float getBaseTime() {
         return baseTime;
     }
 
-    public void setBaseTime(Long baseTime) {
+    public void setBaseTime(Float baseTime) {
         this.baseTime = baseTime;
     }
 
