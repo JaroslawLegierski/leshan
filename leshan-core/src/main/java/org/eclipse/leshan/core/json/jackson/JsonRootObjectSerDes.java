@@ -64,7 +64,7 @@ public class JsonRootObjectSerDes extends JacksonJsonSerDes<JsonRootObject> {
 
         JsonNode bt = jsonNode.get("bt");
         if (bt != null && bt.isNumber())
-            jro.setBaseTime(bt.floatValue());
+            jro.setBaseTime(bt.doubleValue());
 
         return jro;
     }

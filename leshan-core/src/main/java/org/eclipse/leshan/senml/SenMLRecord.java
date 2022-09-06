@@ -30,10 +30,10 @@ public class SenMLRecord {
     }
 
     private String baseName = null;
-    private Float baseTime;
+    private Double baseTime;
 
     private String name;
-    private Float time;
+    private Double time;
 
     private Number numberValue;
     private Boolean booleanValue;
@@ -60,11 +60,11 @@ public class SenMLRecord {
         return null;
     }
 
-    public void setTime(Float time) {
+    public void setTime(Double time) {
         this.time = time;
     }
 
-    public Float getTime() {
+    public Double getTime() {
         return time;
     }
 
@@ -124,11 +124,11 @@ public class SenMLRecord {
         this.baseName = baseName;
     }
 
-    public Float getBaseTime() {
+    public Double getBaseTime() {
         return baseTime;
     }
 
-    public void setBaseTime(Float baseTime) {
+    public void setBaseTime(Double baseTime) {
         this.baseTime = baseTime;
     }
 
@@ -235,7 +235,7 @@ public class SenMLRecord {
     @Override
     public String toString() {
         return String.format(
-                "SenMLRecord [baseName=%s, baseTime=%d, name=%s, time=%d, numberValue=%s, booleanValue=%s, objectLinkValue=%s, stringValue=%s, opaque=%s]",
+                "SenMLRecord [baseName=%s, baseTime=%f, name=%s, time=%f, numberValue=%s, booleanValue=%s, objectLinkValue=%s, stringValue=%s, opaque=%s]",
                 baseName, baseTime, name, time, numberValue, booleanValue, objectLinkValue, stringValue,
                 opaqueValue != null ? Hex.encodeHexString(opaqueValue) : "null");
     }

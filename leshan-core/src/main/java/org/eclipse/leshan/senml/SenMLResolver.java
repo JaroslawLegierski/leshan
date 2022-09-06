@@ -15,8 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.senml;
 
-import java.util.concurrent.TimeUnit;
-
 /**
  * Utility class used to resolve SenML record.
  *
@@ -26,7 +24,7 @@ public abstract class SenMLResolver<T extends ResolvedSenMLRecord> {
 
     private long currentTimestamp = System.currentTimeMillis();
     private String currentBasename = null;
-    private Float currentBasetime = null;
+    private Double currentBasetime = null;
 
     public T resolve(SenMLRecord record) throws SenMLException {
         // Resolve SenML name (see https://tools.ietf.org/html/rfc8428#section-4.5.1)
@@ -40,18 +38,18 @@ public abstract class SenMLResolver<T extends ResolvedSenMLRecord> {
         }
 
         // Resolve SenML time (https://tools.ietf.org/html/rfc8428#section-4.5.3)
-        Float resolvedTimestamp = null;
+        Double resolvedTimestamp = null;
         if (record.getBaseTime() != null)
             currentBasetime = record.getBaseTime();
         if (currentBasetime != null || record.getTime() != null) {
-            Float basetime = currentBasetime != null ? currentBasetime : 0l;
+            Double basetime = currentBasetime != null ? currentBasetime : 0l;
             resolvedTimestamp = record.getTime() != null ? basetime + record.getTime() : basetime;
 
             // Values less than 268,435,456 (2**28) represent time relative to the current time.
             // A negative value indicates seconds in the past from roughly "now".
             // Positive values up to 2**28 indicate seconds in the future from "now".
             if (resolvedTimestamp < 268_435_456) {
-                resolvedTimestamp = TimeUnit.MILLISECONDS.toSeconds(currentTimestamp) + resolvedTimestamp;
+                resolvedTimestamp = currentTimestamp / 1e3d + resolvedTimestamp;
             }
             // else
             // Values greater than or equal to 2**28 represent an absolute time relative to the Unix epoch
@@ -61,6 +59,6 @@ public abstract class SenMLResolver<T extends ResolvedSenMLRecord> {
         return createResolvedRecord(record, resolvedName, resolvedTimestamp);
     }
 
-    protected abstract T createResolvedRecord(SenMLRecord record, String resolvedName, Float resolvedTimestamp)
+    protected abstract T createResolvedRecord(SenMLRecord record, String resolvedName, Double resolvedTimestamp)
             throws SenMLException;
 }

@@ -44,7 +44,7 @@ public class ManualDataSender implements DataSender {
     }
 
     public synchronized void collectData(List<LwM2mPath> paths) {
-        long currentTimestamp = System.currentTimeMillis();
+        double currentTimestamp = System.currentTimeMillis() / 1e3d;
         Map<LwM2mPath, LwM2mNode> currentValues = dataSenderManager.getCurrentValues(ServerIdentity.SYSTEM, paths);
         synchronized (this) {
             builder.addNodes(currentTimestamp, currentValues);

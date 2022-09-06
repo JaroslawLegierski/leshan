@@ -66,7 +66,7 @@ public class SenMLCborPackSerDes {
 
                 CBORObject bt = o.get(-3);
                 if (bt != null && bt.isNumber())
-                    record.setBaseTime(bt.AsNumber().ToERational().ToSingle());
+                    record.setBaseTime(bt.AsNumber().ToERational().ToDouble());
 
                 CBORObject n = o.get(0);
                 if (n != null && n.getType() == CBORType.TextString)
@@ -74,7 +74,7 @@ public class SenMLCborPackSerDes {
 
                 CBORObject t = o.get(6);
                 if (t != null && t.isNumber())
-                    record.setTime(t.AsNumber().ToERational().ToSingle());
+                    record.setTime(t.AsNumber().ToERational().ToDouble());
 
                 CBORObject v = o.get(2);
                 boolean hasValue = false;

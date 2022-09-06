@@ -29,7 +29,7 @@ public class JsonRootObject {
 
     private List<JsonArrayEntry> jsonArray;
 
-    private Float baseTime;
+    private Double baseTime;
 
     public JsonRootObject() {
     }
@@ -42,11 +42,11 @@ public class JsonRootObject {
         this.baseName = baseName;
     }
 
-    public Float getBaseTime() {
+    public Double getBaseTime() {
         return baseTime;
     }
 
-    public void setBaseTime(Float baseTime) {
+    public void setBaseTime(Double baseTime) {
         this.baseTime = baseTime;
     }
 

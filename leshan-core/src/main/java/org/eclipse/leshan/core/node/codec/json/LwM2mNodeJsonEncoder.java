@@ -132,7 +132,7 @@ public class LwM2mNodeJsonEncoder implements TimestampedNodeEncoder {
         private int objectId;
         private LwM2mModel model;
         private LwM2mPath requestPath;
-        private Float timestamp;
+        private Double timestamp;
         private LwM2mValueConverter converter;
 
         // visitor output
@@ -213,7 +213,7 @@ public class LwM2mNodeJsonEncoder implements TimestampedNodeEncoder {
             resourceList.add(jsonArrayEntry);
         }
 
-        private ArrayList<JsonArrayEntry> lwM2mResourceToJsonArrayEntry(String resourcePath, Float timestamp,
+        private ArrayList<JsonArrayEntry> lwM2mResourceToJsonArrayEntry(String resourcePath, Double timestamp,
                 LwM2mResource resource) {
             // get type for this resource
             ResourceModel rSpec = model.getResourceModel(objectId, resource.getId());
@@ -245,7 +245,7 @@ public class LwM2mNodeJsonEncoder implements TimestampedNodeEncoder {
             return resourcesList;
         }
 
-        private JsonArrayEntry createJsonArrayEntry(String name, Float timestamp, Type type, Type expectedType,
+        private JsonArrayEntry createJsonArrayEntry(String name, Double timestamp, Type type, Type expectedType,
                 Object value) {
             // Create resource element
             JsonArrayEntry jsonResourceElt = new JsonArrayEntry();

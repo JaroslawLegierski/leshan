@@ -27,7 +27,7 @@ public class LwM2mSenMLResolver extends SenMLResolver<LwM2mResolvedSenMLRecord> 
 
     @Override
     protected LwM2mResolvedSenMLRecord createResolvedRecord(SenMLRecord unresolvedRecord, String resolvedName,
-            Float resolvedTimestamp) throws SenMLException {
+                                                            Double resolvedTimestamp) throws SenMLException {
         try {
             return new LwM2mResolvedSenMLRecord(unresolvedRecord, resolvedName, resolvedTimestamp);
         } catch (InvalidLwM2mPathException e) {
