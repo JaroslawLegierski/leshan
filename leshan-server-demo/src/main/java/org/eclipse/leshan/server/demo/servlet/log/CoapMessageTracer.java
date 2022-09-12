@@ -65,7 +65,8 @@ public class CoapMessageTracer implements MessageInterceptor {
         if (listener != null) {
             listener.trace(new CoapMessage(request, false));
         }
-        LOG.info("\n"+"UDP QOS S        endRequest: \n"
+        long servertimestamp = System.currentTimeMillis();
+        LOG.info("\n"+"UDP QOS ReceiveRequest: \n"
                 + "MID: "+request.getMID() +"\n"
                 + "endpoint: "+ request.getURI() +"\n"
                 + "msg: "+request.getType() +"\n"
@@ -75,8 +76,14 @@ public class CoapMessageTracer implements MessageInterceptor {
                 + "duplicated: "+request.isDuplicate()+"\n"
                 + "token: "+ request.getTokenString()+"\n"
                 + "timestamp: " + request.getNanoTimestamp()+"\n"
-                + "payload: "+ request.getPayloadString() +"\n"
-            );
+                + "servertimestamp: " + servertimestamp + "\n"
+
+                + "payload: "+ request.getPayloadString()
+
+
+        );
+
+
         for (int i=0;i<request.getSourceContext().entries().values().size();i++)
         {
             if (request.getSourceContext().entries().values().toArray()[i]!=null)
@@ -84,10 +91,14 @@ public class CoapMessageTracer implements MessageInterceptor {
                         +": "
                         + request.getSourceContext().entries().values().toArray()[i]
                         +"\n");
+            if (request.getSourceContext().entries().keySet().toArray()[i].toString().contains("DTLS:DTLS_HANDSHAKE_TIMESTAMP"))
+            {
+                LOG.info("QoS DTLS deltatimeouts:"+
+                        (Long.parseLong((String) request.getSourceContext().entries().values().toArray()[i]) - servertimestamp ));
+            }
+
         }
-
     }
-
     @Override
     public void sendResponse(Response response) {
         CoapMessageListener listener = listeners
@@ -123,6 +134,7 @@ public class CoapMessageTracer implements MessageInterceptor {
         if (listener != null) {
             listener.trace(new CoapMessage(request, true));
         }
+        long servertimestamp = System.currentTimeMillis();
         LOG.info("\n"+"UDP QOS ReceiveRequest: \n"
                 + "MID: "+request.getMID() +"\n"
                 + "endpoint: "+ request.getURI() +"\n"
@@ -133,7 +145,7 @@ public class CoapMessageTracer implements MessageInterceptor {
                 + "duplicated: "+request.isDuplicate()+"\n"
                 + "token: "+ request.getTokenString()+"\n"
                 + "timestamp: " + request.getNanoTimestamp()+"\n"
-                + "servertimestamp: " + System.currentTimeMillis() + "\n"
+                + "servertimestamp: " + servertimestamp + "\n"
 
                 + "payload: "+ request.getPayloadString()
 
@@ -148,6 +160,12 @@ public class CoapMessageTracer implements MessageInterceptor {
                         +": "
                         + request.getSourceContext().entries().values().toArray()[i]
                         +"\n");
+            if (request.getSourceContext().entries().keySet().toArray()[i].toString().equals("DTLS_HANDSHAKE_TIMESTAMP"))
+            {
+                LOG.info("QoS DTLS deltatimeouts:"+
+                        (Long.parseLong(request.getSourceContext().entries().values().toArray()[i].toString())- servertimestamp));
+            }
+
         }
     }
 
