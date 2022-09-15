@@ -85,12 +85,17 @@ public class ConnectionStatistics {
         messageData.put("token", message.getTokenString());
         messageData.put("timestamp", String.valueOf(message.getNanoTimestamp()));
 
-        if (registrationService != null
-                && registrationService.getStore().getRegistrationByAdress(peerAddress) != null) {
+        Registration registration = null;
+        if(registrationService != null) {
+            registration = registrationService.getStore().getRegistrationByAdress(peerAddress);
+            if(registration == null && message.getOptions().getUriPath().size() >= 2) {
+                //In case registration update request comes from a different address than it's known in store
+                registration = registrationService.getStore().getRegistration(message.getOptions().getUriPath().get(1));
+            }
+        }
+        if (registration != null) {
             //This is the case for most messages
-            Registration registration = registrationService.getStore().getRegistrationByAdress(peerAddress);
             messageData.put("endpoint", registration.getEndpoint());
-
             if (message instanceof Request && ((Request) message).getCode().equals(CoAP.Code.DELETE)) {
                 //In this case we know it's de-registration request
                 tokenEndpointMap.put(message.getTokenString(),
@@ -114,8 +119,6 @@ public class ConnectionStatistics {
                 }
             }
         }
-
-        System.out.println("###: " + tokenEndpointMap.size());
 
         putDataInCache(messageData);
     }
