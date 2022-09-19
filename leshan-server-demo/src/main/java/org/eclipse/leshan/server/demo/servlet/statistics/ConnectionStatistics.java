@@ -84,6 +84,14 @@ public class ConnectionStatistics {
         messageData.put("duplicated", String.valueOf(message.isDuplicate()));
         messageData.put("token", message.getTokenString());
         messageData.put("timestamp", String.valueOf(message.getNanoTimestamp()));
+        messageData.put("uri", message.getOptions().getUriString());
+
+        if(message instanceof Request) {
+            messageData.put("coapCode", ((Request) message).getCode().toString());
+        } else if(message instanceof Response) {
+            String coapCode = ((Response) message).getCode().toString() + " (" + ((Response) message).getCode().name() + ")";
+            messageData.put("coapCode", (coapCode));
+        }
 
         Registration registration = null;
         if(registrationService != null) {
