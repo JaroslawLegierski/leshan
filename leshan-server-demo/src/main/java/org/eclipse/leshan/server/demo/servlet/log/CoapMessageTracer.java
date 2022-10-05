@@ -65,7 +65,7 @@ public class CoapMessageTracer implements MessageInterceptor {
         if (listener != null) {
             listener.trace(new CoapMessage(request, false));
         }
-        connectionStatistics.reportSendRequest(request, request.getDestinationContext().getPeerAddress());
+        connectionStatistics.reportSendRequest(request, request.getDestinationContext());
     }
 
     @Override
@@ -75,7 +75,7 @@ public class CoapMessageTracer implements MessageInterceptor {
         if (listener != null) {
             listener.trace(new CoapMessage(response, false));
         }
-        connectionStatistics.reportSendResponse(response, response.getDestinationContext().getPeerAddress());
+        connectionStatistics.reportSendResponse(response, response.getDestinationContext());
     }
 
     @Override
@@ -84,6 +84,7 @@ public class CoapMessageTracer implements MessageInterceptor {
         if (listener != null) {
             listener.trace(new CoapMessage(message, false));
         }
+        connectionStatistics.reportSendEmpty(message, message.getDestinationContext());
     }
 
     @Override
@@ -92,7 +93,7 @@ public class CoapMessageTracer implements MessageInterceptor {
         if (listener != null) {
             listener.trace(new CoapMessage(request, true));
         }
-        connectionStatistics.reportReceiveRequest(request, request.getSourceContext().getPeerAddress());
+        connectionStatistics.reportReceiveRequest(request, request.getSourceContext());
     }
 
     @Override
@@ -101,7 +102,7 @@ public class CoapMessageTracer implements MessageInterceptor {
         if (listener != null) {
             listener.trace(new CoapMessage(response, true));
         }
-        connectionStatistics.reportReceiveResponse(response, response.getSourceContext().getPeerAddress());
+        connectionStatistics.reportReceiveResponse(response, response.getSourceContext());
     }
 
     @Override
@@ -110,7 +111,7 @@ public class CoapMessageTracer implements MessageInterceptor {
         if (listener != null) {
             listener.trace(new CoapMessage(message, true));
         }
-
+        connectionStatistics.reportReceiveEmpty(message, message.getSourceContext());
     }
 
 }
