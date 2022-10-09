@@ -1,16 +1,17 @@
 package org.eclipse.leshan.server.demo.servlet.statistics;
 
-import org.eclipse.leshan.server.demo.servlet.EventServlet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+
+import org.eclipse.leshan.server.demo.servlet.EventServlet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StatisticsDataSender implements StatisticsDataProxy {
     private static final Logger LOG = LoggerFactory.getLogger(EventServlet.class);
