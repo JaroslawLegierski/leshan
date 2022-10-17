@@ -116,12 +116,12 @@ Contributors:
     <project.reporting.outputEncoding>${leshan.encoding}</project.reporting.outputEncoding>
 
     <!-- configure line separator -->
-    <leshan.lineEnding>LF</leshan.lineEnding>
+    <leshan.lineEnding>CRLF</leshan.lineEnding>
     <leshan.lineseparator>\n</leshan.lineseparator>
 
     <!-- we use properties for version when there are used more than once -->
     <!-- dependencies version -->
-    <californium.version>3.6.0</californium.version>
+    <californium.version>3.8.0-A</californium.version>
     <logback.version>1.2.11</logback.version>
     <slf4j.api.version>1.7.36</slf4j.api.version>
     <!-- stuck to 9.4.x for java8 compliance -->

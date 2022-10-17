@@ -73,18 +73,19 @@ public class CoapMessageTracer implements MessageInterceptor {
                 + "payload: " + request.getPayloadString() + "\n" + "options: " + request.getOptions() + "\n"
 
         );
+        if (request.getSourceContext() != null) {
+            for (int i = 0; i < request.getSourceContext().entries().values().size(); i++) {
+                if (request.getSourceContext().entries().values().toArray()[i] != null)
+                    LOG.info("QoS DTLS:" + request.getSourceContext().entries().keySet().toArray()[i] + ": "
+                            + request.getSourceContext().entries().values().toArray()[i] + "\n");
+                if (request.getSourceContext().entries().keySet().toArray()[i].toString()
+                        .contains("DTLS:DTLS_HANDSHAKE_TIMESTAMP")) {
+                    LOG.info("QoS DTLS deltatimeouts:"
+                            + (Long.parseLong((String) request.getSourceContext().entries().values().toArray()[i])
+                                    - servertimestamp));
+                }
 
-        for (int i = 0; i < request.getSourceContext().entries().values().size(); i++) {
-            if (request.getSourceContext().entries().values().toArray()[i] != null)
-                LOG.info("QoS DTLS:" + request.getSourceContext().entries().keySet().toArray()[i] + ": "
-                        + request.getSourceContext().entries().values().toArray()[i] + "\n");
-            if (request.getSourceContext().entries().keySet().toArray()[i].toString()
-                    .contains("DTLS:DTLS_HANDSHAKE_TIMESTAMP")) {
-                LOG.info("QoS DTLS deltatimeouts:"
-                        + (Long.parseLong((String) request.getSourceContext().entries().values().toArray()[i])
-                                - servertimestamp));
             }
-
         }
     }
 
@@ -100,7 +101,14 @@ public class CoapMessageTracer implements MessageInterceptor {
                 + "timeout: " + response.isTimedOut() + "\n" + "duplicated: " + response.isDuplicate() + "\n"
                 + "token: " + response.getTokenString() + "\n" + "timestamp: " + response.getNanoTimestamp() + "\n"
                 + "payload: " + response.getPayloadString() + "\n" + "options: " + response.getOptions() + "\n");
+        if (response.getSourceContext() != null) {
+            for (int i = 0; i < response.getSourceContext().entries().values().size(); i++) {
+                if (response.getSourceContext().entries().values().toArray()[i] != null)
+                    LOG.info("QoS DTLS:" + response.getSourceContext().entries().keySet().toArray()[i] + ": "
+                            + response.getSourceContext().entries().values().toArray()[i] + "\n");
 
+            }
+        }
     }
 
     @Override
@@ -126,18 +134,19 @@ public class CoapMessageTracer implements MessageInterceptor {
                 + "payload: " + request.getPayloadString() + "\n" + "options: " + request.getOptions() + "\n"
 
         );
+        if (request.getSourceContext() != null) {
+            for (int i = 0; i < request.getSourceContext().entries().values().size(); i++) {
+                if (request.getSourceContext().entries().values().toArray()[i] != null)
+                    LOG.info("QoS DTLS:" + request.getSourceContext().entries().keySet().toArray()[i] + ": "
+                            + request.getSourceContext().entries().values().toArray()[i] + "\n");
+                if (request.getSourceContext().entries().keySet().toArray()[i].toString()
+                        .equals("DTLS_HANDSHAKE_TIMESTAMP")) {
+                    LOG.info("QoS DTLS deltatimeouts:"
+                            + (Long.parseLong(request.getSourceContext().entries().values().toArray()[i].toString())
+                                    - servertimestamp));
+                }
 
-        for (int i = 0; i < request.getSourceContext().entries().values().size(); i++) {
-            if (request.getSourceContext().entries().values().toArray()[i] != null)
-                LOG.info("QoS DTLS:" + request.getSourceContext().entries().keySet().toArray()[i] + ": "
-                        + request.getSourceContext().entries().values().toArray()[i] + "\n");
-            if (request.getSourceContext().entries().keySet().toArray()[i].toString()
-                    .equals("DTLS_HANDSHAKE_TIMESTAMP")) {
-                LOG.info("QoS DTLS deltatimeouts:"
-                        + (Long.parseLong(request.getSourceContext().entries().values().toArray()[i].toString())
-                                - servertimestamp));
             }
-
         }
     }
 
@@ -153,7 +162,14 @@ public class CoapMessageTracer implements MessageInterceptor {
                 + response.isDuplicate() + "\n" + "token: " + response.getTokenString() + "\n" + "timestamp: "
                 + response.getNanoTimestamp() + "\n" + "servertimestamp: " + System.currentTimeMillis() + "\n"
                 + "payload: " + response.getPayloadString() + "\n" + "options: " + response.getOptions() + "\n");
+        if (response.getSourceContext() != null) {
+            for (int i = 0; i < response.getSourceContext().entries().values().size(); i++) {
+                if (response.getSourceContext().entries().values().toArray()[i] != null)
+                    LOG.info("QoS DTLS:" + response.getSourceContext().entries().keySet().toArray()[i] + ": "
+                            + response.getSourceContext().entries().values().toArray()[i] + "\n");
 
+            }
+        }
     }
 
     @Override
