@@ -74,19 +74,16 @@ public class CoapMessageTracer implements MessageInterceptor {
 
         );
         if (request.getSourceContext() != null) {
-            for (int i = 0; i < request.getSourceContext().entries().values().size(); i++) {
-                if (request.getSourceContext().entries().values().toArray()[i] != null)
-                    LOG.info("QoS DTLS:" + request.getSourceContext().entries().keySet().toArray()[i] + ": "
-                            + request.getSourceContext().entries().values().toArray()[i] + "\n");
-                if (request.getSourceContext().entries().keySet().toArray()[i].toString()
-                        .contains("DTLS:DTLS_HANDSHAKE_TIMESTAMP")) {
+            for (Map.Entry<?, ?> entry : request.getSourceContext().entries().entrySet()) {
+                if (entry.getKey().toString().contains("DTLS_HANDSHAKE_TIMESTAMP")) {
                     LOG.info("QoS DTLS deltatimeouts:"
-                            + (Long.parseLong((String) request.getSourceContext().entries().values().toArray()[i])
-                                    - servertimestamp));
-                }
+                            + (Long.parseLong(entry.getValue().toString()) - servertimestamp));
 
+                } else
+                    LOG.info("QoS DTLS: " + entry + "\n");
             }
         }
+
     }
 
     @Override
@@ -102,11 +99,8 @@ public class CoapMessageTracer implements MessageInterceptor {
                 + "token: " + response.getTokenString() + "\n" + "timestamp: " + response.getNanoTimestamp() + "\n"
                 + "payload: " + response.getPayloadString() + "\n" + "options: " + response.getOptions() + "\n");
         if (response.getSourceContext() != null) {
-            for (int i = 0; i < response.getSourceContext().entries().values().size(); i++) {
-                if (response.getSourceContext().entries().values().toArray()[i] != null)
-                    LOG.info("QoS DTLS:" + response.getSourceContext().entries().keySet().toArray()[i] + ": "
-                            + response.getSourceContext().entries().values().toArray()[i] + "\n");
-
+            for (Map.Entry<?, ?> entry : response.getSourceContext().entries().entrySet()) {
+                LOG.info("QoS DTLS: " + entry.toString() + "\n");
             }
         }
     }
@@ -135,19 +129,16 @@ public class CoapMessageTracer implements MessageInterceptor {
 
         );
         if (request.getSourceContext() != null) {
-            for (int i = 0; i < request.getSourceContext().entries().values().size(); i++) {
-                if (request.getSourceContext().entries().values().toArray()[i] != null)
-                    LOG.info("QoS DTLS:" + request.getSourceContext().entries().keySet().toArray()[i] + ": "
-                            + request.getSourceContext().entries().values().toArray()[i] + "\n");
-                if (request.getSourceContext().entries().keySet().toArray()[i].toString()
-                        .equals("DTLS_HANDSHAKE_TIMESTAMP")) {
+            for (Map.Entry<?, ?> entry : request.getSourceContext().entries().entrySet()) {
+                if (entry.getKey().toString().contains("DTLS_HANDSHAKE_TIMESTAMP")) {
                     LOG.info("QoS DTLS deltatimeouts:"
-                            + (Long.parseLong(request.getSourceContext().entries().values().toArray()[i].toString())
-                                    - servertimestamp));
-                }
+                            + (Long.parseLong(entry.getValue().toString()) - servertimestamp));
 
+                } else
+                    LOG.info("QoS DTLS: " + entry + "\n");
             }
         }
+
     }
 
     @Override
@@ -163,11 +154,8 @@ public class CoapMessageTracer implements MessageInterceptor {
                 + response.getNanoTimestamp() + "\n" + "servertimestamp: " + System.currentTimeMillis() + "\n"
                 + "payload: " + response.getPayloadString() + "\n" + "options: " + response.getOptions() + "\n");
         if (response.getSourceContext() != null) {
-            for (int i = 0; i < response.getSourceContext().entries().values().size(); i++) {
-                if (response.getSourceContext().entries().values().toArray()[i] != null)
-                    LOG.info("QoS DTLS:" + response.getSourceContext().entries().keySet().toArray()[i] + ": "
-                            + response.getSourceContext().entries().values().toArray()[i] + "\n");
-
+            for (Map.Entry<?, ?> entry : response.getSourceContext().entries().entrySet()) {
+                LOG.info("QoS DTLS: " + entry.toString() + "\n");
             }
         }
     }
