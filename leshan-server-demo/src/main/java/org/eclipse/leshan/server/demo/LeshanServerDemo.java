@@ -24,6 +24,7 @@ import java.net.InetSocketAddress;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.List;
+import java.util.Map;
 
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceInfo;
@@ -41,10 +42,16 @@ import org.eclipse.leshan.core.demo.LwM2mDemoConstant;
 import org.eclipse.leshan.core.demo.cli.ShortErrorMessageHandler;
 import org.eclipse.leshan.core.model.ObjectLoader;
 import org.eclipse.leshan.core.model.ObjectModel;
+import org.eclipse.leshan.core.node.codec.DefaultLwM2mEncoder;
+import org.eclipse.leshan.core.node.codec.LwM2mValueChecker;
+import org.eclipse.leshan.core.node.codec.NodeEncoder;
+import org.eclipse.leshan.core.node.codec.senml.LwM2mNodeSenMLEncoder;
+import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.server.californium.LeshanServer;
 import org.eclipse.leshan.server.californium.LeshanServerBuilder;
 import org.eclipse.leshan.server.core.demo.json.servlet.SecurityServlet;
 import org.eclipse.leshan.server.demo.cli.LeshanServerDemoCLI;
+import org.eclipse.leshan.server.demo.model.CustomSenMLJsonJacksonEncoderDecoder;
 import org.eclipse.leshan.server.demo.servlet.ClientServlet;
 import org.eclipse.leshan.server.demo.servlet.EventServlet;
 import org.eclipse.leshan.server.demo.servlet.ObjectSpecServlet;
@@ -134,6 +141,18 @@ public class LeshanServerDemo {
     public static LeshanServer createLeshanServer(LeshanServerDemoCLI cli) throws Exception {
         // Prepare LWM2M server
         LeshanServerBuilder builder = new LeshanServerBuilder();
+
+        // -------------------------------------------------------------------------------------------------------
+        // TODO : Remove this workaround when Leshan 2.0.0-M10 will be integrated.
+        // see : https://github.com/eclipse/leshan/issues/1325
+        Map<ContentFormat, NodeEncoder> nodeEncoders = DefaultLwM2mEncoder.getDefaultNodeEncoders(false);
+        nodeEncoders.put(ContentFormat.SENML_JSON,
+                new LwM2mNodeSenMLEncoder(new CustomSenMLJsonJacksonEncoderDecoder()));
+
+        DefaultLwM2mEncoder encoder = new DefaultLwM2mEncoder(nodeEncoders, DefaultLwM2mEncoder.getDefaultPathEncoder(),
+                new LwM2mValueChecker());
+        builder.setEncoder(encoder);
+        // -------------------------------------------------------------------------------------------------------
 
         // Create CoAP Config
         File configFile = new File(CF_CONFIGURATION_FILENAME);
