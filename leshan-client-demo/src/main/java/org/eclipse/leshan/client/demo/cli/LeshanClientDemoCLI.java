@@ -28,7 +28,6 @@ import org.eclipse.leshan.core.demo.cli.MultiParameterException;
 import org.eclipse.leshan.core.demo.cli.StandardHelpOptions;
 import org.eclipse.leshan.core.demo.cli.VersionProvider;
 import org.eclipse.leshan.core.demo.cli.converters.CIDConverter;
-import org.eclipse.leshan.core.demo.cli.converters.PortConverter;
 import org.eclipse.leshan.core.demo.cli.converters.StrictlyPositiveIntegerConverter;
 import org.eclipse.leshan.core.util.StringUtils;
 
@@ -120,14 +119,6 @@ public class LeshanClientDemoCLI implements Runnable {
                         "Set the local CoAP address of the Client.", //
                         "Default: any local address." })
         public String localAddress;
-
-        @Option(names = { "-lp", "--local-port" },
-                defaultValue = "0",
-                description = { //
-                        "Set the local CoAP port of the Client.", //
-                        "Default: A valid unsused port value between 0 and 65535." },
-                converter = PortConverter.class)
-        public Integer localPort;
 
         @Option(names = { "-m", "--models-folder" },
                 description = { //

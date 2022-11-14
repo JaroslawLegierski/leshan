@@ -17,6 +17,7 @@
 package org.eclipse.leshan.integration.tests.lockstep;
 
 import java.net.InetSocketAddress;
+import java.net.URI;
 import java.util.List;
 import java.util.Random;
 
@@ -31,6 +32,8 @@ import org.eclipse.californium.elements.config.Configuration;
 import org.eclipse.californium.elements.config.SystemConfig;
 import org.eclipse.californium.elements.config.UdpConfig;
 import org.eclipse.leshan.client.californium.request.CoapRequestBuilder;
+import org.eclipse.leshan.core.californium.identity.DefaultCoapIdentityHandler;
+import org.eclipse.leshan.core.endpoint.EndpointUriUtil;
 import org.eclipse.leshan.core.link.DefaultLinkSerializer;
 import org.eclipse.leshan.core.link.LinkSerializer;
 import org.eclipse.leshan.core.model.LwM2mModel;
@@ -46,10 +49,14 @@ import org.eclipse.leshan.core.response.LwM2mResponse;
 public class LockStepLwM2mClient extends LockstepEndpoint {
 
     private static final Random r = new Random();
-    private InetSocketAddress destination;
+    private final InetSocketAddress destination;
     private final LwM2mEncoder encoder;
     private final LwM2mModel model;
     private final LinkSerializer linkSerializer;
+
+    public LockStepLwM2mClient(final URI destination) {
+        this(EndpointUriUtil.getSocketAddr(destination));
+    }
 
     public LockStepLwM2mClient(final InetSocketAddress destination) {
         super(destination, new Configuration(
@@ -64,7 +71,7 @@ public class LockStepLwM2mClient extends LockstepEndpoint {
     public Request createCoapRequest(UplinkRequest<? extends LwM2mResponse> lwm2mReq) {
         // create CoAP request
         CoapRequestBuilder coapRequestBuilder = new CoapRequestBuilder(Identity.unsecure(destination), encoder, model,
-                linkSerializer);
+                linkSerializer, new DefaultCoapIdentityHandler());
         lwm2mReq.accept(coapRequestBuilder);
         Request coapReq = coapRequestBuilder.getRequest();
         byte[] token = new byte[8];
