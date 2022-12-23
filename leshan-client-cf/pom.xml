@@ -53,6 +53,33 @@ Contributors:
       <version>${californium.version}</version>
     </dependency>
 
+    <!-- coap-java for tests new transport layer dependencies -->
+    <dependency>
+      <groupId>com.github.open-coap.java-coap</groupId>
+      <artifactId>coap-core</artifactId>
+      <version>6.5.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.open-coap.java-coap</groupId>
+      <artifactId>coap-tcp</artifactId>
+      <version>6.5.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.open-coap.java-coap</groupId>
+      <artifactId>mbedtls-transport</artifactId>
+      <version>6.5.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.open-coap.java-coap</groupId>
+      <artifactId>lwm2m</artifactId>
+      <version>6.5.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.open-coap</groupId>
+      <artifactId>kotlin-mbedtls</artifactId>
+      <version>1.6.0</version>
+    </dependency>
+
     <!-- test dependencies -->
     <dependency>
       <groupId>ch.qos.logback</groupId>

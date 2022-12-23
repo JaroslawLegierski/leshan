@@ -59,12 +59,12 @@ import org.eclipse.californium.scandium.dtls.PskPublicInformation;
 import org.eclipse.californium.scandium.dtls.cipher.CipherSuite;
 import org.eclipse.californium.scandium.dtls.pskstore.AdvancedPskStore;
 import org.eclipse.leshan.client.LeshanClientBuilder;
-import org.eclipse.leshan.client.californium.X509Util;
-import org.eclipse.leshan.client.californium.endpoint.CaliforniumClientEndpointFactory;
-import org.eclipse.leshan.client.californium.endpoint.CaliforniumClientEndpointsProvider;
-import org.eclipse.leshan.client.californium.endpoint.coap.CoapClientProtocolProvider;
-import org.eclipse.leshan.client.californium.endpoint.coap.CoapOscoreProtocolProvider;
-import org.eclipse.leshan.client.californium.endpoint.coaps.CoapsClientProtocolProvider;
+import org.eclipse.leshan.client.javacoap.X509Util;
+import org.eclipse.leshan.client.javacoap.endpoint.CaliforniumClientEndpointFactory;
+import org.eclipse.leshan.client.javacoap.endpoint.CaliforniumClientEndpointsProvider;
+import org.eclipse.leshan.client.javacoap.endpoint.coap.CoapClientProtocolProvider;
+import org.eclipse.leshan.client.javacoap.endpoint.coap.CoapOscoreProtocolProvider;
+import org.eclipse.leshan.client.javacoap.endpoint.coaps.CoapsClientProtocolProvider;
 import org.eclipse.leshan.client.engine.DefaultRegistrationEngineFactory;
 import org.eclipse.leshan.client.object.Device;
 import org.eclipse.leshan.client.object.Oscore;
@@ -267,7 +267,7 @@ public class SecureIntegrationTestHelper extends IntegrationTestHelper {
         CoapsClientProtocolProvider coapsProtocolProvider = new CoapsClientProtocolProvider() {
             @Override
             public CaliforniumClientEndpointFactory createDefaultEndpointFactory() {
-                return new org.eclipse.leshan.client.californium.endpoint.coaps.CoapsClientEndpointFactory() {
+                return new org.eclipse.leshan.client.javacoap.endpoint.coaps.CoapsClientEndpointFactory() {
                     @Override
                     protected DtlsConnectorConfig.Builder setUpDtlsConfig(InetSocketAddress addr, ServerInfo serverInfo,
                             Builder dtlsConfigBuilder, Configuration coapConfig, boolean clientInitiatedOnly,

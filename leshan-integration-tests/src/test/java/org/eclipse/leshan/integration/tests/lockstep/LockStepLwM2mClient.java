@@ -31,7 +31,7 @@ import org.eclipse.californium.elements.RawData;
 import org.eclipse.californium.elements.config.Configuration;
 import org.eclipse.californium.elements.config.SystemConfig;
 import org.eclipse.californium.elements.config.UdpConfig;
-import org.eclipse.leshan.client.californium.request.CoapRequestBuilder;
+import org.eclipse.leshan.client.javacoap.request.CoapRequestBuilder;
 import org.eclipse.leshan.core.californium.identity.DefaultCoapIdentityHandler;
 import org.eclipse.leshan.core.endpoint.EndpointUriUtil;
 import org.eclipse.leshan.core.link.DefaultLinkSerializer;

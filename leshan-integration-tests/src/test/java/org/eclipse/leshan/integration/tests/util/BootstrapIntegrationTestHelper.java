@@ -47,9 +47,9 @@ import java.util.concurrent.TimeoutException;
 
 import org.eclipse.californium.core.coap.Request;
 import org.eclipse.leshan.client.LeshanClientBuilder;
-import org.eclipse.leshan.client.californium.endpoint.CaliforniumClientEndpointsProvider;
-import org.eclipse.leshan.client.californium.endpoint.coap.CoapOscoreProtocolProvider;
-import org.eclipse.leshan.client.californium.endpoint.coaps.CoapsClientProtocolProvider;
+import org.eclipse.leshan.client.javacoap.endpoint.CaliforniumClientEndpointsProvider;
+import org.eclipse.leshan.client.javacoap.endpoint.coap.CoapOscoreProtocolProvider;
+import org.eclipse.leshan.client.javacoap.endpoint.coaps.CoapsClientProtocolProvider;
 import org.eclipse.leshan.client.engine.DefaultRegistrationEngineFactory;
 import org.eclipse.leshan.client.object.Device;
 import org.eclipse.leshan.client.object.Oscore;

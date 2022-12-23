@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.eclipse.leshan.client.LeshanClientBuilder;
-import org.eclipse.leshan.client.californium.endpoint.CaliforniumClientEndpointsProvider;
+import org.eclipse.leshan.client.javacoap.endpoint.CaliforniumClientEndpointsProvider;
 import org.eclipse.leshan.client.engine.DefaultRegistrationEngineFactory;
 import org.eclipse.leshan.client.object.Security;
 import org.eclipse.leshan.client.object.Server;

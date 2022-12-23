@@ -36,17 +36,18 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.util.List;
 
-import org.eclipse.californium.elements.config.Configuration;
+//import org.eclipse.californium.elements.config.Configuration;
 import org.eclipse.californium.scandium.config.DtlsConfig;
 import org.eclipse.californium.scandium.config.DtlsConnectorConfig;
 import org.eclipse.californium.scandium.config.DtlsConnectorConfig.Builder;
 import org.eclipse.leshan.client.LeshanClient;
 import org.eclipse.leshan.client.LeshanClientBuilder;
-import org.eclipse.leshan.client.californium.endpoint.CaliforniumClientEndpointFactory;
-import org.eclipse.leshan.client.californium.endpoint.CaliforniumClientEndpointsProvider;
-import org.eclipse.leshan.client.californium.endpoint.coap.CoapOscoreProtocolProvider;
-import org.eclipse.leshan.client.californium.endpoint.coaps.CoapsClientEndpointFactory;
-import org.eclipse.leshan.client.californium.endpoint.coaps.CoapsClientProtocolProvider;
+import org.eclipse.leshan.client.javacoap.endpoint.CaliforniumClientEndpointFactory;
+import org.eclipse.leshan.client.javacoap.endpoint.CaliforniumClientEndpointsProvider;
+import org.eclipse.leshan.client.javacoap.endpoint.JavaCoapClientEndpointsProvider;
+import org.eclipse.leshan.client.javacoap.endpoint.coap.CoapOscoreProtocolProvider;
+import org.eclipse.leshan.client.javacoap.endpoint.coaps.CoapsClientEndpointFactory;
+import org.eclipse.leshan.client.javacoap.endpoint.coaps.CoapsClientProtocolProvider;
 import org.eclipse.leshan.client.demo.cli.LeshanClientDemoCLI;
 import org.eclipse.leshan.client.demo.cli.interactive.InteractiveCommands;
 import org.eclipse.leshan.client.engine.DefaultRegistrationEngineFactory;
@@ -83,8 +84,8 @@ public class LeshanClientDemo {
     private static final Logger LOG = LoggerFactory.getLogger(LeshanClientDemo.class);
     private static final int OBJECT_ID_TEMPERATURE_SENSOR = 3303;
     private static final int OBJECT_ID_LWM2M_TEST_OBJECT = 3442;
-    private static final String CF_CONFIGURATION_FILENAME = "Californium3.client.properties";
-    private static final String CF_CONFIGURATION_HEADER = "Leshan Client Demo - " + Configuration.DEFAULT_HEADER;
+//    private static final String CF_CONFIGURATION_FILENAME = "Californium3.client.properties";
+//    private static final String CF_CONFIGURATION_HEADER = "Leshan Client Demo - " + Configuration.DEFAULT_HEADER;
 
     public static void main(String[] args) {
 
@@ -236,7 +237,7 @@ public class LeshanClientDemo {
         // Create Californium Endpoints Provider:
         // --------------------------------------
 
-        // Define custom CoapsProtocolProvider
+ /*       // Define custom CoapsProtocolProvider
         CoapsClientProtocolProvider customCoapsProtocolProvider = new CoapsClientProtocolProvider() {
             @Override
             public CaliforniumClientEndpointFactory createDefaultEndpointFactory() {
@@ -267,20 +268,24 @@ public class LeshanClientDemo {
         clientCoapConfig.set(DtlsConfig.DTLS_CONNECTION_ID_LENGTH, cli.dtls.cid);
         if (cli.dtls.ciphers != null) {
             clientCoapConfig.set(DtlsConfig.DTLS_CIPHER_SUITES, cli.dtls.ciphers);
-        }
+        }*/
+        // Java-Coap  Configuration
+        JavaCoapClientEndpointsProvider.Builder endpointsBuilder = new JavaCoapClientEndpointsProvider.Builder();
+        //
+//        Configuration clientCoapConfig = endpointsBuilder.createDefaultConfiguration();
 
         // Persist configuration
-        File configFile = new File(CF_CONFIGURATION_FILENAME);
-        if (configFile.isFile()) {
-            clientCoapConfig.load(configFile);
-        } else {
-            clientCoapConfig.store(configFile, CF_CONFIGURATION_HEADER);
-        }
+//        File configFile = new File(CF_CONFIGURATION_FILENAME);
+//        if (configFile.isFile()) {
+//            clientCoapConfig.load(configFile);
+//        } else {
+//            clientCoapConfig.store(configFile, CF_CONFIGURATION_HEADER);
+//        }
 
         // Set Californium Configuration
-        endpointsBuilder.setConfiguration(clientCoapConfig);
+//        endpointsBuilder.setConfiguration(clientCoapConfig);
 
-        endpointsBuilder.setClientAddress(InetAddress.getByName(cli.main.localAddress));
+//        endpointsBuilder.setClientAddress(InetAddress.getByName(cli.main.localAddress));
 
         // Create client
         LeshanClientBuilder builder = new LeshanClientBuilder(cli.main.endpoint);
