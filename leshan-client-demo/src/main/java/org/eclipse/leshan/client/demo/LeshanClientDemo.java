@@ -65,6 +65,7 @@ import org.eclipse.leshan.core.model.ObjectLoader;
 import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.core.node.codec.DefaultLwM2mDecoder;
 import org.eclipse.leshan.core.node.codec.DefaultLwM2mEncoder;
+import org.eclipse.leshan.transport.javacoap.endpoint.JavaCoapClientEndpointsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -256,6 +257,10 @@ public class LeshanClientDemo {
         CaliforniumClientEndpointsProvider.Builder endpointsBuilder = new CaliforniumClientEndpointsProvider.Builder(
                 new CoapOscoreProtocolProvider(), customCoapsProtocolProvider);
 
+        // test java-coap EndpointProvider
+        JavaCoapClientEndpointsProvider endpointBuilder = new JavaCoapClientEndpointsProvider(5683);
+
+
         // Create Californium Configuration
         Configuration clientCoapConfig = endpointsBuilder.createDefaultConfiguration();
 
@@ -285,7 +290,9 @@ public class LeshanClientDemo {
         // Create client
         LeshanClientBuilder builder = new LeshanClientBuilder(cli.main.endpoint);
         builder.setObjects(enablers);
-        builder.setEndpointsProvider(endpointsBuilder.build());
+        //builder.setEndpointsProvider(endpointsBuilder.build());
+        // test java-coap
+        builder.setEndpointsProvider(endpointBuilder);
         builder.setDataSenders(new ManualDataSender());
         if (cli.identity.isx509())
             builder.setTrustStore(cli.identity.getX509().trustStore);
