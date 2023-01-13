@@ -27,14 +27,15 @@ import org.eclipse.leshan.client.endpoint.ClientEndpointToolbox;
 import org.eclipse.leshan.client.endpoint.LwM2mClientEndpoint;
 import org.eclipse.leshan.client.endpoint.LwM2mClientEndpointsProvider;
 import org.eclipse.leshan.client.request.DownlinkRequestReceiver;
+import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
 import org.eclipse.leshan.client.resource.LwM2mObjectTree;
 import org.eclipse.leshan.client.servers.ServerIdentity;
 import org.eclipse.leshan.client.servers.ServerInfo;
 import org.eclipse.leshan.core.SecurityMode;
-import org.eclipse.leshan.core.endpoint.EndpointUriUtil;
 import org.eclipse.leshan.core.oscore.OscoreIdentity;
 import org.eclipse.leshan.core.request.Identity;
 import org.eclipse.leshan.transport.javacoap.request.JavaCoapClientCoapMessageTranslator;
+import org.eclipse.leshan.transport.javacoap.resource.ObjectResource;
 import org.eclipse.leshan.transport.javacoap.resource.ResourcesService;
 
 import com.mbed.coap.client.CoapClient;
@@ -43,36 +44,71 @@ import com.mbed.coap.server.CoapServer;
 
 public class JavaCoapClientEndpointsProvider implements LwM2mClientEndpointsProvider {
 
+    private String url;
     private CoapServer coapServer;
-    private final int coapPort;
+
     private CoapClient coapClient;
     private final JavaCoapClientCoapMessageTranslator messagetranslator = new JavaCoapClientCoapMessageTranslator();
     private JavaCoapClientEndpoint lwm2mEndpoint;
+    private ServerIdentity currentServer;
+    private Identity identity;
+    private int shortserverid;
 
-    public JavaCoapClientEndpointsProvider(int coapPort) {
-        this.coapPort = coapPort;
+    public JavaCoapClientEndpointsProvider(String url, int shortserverid) {
+
+        this.url=url;
+        this.shortserverid = shortserverid;
     }
 
-    @Override
+
+
+   @Override
     public void init(LwM2mObjectTree objectTree, DownlinkRequestReceiver requestReceiver,
             ClientEndpointToolbox toolbox) {
 
-        URI endpointURI = EndpointUriUtil.createUri("coap", "127.0.0.1", coapPort);
+
+        URI endpointURI = URI.create(url);
 
         // create Resources / Routes
-            ResourcesService resources = ResourcesService.builder() //
-      //              .add("/url", val ))
-                    .build();
+        ResourcesService.ResourcesBuilder resorcesbuilder = new ResourcesService.ResourcesBuilder();
 
-        coapServer = CoapServer.builder().transport(5685)
+       for (LwM2mObjectEnabler enabler : objectTree.getObjectEnablers().values()) {
+
+           String objectpath="/";
+           String instancepath="";
+           String resourcepath="";
+           String finalpath="";
+           objectpath=objectpath+enabler.getId();
+
+           for ( int i=0 ;i<enabler.getAvailableInstanceIds().size(); i++ ) {
+
+               instancepath="/"+enabler.getAvailableInstanceIds().get(i);
+              List<Integer> availableResources1 = enabler.getAvailableResourceIds(i);
+
+               for (Integer availableResource : enabler.getAvailableResourceIds(i)) {
+                   resourcepath="/"+availableResource;
+
+                   finalpath=objectpath+instancepath+resourcepath;
+                    resorcesbuilder.add(finalpath, new ObjectResource(requestReceiver, finalpath,toolbox,url, shortserverid));
+               }
+
+           }
+       }
+
+
+            ResourcesService resources = resorcesbuilder.build();
+
+
+        coapServer = CoapServer.builder().transport(0)
                 .route(resources)
                 .build();
 
-        InetSocketAddress destination = new InetSocketAddress(endpointURI.getHost(), endpointURI.getPort());
 
-        coapClient = CoapClientBuilder.clientFor(destination, coapServer);
+         InetSocketAddress destination = new InetSocketAddress(endpointURI.getHost(), endpointURI.getPort());
 
-        lwm2mEndpoint = new JavaCoapClientEndpoint(endpointURI, coapServer, coapClient,
+          coapClient = CoapClientBuilder.clientFor(destination, coapServer);
+
+        lwm2mEndpoint = new JavaCoapClientEndpoint(endpointURI,  coapClient,
                 messagetranslator, toolbox, objectTree.getModel());
     }
 
@@ -81,9 +117,6 @@ public class JavaCoapClientEndpointsProvider implements LwM2mClientEndpointsProv
             List<Certificate> trustStore, ClientEndpointToolbox toolbox) {
 
         // TODO we should get endpoint used URI dynamically in Resources
-
-
-
 
         ServerIdentity currentServer = extractIdentity(serverInfo);
 

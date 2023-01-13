@@ -258,7 +258,7 @@ public class LeshanClientDemo {
                 new CoapOscoreProtocolProvider(), customCoapsProtocolProvider);
 
         // test java-coap EndpointProvider
-        JavaCoapClientEndpointsProvider endpointBuilder = new JavaCoapClientEndpointsProvider(5683);
+        JavaCoapClientEndpointsProvider endpointBuilder = new JavaCoapClientEndpointsProvider( cli.main.url, 123);
 
 
         // Create Californium Configuration

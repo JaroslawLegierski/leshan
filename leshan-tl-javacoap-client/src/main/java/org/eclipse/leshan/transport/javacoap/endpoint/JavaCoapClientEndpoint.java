@@ -27,12 +27,11 @@ import org.eclipse.leshan.core.response.ErrorCallback;
 import org.eclipse.leshan.core.response.LwM2mResponse;
 import org.eclipse.leshan.core.response.ResponseCallback;
 import org.eclipse.leshan.transport.javacoap.request.JavaCoapClientCoapMessageTranslator;
-
 import com.mbed.coap.client.CoapClient;
 import com.mbed.coap.exception.CoapException;
 import com.mbed.coap.packet.CoapRequest;
 import com.mbed.coap.packet.CoapResponse;
-import com.mbed.coap.server.CoapServer;
+
 
 public class JavaCoapClientEndpoint implements LwM2mClientEndpoint {
 
@@ -44,7 +43,7 @@ public class JavaCoapClientEndpoint implements LwM2mClientEndpoint {
 
 
 
-    public JavaCoapClientEndpoint(URI endpointUri, CoapServer coapServer, CoapClient client,
+    public JavaCoapClientEndpoint(URI endpointUri,  CoapClient client,
             JavaCoapClientCoapMessageTranslator translator, ClientEndpointToolbox toolbox, LwM2mModel model)
     {
         this.endpointUri = endpointUri;

@@ -15,6 +15,7 @@
  *******************************************************************************/
 package org.eclipse.leshan.transport.javacoap.request;
 
+import org.eclipse.leshan.core.ResponseCode;
 import org.eclipse.leshan.core.request.BootstrapRequest;
 import org.eclipse.leshan.core.request.DeregisterRequest;
 import org.eclipse.leshan.core.request.LwM2mRequest;
@@ -33,10 +34,9 @@ import org.eclipse.leshan.core.response.UpdateResponse;
 import com.mbed.coap.packet.CoapResponse;
 import com.mbed.coap.packet.Code;
 
-import static org.eclipse.leshan.core.californium.ResponseCodeUtil.toLwM2mResponseCode;
 
 /**
- * This class is able to create a {@link LwM2mResponse} from a CoAP {@link Response}.
+ * This class is able to create a {@link LwM2mResponse} from a CoAP {@link CoapResponse}.
  * <p>
  * Call <code>LwM2mClientResponseBuilder#visit(coapResponse)</code>, then get the result using {@link #getResponse()}
  *
@@ -56,8 +56,10 @@ public class JavaCoapLwM2mResponseBuilder<T extends LwM2mResponse> implements Up
 
         if (coapResponse.getCode().getHttpCode() >= 400) {
             // handle error response:
-            lwM2mresponse = new RegisterResponse(toLwM2mResponseCode(coapResponse.getCode().getCoapCode()), null,
+            lwM2mresponse = new RegisterResponse(ResponseCode.fromCode(coapResponse.getCode().getHttpCode()), null,
                     coapResponse.getPayloadString());
+
+
         } else if (coapResponse.getCode() == Code.C201_CREATED) {
             // handle success response:
             lwM2mresponse = RegisterResponse.success(
@@ -73,7 +75,7 @@ public class JavaCoapLwM2mResponseBuilder<T extends LwM2mResponse> implements Up
         if (coapResponse.getCode().getHttpCode() >= 400) {
         //            // handle error response:
 
-            lwM2mresponse = new DeregisterResponse(toLwM2mResponseCode(coapResponse.getCode().getCoapCode()), null,
+            lwM2mresponse = new DeregisterResponse(ResponseCode.fromCode(coapResponse.getCode().getHttpCode()), null,
                     coapResponse.getPayloadString());
 
                 } else if (  coapResponse.getCode() == Code.C202_DELETED) {
@@ -88,7 +90,7 @@ public class JavaCoapLwM2mResponseBuilder<T extends LwM2mResponse> implements Up
     @Override public void visit(UpdateRequest request) {
                 if (coapResponse.getCode().getHttpCode() >= 400) {
         //            // handle error response:
-                    lwM2mresponse = new UpdateResponse(toLwM2mResponseCode(coapResponse.getCode().getCoapCode()),
+                    lwM2mresponse = new UpdateResponse(ResponseCode.fromCode(coapResponse.getCode().getHttpCode()),
                             coapResponse.getPayloadString());
                 } else if (coapResponse.getCode() == Code.C204_CHANGED) {
                     // handle success response:
@@ -104,7 +106,7 @@ public class JavaCoapLwM2mResponseBuilder<T extends LwM2mResponse> implements Up
         if (coapResponse.getCode().getHttpCode() >= 400) {
         //            // handle error response:
 
-            lwM2mresponse = new SendResponse(toLwM2mResponseCode(coapResponse.getCode().getCoapCode()),
+            lwM2mresponse = new SendResponse(ResponseCode.fromCode(coapResponse.getCode().getHttpCode()),
                     coapResponse.getPayloadString());
 
                     } else if (coapResponse.getCode() == Code.C204_CHANGED) {
@@ -120,7 +122,7 @@ public class JavaCoapLwM2mResponseBuilder<T extends LwM2mResponse> implements Up
 
         if (coapResponse.getCode().getHttpCode() >= 400) {
         //            // handle error response:
-                    lwM2mresponse = new BootstrapResponse(toLwM2mResponseCode(coapResponse.getCode().getCoapCode()),
+                    lwM2mresponse = new BootstrapResponse(ResponseCode.fromCode(coapResponse.getCode().getHttpCode()),
                             coapResponse.getPayloadString());
 
                  } else if (coapResponse.getCode() == Code.C204_CHANGED) {

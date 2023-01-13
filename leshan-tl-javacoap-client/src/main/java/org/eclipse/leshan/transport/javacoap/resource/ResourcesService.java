@@ -19,7 +19,6 @@ import static java.util.concurrent.CompletableFuture.completedFuture;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -33,7 +32,6 @@ import com.mbed.coap.utils.Service;
 public class ResourcesService implements Service<CoapRequest, CoapResponse> {
 
     private final Map<RequestMatcher, Service<CoapRequest, CoapResponse>> handlers;
-    private final List<Entry<RequestMatcher, Service<CoapRequest, CoapResponse>>> prefixedHandlers;
 
     public static ResourcesBuilder builder() {
         return new ResourcesBuilder();
@@ -45,27 +43,20 @@ public class ResourcesService implements Service<CoapRequest, CoapResponse> {
     ResourcesService(Map<RequestMatcher, Service<CoapRequest, CoapResponse>> handlers) {
 
         this.handlers = Collections
-                .unmodifiableMap(handlers.entrySet().stream().filter(entry -> !entry.getKey().isPrefixed())
+                .unmodifiableMap(handlers.entrySet().stream()
                         .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
 
-        this.prefixedHandlers = Collections.unmodifiableList(
-                handlers.entrySet().stream().filter(entry -> entry.getKey().isPrefixed()).collect(Collectors.toList()));
     }
 
     @Override
     public CompletableFuture<CoapResponse> apply(CoapRequest request) {
         RequestMatcher requestMatcher = new RequestMatcher(request.options().getUriPath());
 
-        return handlers.getOrDefault(requestMatcher, findHandler(requestMatcher)).apply(request);
-    }
-
-    private Service<CoapRequest, CoapResponse> findHandler(RequestMatcher requestMatcher) {
-        return prefixedHandlers.stream().filter(e -> e.getKey().matches(requestMatcher)).findFirst()
-                .map(Entry::getValue).orElse(NOT_FOUND_SERVICE);
+        return handlers.getOrDefault(requestMatcher, NOT_FOUND_SERVICE).apply(request);
 
     }
 
-    public static class ResourcesBuilder {
+      public static class ResourcesBuilder {
         private final Map<RequestMatcher, Service<CoapRequest, CoapResponse>> handlers = new HashMap<>();
 
         public ResourcesBuilder add(String uriPath, Service<CoapRequest, CoapResponse> service) {
@@ -80,26 +71,9 @@ public class ResourcesService implements Service<CoapRequest, CoapResponse> {
 
     static final class RequestMatcher {
         private final String uriPath;
-        private transient final boolean isPrefixed;
 
         RequestMatcher(String uriPath) {
-            if (uriPath == null) {
-                uriPath = "/";
-            }
-            this.isPrefixed = uriPath.endsWith("*");
-            if (isPrefixed) {
-                this.uriPath = uriPath.substring(0, uriPath.length() - 1);
-            } else {
-                this.uriPath = uriPath;
-            }
-        }
-
-        public boolean isPrefixed() {
-            return isPrefixed;
-        }
-
-        public boolean matches(RequestMatcher other) {
-            return other.uriPath.startsWith(uriPath);
+         this.uriPath = uriPath;
         }
 
         @Override
