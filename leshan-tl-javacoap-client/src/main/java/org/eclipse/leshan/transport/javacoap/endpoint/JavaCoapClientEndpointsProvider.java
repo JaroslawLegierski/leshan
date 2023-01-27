@@ -85,6 +85,7 @@ public class JavaCoapClientEndpointsProvider implements LwM2mClientEndpointsProv
                instancepath="/"+enabler.getAvailableInstanceIds().get(i);
               List<Integer> availableResources1 = enabler.getAvailableResourceIds(i);
 
+
                for (Integer availableResource : enabler.getAvailableResourceIds(i)) {
                    resourcepath="/"+availableResource;
 
@@ -92,9 +93,9 @@ public class JavaCoapClientEndpointsProvider implements LwM2mClientEndpointsProv
                     resorcesbuilder.add(finalpath, new ObjectResource(requestReceiver, finalpath,toolbox,url, shortserverid));
                }
 
+               resorcesbuilder.add(objectpath+instancepath, new ObjectResource(requestReceiver, objectpath+instancepath,toolbox,url, shortserverid));
            }
        }
-
 
             ResourcesService resources = resorcesbuilder.build();
 

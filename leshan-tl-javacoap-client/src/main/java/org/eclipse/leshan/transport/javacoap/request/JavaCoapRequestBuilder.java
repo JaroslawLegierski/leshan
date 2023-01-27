@@ -52,6 +52,7 @@ public class JavaCoapRequestBuilder implements UplinkRequestVisitor {
     protected final LwM2mEncoder encoder;
     protected final LwM2mModel model;
     protected final LinkSerializer linkSerializer;
+    private final RandomTokenGenerator tokenGenerator = new RandomTokenGenerator(8);
 
 
     public JavaCoapRequestBuilder(Identity server, LwM2mEncoder encoder, LwM2mModel model,
@@ -149,7 +150,8 @@ public class JavaCoapRequestBuilder implements UplinkRequestVisitor {
 
             coapRequest = coapRequest.payload(Opaque.of(payload), (short) ContentFormat.LINK.getCode());
             // todo there is no token generator in java-coap
-           coapRequest=coapRequest.token(123456);
+
+           coapRequest=coapRequest.token(tokenGenerator.createToken());
         }
     }
     @Override public void visit(UpdateRequest request) {

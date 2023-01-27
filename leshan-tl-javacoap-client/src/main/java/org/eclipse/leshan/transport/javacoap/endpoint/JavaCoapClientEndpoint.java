@@ -16,6 +16,8 @@
 package org.eclipse.leshan.transport.javacoap.endpoint;
 
 import java.net.URI;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import org.eclipse.leshan.client.endpoint.ClientEndpointToolbox;
 import org.eclipse.leshan.client.endpoint.LwM2mClientEndpoint;
@@ -112,7 +114,21 @@ public class JavaCoapClientEndpoint implements LwM2mClientEndpoint {
     public <T extends LwM2mResponse> void send(ServerIdentity server, UplinkRequest<T> request,
             ResponseCallback<T> responseCallback, ErrorCallback errorCallback, long timeoutInMs) {
 
+        final CoapRequest coapRequest = translator.createCoapRequest(server, request, toolbox, model);
 
+
+
+        CompletableFuture<CoapResponse> cfcoapResponse = null;
+        CoapResponse coapResponse = null;
+
+        cfcoapResponse = client.send(coapRequest);
+        try {
+            coapResponse = cfcoapResponse.get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
 
     }
 }
