@@ -81,6 +81,14 @@ public interface RegistrationStore {
     Registration getRegistrationByIdentity(Identity identity);
 
     /**
+     * Get the registration by {@link Identity .pskIdentity}.
+     *
+     * @param pskIdentity of the client pskIdentity.
+     * @return the registration or null if there is no client registered with this identity.
+     */
+    Registration getRegistrationByPSKIdentity(String pskIdentity);
+
+    /**
      * Returns an iterator over the registration of this store. There are no guarantees concerning the order in which
      * the elements are returned (unless the implementation provides a guarantee).
      *

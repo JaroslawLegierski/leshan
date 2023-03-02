@@ -187,6 +187,23 @@ public class InMemoryRegistrationStore implements RegistrationStore, Startable, 
     }
 
     @Override
+    public Registration getRegistrationByPSKIdentity(String pskid) {
+        try {
+            lock.readLock().lock();
+
+            for (Map.Entry<Identity, Registration> entry : regsByIdentity.entrySet()) {
+                if (entry.getKey().getPskIdentity().contains(pskid)) {
+                    return entry.getValue();
+                }
+            }
+
+        } finally {
+            lock.readLock().unlock();
+        }
+        return null;
+    }
+
+    @Override
     public Iterator<Registration> getAllRegistrations() {
         try {
             lock.readLock().lock();

@@ -65,6 +65,16 @@ public class SendResource extends LwM2mCoapResource {
             return;
         }
 
+        // registration in Identity is null because of ip address change but pskidentity exists
+        if (clientProfile.getRegistration() == null) {
+
+            clientProfile = profileProvider.getProfileByPSKid(sender.getPskIdentity());
+
+            // based on the OMA Specification should be:
+            // exchange.respond(ResponseCode.NOT_FOUND, "no registration found");
+            // return;
+        }
+
         try {
             // Decode payload
             byte[] payload = exchange.getRequestPayload();

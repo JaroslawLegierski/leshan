@@ -20,4 +20,6 @@ import org.eclipse.leshan.core.request.Identity;
 public interface ClientProfileProvider {
 
     ClientProfile getProfile(Identity identity);
+
+    ClientProfile getProfileByPSKid(String pskIdentity);
 }

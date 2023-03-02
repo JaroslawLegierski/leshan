@@ -38,4 +38,9 @@ public class DefaultClientProfileProvider implements ClientProfileProvider {
         return new ClientProfile(registration, model);
     }
 
+    public ClientProfile getProfileByPSKid(String pskIdentity) {
+        Registration registration = registrationStore.getRegistrationByPSKIdentity(pskIdentity);
+        LwM2mModel model = modelProvider.getObjectModel(registration);
+        return new ClientProfile(registration, model);
+    }
 }

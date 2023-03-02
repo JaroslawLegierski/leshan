@@ -312,6 +312,12 @@ public class RedisRegistrationStore implements RegistrationStore, Startable, Sto
     }
 
     @Override
+    public Registration getRegistrationByPSKIdentity(String pskIdentity) {
+        // TODO add support for Redis
+        return null;
+    }
+
+    @Override
     public Iterator<Registration> getAllRegistrations() {
         return new RedisIterator(pool, new ScanParams().match(REG_EP + "*").count(100));
     }
