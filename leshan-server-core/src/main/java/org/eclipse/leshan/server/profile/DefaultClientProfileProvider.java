@@ -38,4 +38,10 @@ public class DefaultClientProfileProvider implements ClientProfileProvider {
         return new ClientProfile(registration, model);
     }
 
+    @Override
+    public ClientProfile getProfile(String registrationid) {
+        Registration registration = registrationStore.getRegistration(registrationid);
+        LwM2mModel model = modelProvider.getObjectModel(registration);
+        return new ClientProfile(registration, model);
+    }
 }

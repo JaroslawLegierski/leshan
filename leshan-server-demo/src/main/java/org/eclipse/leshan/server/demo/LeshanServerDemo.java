@@ -161,7 +161,7 @@ public class LeshanServerDemo {
             builder.setRegistrationStore(new RedisRegistrationStore(cli.main.redis));
         }
         builder.setSecurityStore(securityStore);
-
+        builder.setUpdateRegistrationOnNotification(true);
         if (cli.identity.isx509()) {
             // use X.509 mode (+ RPK)
             builder.setPrivateKey(cli.identity.getPrivateKey());
