@@ -40,6 +40,7 @@ import org.eclipse.leshan.server.model.LwM2mModelProvider;
 import org.eclipse.leshan.server.model.StandardModelProvider;
 import org.eclipse.leshan.server.queue.ClientAwakeTimeProvider;
 import org.eclipse.leshan.server.queue.StaticClientAwakeTimeProvider;
+import org.eclipse.leshan.server.registration.CustomInMemoryRegistrationStore;
 import org.eclipse.leshan.server.registration.InMemoryRegistrationStore;
 import org.eclipse.leshan.server.registration.RandomStringRegistrationIdProvider;
 import org.eclipse.leshan.server.registration.Registration;
@@ -276,7 +277,7 @@ public class LeshanServerBuilder {
      */
     public LeshanServer build() {
         if (registrationStore == null)
-            registrationStore = new InMemoryRegistrationStore();
+            registrationStore = new CustomInMemoryRegistrationStore();
         if (authorizer == null)
             authorizer = new DefaultAuthorizer(securityStore);
         if (modelProvider == null)

@@ -57,7 +57,7 @@ import org.eclipse.leshan.server.demo.servlet.ObjectSpecServlet;
 import org.eclipse.leshan.server.demo.servlet.ServerServlet;
 import org.eclipse.leshan.server.model.LwM2mModelProvider;
 import org.eclipse.leshan.server.model.VersionedModelProvider;
-import org.eclipse.leshan.server.redis.RedisRegistrationStore;
+import org.eclipse.leshan.server.redis.CustomRedisRegistrationStore;
 import org.eclipse.leshan.server.redis.RedisSecurityStore;
 import org.eclipse.leshan.server.security.EditableSecurityStore;
 import org.eclipse.leshan.server.security.FileSecurityStore;
@@ -158,7 +158,7 @@ public class LeshanServerDemo {
         } else {
             // use Redis Store
             securityStore = new RedisSecurityStore(cli.main.redis);
-            builder.setRegistrationStore(new RedisRegistrationStore(cli.main.redis));
+            builder.setRegistrationStore(new CustomRedisRegistrationStore(cli.main.redis));
         }
         builder.setSecurityStore(securityStore);
 
