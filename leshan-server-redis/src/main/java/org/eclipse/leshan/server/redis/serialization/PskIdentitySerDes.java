@@ -48,6 +48,9 @@ public class PskIdentitySerDes {
             o.put(KEY_RPK, Hex.encodeHexString(publicKey.getEncoded()));
         } else if (identity.isX509()) {
             o.put(KEY_CN, identity.getX509CommonName());
+        } else if (!identity.isSecure()) {
+            o.put(KEY_ADDRESS, identity.getPeerAddress().getHostString());
+            o.put(KEY_PORT, identity.getPeerAddress().getPort());
         }
         return o;
     }
