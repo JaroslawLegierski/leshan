@@ -48,13 +48,13 @@ import org.slf4j.LoggerFactory;
  * An in memory store for registration and observation.
  */
 public class CustomInMemoryRegistrationStore implements RegistrationStore, Startable, Stoppable, Destroyable {
-    private final Logger LOG = LoggerFactory.getLogger(CustomInMemoryRegistrationStore.class);
+    private final Logger LOG = LoggerFactory.getLogger(InMemoryRegistrationStore.class);
 
     // Data structure
     private final Map<String /* end-point */, Registration> regsByEp = new HashMap<>();
     private final Map<InetSocketAddress, Registration> regsByAddr = new HashMap<>();
     private final Map<String /* reg-id */, Registration> regsByRegId = new HashMap<>();
-    private final Map<String /* PskIdentity */, Registration> regsByIdentity = new HashMap<>();
+    private final Map<String /* PskIdentity or RPK or X509CN or IPAddress */, Registration> regsByIdentity = new HashMap<>();
     private final Map<ObservationIdentifier, Observation> obsByToken = new HashMap<>();
     private final Map<String, Set<ObservationIdentifier>> tokensByRegId = new HashMap<>();
 
@@ -87,12 +87,31 @@ public class CustomInMemoryRegistrationStore implements RegistrationStore, Start
 
     @Override
     public Deregistration addRegistration(Registration registration) {
+        String registrationidentifier = null;
+
         try {
             lock.writeLock().lock();
 
+            if (registration.getIdentity().isPSK()) {
+                registrationidentifier = registration.getIdentity().getPskIdentity();
+            }
+            if (registration.getIdentity().isRPK()) {
+                registrationidentifier = registration.getIdentity().getRawPublicKey().toString();
+            }
+            if (registration.getIdentity().isX509()) {
+                registrationidentifier = registration.getIdentity().getX509CommonName();
+            }
+            if (registration.getIdentity().isOSCORE()) {
+                registrationidentifier = registration.getIdentity().getOscoreIdentity().toString();
+            }
+            if (!registration.getIdentity().isSecure()) {
+                registrationidentifier = registration.getIdentity().getPeerAddress().toString();
+            }
+
             Registration registrationRemoved = regsByEp.put(registration.getEndpoint(), registration);
+
             regsByRegId.put(registration.getId(), registration);
-            regsByIdentity.put(registration.getIdentity().getPskIdentity(), registration);
+            regsByIdentity.put(registrationidentifier, registration);
             // If a registration is already associated to this address we don't care as we only want to keep the most
             // recent binding.
             regsByAddr.put(registration.getSocketAddress(), registration);
@@ -104,9 +123,11 @@ public class CustomInMemoryRegistrationStore implements RegistrationStore, Start
                 if (!registrationRemoved.getId().equals(registration.getId())) {
                     removeFromMap(regsByRegId, registrationRemoved.getId(), registrationRemoved);
                 }
-                if (!registrationRemoved.getIdentity().equals(registration.getIdentity().getPskIdentity())) {
-                    removeFromMap(regsByIdentity, registrationRemoved.getIdentity().getPskIdentity(),
-                            registrationRemoved);
+                if (!(registrationRemoved.getIdentity().getPskIdentity())
+                        .equals(registration.getIdentity().getPskIdentity())) {
+                    removeFromMap(regsByIdentity, registrationidentifier, registrationRemoved);
+                    // removeFromMap(regsByIdentity,
+                    // registrationRemoved.getIdentity().getPskIdentity(),registrationRemoved);
                 }
                 return new Deregistration(registrationRemoved, observationsRemoved);
             }
@@ -133,9 +154,34 @@ public class CustomInMemoryRegistrationStore implements RegistrationStore, Start
                 if (!registration.getSocketAddress().equals(updatedRegistration.getSocketAddress())) {
                     removeFromMap(regsByAddr, registration.getSocketAddress(), registration);
                 }
-                regsByIdentity.put(updatedRegistration.getIdentity().getPskIdentity(), updatedRegistration);
+
                 if (!registration.getIdentity().equals(updatedRegistration.getIdentity())) {
-                    removeFromMap(regsByIdentity, registration.getIdentity().getPskIdentity(), registration);
+                    if (updatedRegistration.getIdentity().isPSK()) {
+                        regsByIdentity.put(updatedRegistration.getIdentity().getPskIdentity(), updatedRegistration);
+                        removeFromMap(regsByIdentity, registration.getIdentity().getPskIdentity(), registration);
+                    }
+                    if (updatedRegistration.getIdentity().isRPK()) {
+                        regsByIdentity.put(updatedRegistration.getIdentity().getRawPublicKey().toString(),
+                                updatedRegistration);
+                        removeFromMap(regsByIdentity, registration.getIdentity().getRawPublicKey().toString(),
+                                registration);
+                    }
+                    if (updatedRegistration.getIdentity().isX509()) {
+                        regsByIdentity.put(updatedRegistration.getIdentity().getX509CommonName(), updatedRegistration);
+                        removeFromMap(regsByIdentity, registration.getIdentity().getX509CommonName(), registration);
+                    }
+                    if (updatedRegistration.getIdentity().isOSCORE()) {
+                        regsByIdentity.put(updatedRegistration.getIdentity().getOscoreIdentity().toString(),
+                                updatedRegistration);
+                        removeFromMap(regsByIdentity, registration.getIdentity().getOscoreIdentity().toString(),
+                                registration);
+                    }
+                    if (!updatedRegistration.getIdentity().isSecure()) {
+                        regsByIdentity.put(updatedRegistration.getIdentity().getPeerAddress().toString(),
+                                updatedRegistration);
+                        removeFromMap(regsByIdentity, registration.getIdentity().getPeerAddress().toString(),
+                                registration);
+                    }
                 }
 
                 regsByRegId.put(updatedRegistration.getId(), updatedRegistration);
@@ -181,7 +227,21 @@ public class CustomInMemoryRegistrationStore implements RegistrationStore, Start
     public Registration getRegistrationByIdentity(Identity identity) {
         try {
             lock.readLock().lock();
-            return regsByIdentity.get(identity.getPskIdentity());
+            if (identity.isPSK()) {
+                return regsByIdentity.get(identity.getPskIdentity());
+            }
+            if (identity.isRPK()) {
+                return regsByIdentity.get(identity.getRawPublicKey().toString());
+            }
+            if (identity.isX509()) {
+                return regsByIdentity.get(identity.getX509CommonName());
+            }
+            if (identity.isOSCORE()) {
+                return regsByIdentity.get(identity.getOscoreIdentity().toString());
+            } else {
+                return regsByIdentity.get(identity.getPeerAddress().toString());
+            }
+
         } finally {
             lock.readLock().unlock();
         }
@@ -208,7 +268,25 @@ public class CustomInMemoryRegistrationStore implements RegistrationStore, Start
                 regsByEp.remove(registration.getEndpoint());
                 removeFromMap(regsByAddr, registration.getSocketAddress(), registration);
                 removeFromMap(regsByRegId, registration.getId(), registration);
-                removeFromMap(regsByIdentity, registration.getIdentity().getPskIdentity(), registration);
+
+                if (registration.getIdentity().isPSK()) {
+                    removeFromMap(regsByIdentity, registration.getIdentity().getPskIdentity(), registration);
+                }
+                if (registration.getIdentity().isRPK()) {
+                    removeFromMap(regsByIdentity, registration.getIdentity().getRawPublicKey().toString(),
+                            registration);
+                }
+                if (registration.getIdentity().isX509()) {
+                    removeFromMap(regsByIdentity, registration.getIdentity().getX509CommonName(), registration);
+                }
+                if (registration.getIdentity().isOSCORE()) {
+                    removeFromMap(regsByIdentity, registration.getIdentity().getOscoreIdentity().toString(),
+                            registration);
+                }
+                if (!registration.getIdentity().isSecure()) {
+                    removeFromMap(regsByIdentity, registration.getIdentity().getPeerAddress().toString(), registration);
+                }
+
                 return new Deregistration(registration, observationsRemoved);
             }
             return null;
