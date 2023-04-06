@@ -20,7 +20,6 @@ package org.eclipse.leshan.client.resource;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -74,14 +73,13 @@ public class ObjectEnabler extends BaseObjectEnabler implements Destroyable, Sta
 
     private static Logger LOG = LoggerFactory.getLogger(DummyInstanceEnabler.class);
 
-    protected Map<Integer, LwM2mInstanceEnabler> instances;
     protected LwM2mInstanceEnablerFactory instanceFactory;
     protected ContentFormat defaultContentFormat;
 
     public ObjectEnabler(int id, ObjectModel objectModel, Map<Integer, LwM2mInstanceEnabler> instances,
             LwM2mInstanceEnablerFactory instanceFactory, ContentFormat defaultContentFormat) {
-        super(id, objectModel);
-        this.instances = new HashMap<>(instances);
+        super(id, objectModel, instances);
+
         this.instanceFactory = instanceFactory;
         this.defaultContentFormat = defaultContentFormat;
         for (Entry<Integer, LwM2mInstanceEnabler> entry : this.instances.entrySet()) {

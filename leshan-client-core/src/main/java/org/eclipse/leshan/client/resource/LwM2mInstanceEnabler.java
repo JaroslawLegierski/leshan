@@ -26,6 +26,7 @@ import org.eclipse.leshan.client.servers.ServerIdentity;
 import org.eclipse.leshan.core.Destroyable;
 import org.eclipse.leshan.core.Startable;
 import org.eclipse.leshan.core.Stoppable;
+import org.eclipse.leshan.core.link.lwm2m.attributes.LwM2mAttributeSet;
 import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.core.node.LwM2mObjectInstance;
 import org.eclipse.leshan.core.node.LwM2mResource;
@@ -35,6 +36,7 @@ import org.eclipse.leshan.core.request.argument.Arguments;
 import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.eclipse.leshan.core.response.ObserveResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
+import org.eclipse.leshan.core.response.WriteAttributesResponse;
 import org.eclipse.leshan.core.response.WriteResponse;
 
 /**
@@ -181,6 +183,9 @@ public interface LwM2mInstanceEnabler {
      */
     WriteResponse write(ServerIdentity identity, boolean addIfAbsent, int resourceid, int resourceInstance,
             LwM2mResourceInstance value);
+
+    public WriteAttributesResponse writeAttributeSet(ServerIdentity identity, boolean replace, int resourceid,
+            LwM2mAttributeSet value);
 
     /**
      * Executes the operation represented by one of this LWM2M object instance's resources.

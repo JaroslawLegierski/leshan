@@ -24,9 +24,12 @@ package org.eclipse.leshan.client.resource;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.leshan.client.LwM2mClient;
 import org.eclipse.leshan.client.resource.listener.ObjectListener;
@@ -72,17 +75,110 @@ import org.eclipse.leshan.core.response.WriteResponse;
  */
 public abstract class BaseObjectEnabler implements LwM2mObjectEnabler {
 
+    private class ObservationTrigger implements Runnable {
+        private Integer DEFAULT_PMAX = 5;
+        private Integer DEFAULT_PMIN = 1;
+        private Thread thread;
+        private HashMap<LwM2mPath, Integer> pmaxMap;
+        private HashMap<LwM2mPath, Integer> pminMap;
+        private HashMap<LwM2mPath, Integer> lifetimeMap;
+        private ArrayList<LwM2mPath> queued;
+
+        private boolean isRunning;
+
+        public ObservationTrigger() {
+            this.pmaxMap = new HashMap<>();
+            this.pminMap = new HashMap<>();
+            this.lifetimeMap = new HashMap<>();
+            this.queued = new ArrayList<>();
+            this.isRunning = true;
+        }
+
+        public void setMax(LwM2mPath path, Integer pmax) {
+            pmaxMap.put(path, pmax);
+        }
+
+        public void setMin(LwM2mPath path, Integer pmin) {
+            pminMap.put(path, pmin);
+        }
+
+        public Integer getMax(LwM2mPath path) {
+            if (pmaxMap.containsKey(path))
+                return pmaxMap.get(path);
+            else
+                return DEFAULT_PMAX;
+        }
+
+        public Integer getMin(LwM2mPath path) {
+            if (pminMap.containsKey(path))
+                return pminMap.get(path);
+            else
+                return DEFAULT_PMIN;
+        }
+
+        public void putIntoQueue(LwM2mPath path) {
+            queued.add(path);
+            lifetimeMap.put(path, 0);
+        }
+
+        @Override
+        public void run() {
+            while (isRunning) {
+
+                // pmin excited
+                for (LwM2mPath path : queued) {
+                    Integer pmin = getMin(path);
+                    Integer lifetime = lifetimeMap.get(path);
+                    if (lifetime >= pmin) {
+                        queued.remove(path);
+                        fireResourcesChanged(path);
+                    }
+                }
+
+                // pmax excited
+                for (LwM2mPath path : lifetimeMap.keySet()) {
+                    Integer pmax = getMax(path);
+                    Integer lifetime = lifetimeMap.get(path);
+
+                    if (lifetime >= pmax) {
+                        fireResourcesChanged(path);
+                    }
+
+                    lifetimeMap.put(path, ++lifetime);
+                }
+
+                try {
+                    TimeUnit.SECONDS.sleep(1);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+        public void start() {
+            if (thread == null) {
+                thread = new Thread(this);
+                thread.start();
+            }
+        }
+    }
+
     protected final int id;
     protected final TransactionalObjectListener transactionalListener;
     protected final ObjectModel objectModel;
+    protected Map<Integer, LwM2mInstanceEnabler> instances;
 
     private LwM2mClient lwm2mClient;
 
-    public BaseObjectEnabler(int id, ObjectModel objectModel) {
+    private ObservationTrigger observationTrigger;
+
+    public BaseObjectEnabler(int id, ObjectModel objectModel, Map<Integer, LwM2mInstanceEnabler> instances) {
+        this.instances = new HashMap<>(instances);
         this.id = id;
         this.objectModel = objectModel;
         this.transactionalListener = createTransactionListener();
-
+        this.observationTrigger = new ObservationTrigger();
+        observationTrigger.start();
     }
 
     protected TransactionalObjectListener createTransactionListener() {
@@ -371,9 +467,24 @@ public abstract class BaseObjectEnabler implements LwM2mObjectEnabler {
         if (identity.isLwm2mBootstrapServer()) {
             return WriteAttributesResponse.methodNotAllowed();
         }
-        // TODO should be implemented here to be available for all object enabler
-        // This should be a not implemented error, but this is not defined in the spec.
-        return WriteAttributesResponse.internalServerError("not implemented");
+
+        return dowriteAttributes(identity, request);
+    }
+
+    protected WriteAttributesResponse dowriteAttributes(ServerIdentity identity, WriteAttributesRequest request) {
+        LwM2mPath path = request.getPath();
+
+        Integer pmin = (Integer) request.getAttributes().get("pmin").getValue();
+        Integer pmax = (Integer) request.getAttributes().get("pmax").getValue();
+
+        observationTrigger.setMin(path, pmin);
+        observationTrigger.setMax(path, pmax);
+
+        LwM2mInstanceEnabler instance = instances.get(path.getObjectInstanceId());
+
+        instance.writeAttributeSet(identity, true, path.getResourceId(), request.getAttributes());
+
+        return WriteAttributesResponse.success();
     }
 
     @Override

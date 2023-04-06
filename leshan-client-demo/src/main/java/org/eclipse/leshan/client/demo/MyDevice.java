@@ -29,12 +29,15 @@ import java.util.TimerTask;
 import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
 import org.eclipse.leshan.client.servers.ServerIdentity;
 import org.eclipse.leshan.core.Destroyable;
+import org.eclipse.leshan.core.link.attributes.Attribute;
+import org.eclipse.leshan.core.link.lwm2m.attributes.LwM2mAttributeSet;
 import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
 import org.eclipse.leshan.core.node.LwM2mResource;
 import org.eclipse.leshan.core.request.argument.Arguments;
 import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
+import org.eclipse.leshan.core.response.WriteAttributesResponse;
 import org.eclipse.leshan.core.response.WriteResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -144,6 +147,21 @@ public class MyDevice extends BaseInstanceEnabler implements Destroyable {
             return WriteResponse.success();
         default:
             return super.write(identity, replace, resourceid, value);
+        }
+    }
+
+    @Override
+    public WriteAttributesResponse writeAttributeSet(ServerIdentity identity, boolean replace, int resourceid,
+            LwM2mAttributeSet attributes) {
+        switch (resourceid) {
+        case 13:
+            LOG.info("Recived attributes:");
+            for (Attribute attribute : attributes) {
+                LOG.info(attribute.getName());
+            }
+
+        default:
+            return super.writeAttributeSet(identity, replace, resourceid, attributes);
         }
     }
 
