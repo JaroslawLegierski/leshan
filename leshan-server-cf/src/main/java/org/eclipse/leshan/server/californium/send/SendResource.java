@@ -33,6 +33,9 @@ import org.eclipse.leshan.core.response.SendResponse;
 import org.eclipse.leshan.core.response.SendableResponse;
 import org.eclipse.leshan.server.profile.ClientProfile;
 import org.eclipse.leshan.server.profile.ClientProfileProvider;
+import org.eclipse.leshan.server.registration.RegistrationStore;
+import org.eclipse.leshan.server.registration.RegistrationUpdate;
+import org.eclipse.leshan.server.registration.UpdatedRegistration;
 import org.eclipse.leshan.server.request.UplinkRequestReceiver;
 
 /**
@@ -44,13 +47,19 @@ public class SendResource extends LwM2mCoapResource {
     private final LwM2mDecoder decoder;
     private final UplinkRequestReceiver receiver;
     private final ClientProfileProvider profileProvider;
+    private final RegistrationStore registrationStore;
+    private final boolean updateRegistrationOnSend;
 
     public SendResource(UplinkRequestReceiver receiver, LwM2mDecoder decoder, ClientProfileProvider profileProvider,
-            IdentityHandlerProvider identityHandlerProvider) {
+            IdentityHandlerProvider identityHandlerProvider, RegistrationStore registrationStore,
+            boolean updateRegistrationOnSend) {
         super("dp", identityHandlerProvider);
         this.decoder = decoder;
         this.receiver = receiver;
         this.profileProvider = profileProvider;
+        this.registrationStore = registrationStore;
+        this.updateRegistrationOnSend = updateRegistrationOnSend;
+
     }
 
     @Override
@@ -63,6 +72,19 @@ public class SendResource extends LwM2mCoapResource {
         if (clientProfile.getRegistration() == null) {
             exchange.respond(ResponseCode.NOT_FOUND, "no registration found");
             return;
+        }
+
+        // Update registration on send
+        if (updateRegistrationOnSend) {
+            RegistrationUpdate regUpdate = new RegistrationUpdate(clientProfile.getRegistrationId(), sender, null, null,
+                    null, null, null, null);
+            UpdatedRegistration updatedRegistration = registrationStore.updateRegistration(regUpdate);
+            if (updatedRegistration == null || updatedRegistration.getUpdatedRegistration() == null) {
+                // Todo - Do we want to handle this ?
+                // LOG.error("Unexpected error: registration with id {} was not updated",
+                // clientProfile.getRegistrationId());
+                // return;
+            }
         }
 
         try {

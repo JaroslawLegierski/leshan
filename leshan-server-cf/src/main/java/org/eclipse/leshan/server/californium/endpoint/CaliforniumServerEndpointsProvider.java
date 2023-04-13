@@ -78,6 +78,7 @@ public class CaliforniumServerEndpointsProvider implements LwM2mServerEndpointsP
     private final ServerCoapMessageTranslator messagetranslator = new ServerCoapMessageTranslator();
     private final List<CaliforniumServerEndpoint> endpoints;
     private CoapServer coapServer;
+    private final boolean updateRegistrationOnSend;
 
     public CaliforniumServerEndpointsProvider() {
         this(new Builder().generateDefaultValue());
@@ -87,6 +88,7 @@ public class CaliforniumServerEndpointsProvider implements LwM2mServerEndpointsP
         this.serverConfig = builder.serverConfiguration;
         this.endpointsFactory = builder.endpointsFactory;
         this.endpoints = new ArrayList<CaliforniumServerEndpoint>();
+        this.updateRegistrationOnSend = builder.updateRegistrationOnSend;
     }
 
     @Override
@@ -180,7 +182,8 @@ public class CaliforniumServerEndpointsProvider implements LwM2mServerEndpointsP
         }
 
         // create resources
-        List<Resource> resources = messagetranslator.createResources(requestReceiver, toolbox, identityHandlerProvider);
+        List<Resource> resources = messagetranslator.createResources(requestReceiver, toolbox, identityHandlerProvider,
+                server.getRegistrationStore(), updateRegistrationOnSend);
         coapServer.add(resources.toArray(new Resource[resources.size()]));
     }
 
@@ -210,6 +213,7 @@ public class CaliforniumServerEndpointsProvider implements LwM2mServerEndpointsP
     public static class Builder {
 
         private final List<ServerProtocolProvider> protocolProviders;
+        public boolean updateRegistrationOnSend;
         private Configuration serverConfiguration;
         private final List<CaliforniumServerEndpointFactory> endpointsFactory;
 
@@ -351,6 +355,11 @@ public class CaliforniumServerEndpointsProvider implements LwM2mServerEndpointsP
         public CaliforniumServerEndpointsProvider build() {
             generateDefaultValue();
             return new CaliforniumServerEndpointsProvider(this);
+        }
+
+        public void setupdateRegistrationOnSend(boolean updateRegistrationOnSend) {
+            this.updateRegistrationOnSend = updateRegistrationOnSend;
+
         }
     }
 }

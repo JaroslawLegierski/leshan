@@ -193,6 +193,8 @@ public class LeshanServerDemo {
 
         // Create Californium Configuration
         Configuration serverCoapConfig = endpointsBuilder.createDefaultConfiguration();
+        // Update Registration on Send
+        endpointsBuilder.setupdateRegistrationOnSend(true);
 
         // Set some DTLS stuff
         // These configuration values are always overwritten by CLI therefore set them to transient.

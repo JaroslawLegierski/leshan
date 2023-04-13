@@ -49,6 +49,7 @@ import org.eclipse.leshan.server.californium.request.LwM2mResponseBuilder;
 import org.eclipse.leshan.server.californium.send.SendResource;
 import org.eclipse.leshan.server.endpoint.ServerEndpointToolbox;
 import org.eclipse.leshan.server.profile.ClientProfile;
+import org.eclipse.leshan.server.registration.RegistrationStore;
 import org.eclipse.leshan.server.request.UplinkRequestReceiver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,11 +77,12 @@ public class ServerCoapMessageTranslator {
     }
 
     public List<Resource> createResources(UplinkRequestReceiver receiver, ServerEndpointToolbox toolbox,
-            IdentityHandlerProvider identityHandlerProvider) {
+            IdentityHandlerProvider identityHandlerProvider, RegistrationStore registrationStore,
+            boolean updateRegistrationOnSend) {
         return Arrays.asList( //
                 (Resource) new RegisterResource(receiver, toolbox.getLinkParser(), identityHandlerProvider), //
                 (Resource) new SendResource(receiver, toolbox.getDecoder(), toolbox.getProfileProvider(),
-                        identityHandlerProvider));
+                        identityHandlerProvider, registrationStore, updateRegistrationOnSend));
     }
 
     public AbstractLwM2mResponse createObservation(Observation observation, Response coapResponse,
