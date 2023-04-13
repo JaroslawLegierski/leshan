@@ -177,9 +177,7 @@ public class CustomRedisRegistrationStore implements RegistrationStore, Startabl
                     if (!oldRegistration.getSocketAddress().equals(registration.getSocketAddress())) {
                         removeAddrIndex(j, oldRegistration);
                     }
-                    if (!oldRegistration.getIdentity().equals(registration.getIdentity())) {
-                        removeIdentityIndex(j, oldRegistration);
-                    }
+
                     // remove old observation
                     Collection<Observation> obsRemoved = unsafeRemoveAllObservations(j, oldRegistration.getId());
 
@@ -235,9 +233,6 @@ public class CustomRedisRegistrationStore implements RegistrationStore, Startabl
                 // update secondary index :
                 byte[] identity_idx = toRegIdentityKey(updatedRegistration.getIdentity());
                 j.set(identity_idx, updatedRegistration.getEndpoint().getBytes(UTF_8));
-                if (!r.getIdentity().equals(updatedRegistration.getIdentity())) {
-                    removeIdentityIndex(j, r);
-                }
 
                 return new UpdatedRegistration(r, updatedRegistration);
 
