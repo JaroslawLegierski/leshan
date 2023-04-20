@@ -62,6 +62,12 @@ import org.eclipse.leshan.core.californium.identity.IdentityHandler;
 import org.eclipse.leshan.core.endpoint.EndpointUriUtil;
 import org.eclipse.leshan.core.endpoint.Protocol;
 import org.eclipse.leshan.core.request.Identity;
+import org.eclipse.leshan.core.request.IpPeer;
+import org.eclipse.leshan.core.request.LwM2MIdentity;
+import org.eclipse.leshan.core.request.Peer;
+import org.eclipse.leshan.core.request.PskIdentity;
+import org.eclipse.leshan.core.request.RpkIdentity;
+import org.eclipse.leshan.core.request.X509Identity;
 import org.eclipse.leshan.core.request.exception.TimeoutException;
 import org.eclipse.leshan.core.request.exception.TimeoutException.Type;
 import org.eclipse.leshan.core.util.X509CertUtil;
@@ -283,20 +289,23 @@ public class CoapsBootstrapServerEndpointFactory implements CaliforniumBootstrap
         return new IdentityHandler() {
 
             @Override
-            public Identity getIdentity(Message receivedMessage) {
+            public IpPeer getIdentity(Message receivedMessage) {
                 EndpointContext context = receivedMessage.getSourceContext();
                 InetSocketAddress peerAddress = context.getPeerAddress();
                 Principal senderIdentity = context.getPeerIdentity();
                 if (senderIdentity != null) {
                     if (senderIdentity instanceof PreSharedKeyIdentity) {
-                        return Identity.psk(peerAddress, ((PreSharedKeyIdentity) senderIdentity).getIdentity());
+                        return new IpPeer(peerAddress, new PskIdentity(((PreSharedKeyIdentity) senderIdentity).getIdentity()));
+                        //return Identity.psk(peerAddress, ((PreSharedKeyIdentity) senderIdentity).getIdentity());
                     } else if (senderIdentity instanceof RawPublicKeyIdentity) {
                         PublicKey publicKey = ((RawPublicKeyIdentity) senderIdentity).getKey();
-                        return Identity.rpk(peerAddress, publicKey);
+                        return new IpPeer(peerAddress, new RpkIdentity(publicKey));
+                        //return Identity.rpk(peerAddress, publicKey);
                     } else if (senderIdentity instanceof X500Principal || senderIdentity instanceof X509CertPath) {
                         // Extract common name
                         String x509CommonName = X509CertUtil.extractCN(senderIdentity.getName());
-                        return Identity.x509(peerAddress, x509CommonName);
+                        return  new IpPeer(peerAddress, new X509Identity(x509CommonName));
+                        //return Identity.x509(peerAddress, x509CommonName);
                     }
                     throw new IllegalStateException(
                             String.format("Unable to extract sender identity : unexpected type of Principal %s [%s]",
@@ -306,23 +315,23 @@ public class CoapsBootstrapServerEndpointFactory implements CaliforniumBootstrap
             }
 
             @Override
-            public EndpointContext createEndpointContext(Identity identity, boolean allowConnectionInitiation) {
+            public EndpointContext createEndpointContext(IpPeer ipeer, boolean allowConnectionInitiation) {
                 Principal peerIdentity = null;
-                if (identity != null) {
-                    if (identity.isPSK()) {
-                        peerIdentity = new PreSharedKeyIdentity(identity.getPskIdentity());
-                    } else if (identity.isRPK()) {
-                        peerIdentity = new RawPublicKeyIdentity(identity.getRawPublicKey());
-                    } else if (identity.isX509()) {
+                if (ipeer != null) {
+                    if (ipeer.getIdentity() instanceof PskIdentity) {
+                        peerIdentity = new PreSharedKeyIdentity(((PskIdentity) ipeer.getIdentity()).getpskIdentity());
+                    } else if (ipeer.getIdentity() instanceof RpkIdentity) {
+                        peerIdentity = new RawPublicKeyIdentity( ((RpkIdentity) ipeer.getIdentity()).getPublicKey());
+                    } else if (ipeer.getIdentity() instanceof X509Identity) {
                         /* simplify distinguished name to CN= part */
-                        peerIdentity = new X500Principal("CN=" + identity.getX509CommonName());
+                        peerIdentity = new X500Principal("CN=" + ((X509Identity) ipeer.getIdentity()).getX509CommonName());
                     }
                 }
                 if (peerIdentity != null && allowConnectionInitiation) {
-                    return new MapBasedEndpointContext(identity.getPeerAddress(), peerIdentity, new Attributes()
+                    return new MapBasedEndpointContext(ipeer.getSocketAddress(), peerIdentity, new Attributes()
                             .add(DtlsEndpointContext.KEY_HANDSHAKE_MODE, DtlsEndpointContext.HANDSHAKE_MODE_AUTO));
                 }
-                return new AddressEndpointContext(identity.getPeerAddress(), peerIdentity);
+                return new AddressEndpointContext(ipeer.getSocketAddress(), peerIdentity);
             }
         };
     }
