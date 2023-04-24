@@ -68,7 +68,7 @@ import org.eclipse.leshan.core.oscore.OscoreSetting;
 import org.eclipse.leshan.core.request.BootstrapDownlinkRequest;
 import org.eclipse.leshan.core.request.BootstrapRequest;
 import org.eclipse.leshan.core.request.ContentFormat;
-import org.eclipse.leshan.core.request.Identity;
+import org.eclipse.leshan.core.request.IpPeer;
 import org.eclipse.leshan.core.response.LwM2mResponse;
 import org.eclipse.leshan.core.util.Hex;
 import org.eclipse.leshan.server.bootstrap.BootstrapConfig;
@@ -125,7 +125,7 @@ public class BootstrapIntegrationTestHelper extends SecureIntegrationTestHelper 
         }
 
         @Override
-        public BootstrapSession begin(BootstrapRequest request, Identity clientIdentity, URI endpointUsed) {
+        public BootstrapSession begin(BootstrapRequest request, IpPeer clientIdentity, URI endpointUsed) {
             assertThat(request.getCoapRequest(), instanceOf(Request.class));
             return super.begin(request, clientIdentity, endpointUsed);
         }
@@ -179,7 +179,7 @@ public class BootstrapIntegrationTestHelper extends SecureIntegrationTestHelper 
         builder.setSessionManager(new DefaultBootstrapSessionManager(securityStore, configStore) {
 
             @Override
-            public BootstrapSession begin(BootstrapRequest request, Identity clientIdentity, URI endpointUsed) {
+            public BootstrapSession begin(BootstrapRequest request, IpPeer clientIdentity, URI endpointUsed) {
                 assertThat(request.getCoapRequest(), instanceOf(Request.class));
                 return super.begin(request, clientIdentity, endpointUsed);
             }
@@ -500,7 +500,7 @@ public class BootstrapIntegrationTestHelper extends SecureIntegrationTestHelper 
         return new BootstrapConfigStore() {
 
             @Override
-            public BootstrapConfig get(String endpoint, Identity deviceIdentity, BootstrapSession session) {
+            public BootstrapConfig get(String endpoint, IpPeer deviceIdentity, BootstrapSession session) {
 
                 BootstrapConfig bsConfig = new BootstrapConfig();
 
@@ -544,7 +544,7 @@ public class BootstrapIntegrationTestHelper extends SecureIntegrationTestHelper 
         return new BootstrapConfigStore() {
 
             @Override
-            public BootstrapConfig get(String endpoint, Identity deviceIdentity, BootstrapSession session) {
+            public BootstrapConfig get(String endpoint, IpPeer deviceIdentity, BootstrapSession session) {
 
                 BootstrapConfig bsConfig = new BootstrapConfig();
                 bsConfig.toDelete = Arrays.asList(pathToDelete);
@@ -557,7 +557,7 @@ public class BootstrapIntegrationTestHelper extends SecureIntegrationTestHelper 
         return new BootstrapConfigStore() {
 
             @Override
-            public BootstrapConfig get(String endpoint, Identity deviceIdentity, BootstrapSession session) {
+            public BootstrapConfig get(String endpoint, IpPeer deviceIdentity, BootstrapSession session) {
 
                 BootstrapConfig bsConfig = new BootstrapConfig();
 
@@ -605,7 +605,7 @@ public class BootstrapIntegrationTestHelper extends SecureIntegrationTestHelper 
         return new BootstrapConfigStore() {
 
             @Override
-            public BootstrapConfig get(String endpoint, Identity deviceIdentity, BootstrapSession session) {
+            public BootstrapConfig get(String endpoint, IpPeer deviceIdentity, BootstrapSession session) {
 
                 BootstrapConfig bsConfig = new BootstrapConfig();
 
@@ -639,7 +639,7 @@ public class BootstrapIntegrationTestHelper extends SecureIntegrationTestHelper 
         return new BootstrapConfigStore() {
 
             @Override
-            public BootstrapConfig get(String endpoint, Identity deviceIdentity, BootstrapSession session) {
+            public BootstrapConfig get(String endpoint, IpPeer deviceIdentity, BootstrapSession session) {
 
                 BootstrapConfig bsConfig = new BootstrapConfig();
 
@@ -698,7 +698,7 @@ public class BootstrapIntegrationTestHelper extends SecureIntegrationTestHelper 
         return new BootstrapConfigStore() {
 
             @Override
-            public BootstrapConfig get(String endpoint, Identity deviceIdentity, BootstrapSession session) {
+            public BootstrapConfig get(String endpoint, IpPeer deviceIdentity, BootstrapSession session) {
 
                 BootstrapConfig bsConfig = new BootstrapConfig();
 
@@ -733,7 +733,7 @@ public class BootstrapIntegrationTestHelper extends SecureIntegrationTestHelper 
         return new BootstrapConfigStore() {
 
             @Override
-            public BootstrapConfig get(String endpoint, Identity deviceIdentity, BootstrapSession session) {
+            public BootstrapConfig get(String endpoint, IpPeer deviceIdentity, BootstrapSession session) {
 
                 BootstrapConfig bsConfig = new BootstrapConfig();
 
@@ -770,7 +770,7 @@ public class BootstrapIntegrationTestHelper extends SecureIntegrationTestHelper 
         return new BootstrapConfigStore() {
 
             @Override
-            public BootstrapConfig get(String endpoint, Identity deviceIdentity, BootstrapSession session) {
+            public BootstrapConfig get(String endpoint, IpPeer deviceIdentity, BootstrapSession session) {
 
                 BootstrapConfig bsConfig = new BootstrapConfig();
 

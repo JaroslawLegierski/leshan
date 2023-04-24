@@ -61,7 +61,7 @@ import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.core.model.StaticModel;
 import org.eclipse.leshan.core.node.codec.DefaultLwM2mDecoder;
 import org.eclipse.leshan.core.node.codec.DefaultLwM2mEncoder;
-import org.eclipse.leshan.core.request.Identity;
+import org.eclipse.leshan.core.request.IpPeer;
 import org.eclipse.leshan.core.request.UplinkRequest;
 import org.eclipse.leshan.core.request.argument.Arguments;
 import org.eclipse.leshan.core.response.ExecuteResponse;
@@ -217,7 +217,7 @@ public class IntegrationTestHelper {
         builder.setAuthorizer(new DefaultAuthorizer(securityStore) {
             @Override
             public Authorization isAuthorized(UplinkRequest<?> request, Registration registration,
-                    Identity senderIdentity) {
+                    IpPeer senderIdentity) {
                 assertThat(request.getCoapRequest(), instanceOf(Request.class));
                 return super.isAuthorized(request, registration, senderIdentity);
             }

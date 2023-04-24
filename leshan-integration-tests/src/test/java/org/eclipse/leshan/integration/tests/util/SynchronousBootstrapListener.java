@@ -21,7 +21,7 @@ import java.util.concurrent.TimeoutException;
 
 import org.eclipse.leshan.core.request.BootstrapDownlinkRequest;
 import org.eclipse.leshan.core.request.BootstrapRequest;
-import org.eclipse.leshan.core.request.Identity;
+import org.eclipse.leshan.core.request.IpPeer;
 import org.eclipse.leshan.core.response.LwM2mResponse;
 import org.eclipse.leshan.server.bootstrap.BootstrapFailureCause;
 import org.eclipse.leshan.server.bootstrap.BootstrapSession;
@@ -35,11 +35,11 @@ public class SynchronousBootstrapListener implements BootstrapSessionListener {
     private BootstrapFailureCause lastCause;
 
     @Override
-    public void sessionInitiated(BootstrapRequest request, Identity clientIdentity) {
+    public void sessionInitiated(BootstrapRequest request, IpPeer clientIdentity) {
     }
 
     @Override
-    public void unAuthorized(BootstrapRequest request, Identity clientIdentity) {
+    public void unAuthorized(BootstrapRequest request, IpPeer clientIdentity) {
     }
 
     @Override
