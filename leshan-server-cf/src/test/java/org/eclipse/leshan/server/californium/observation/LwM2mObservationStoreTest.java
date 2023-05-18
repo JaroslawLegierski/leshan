@@ -49,6 +49,7 @@ import org.eclipse.leshan.core.request.ObserveCompositeRequest;
 import org.eclipse.leshan.core.request.ObserveRequest;
 import org.eclipse.leshan.core.response.ObserveCompositeResponse;
 import org.eclipse.leshan.core.response.ObserveResponse;
+import org.eclipse.leshan.server.model.LwM2mModelProvider;
 import org.eclipse.leshan.server.observation.LwM2mNotificationReceiver;
 import org.eclipse.leshan.server.profile.ClientProfile;
 import org.eclipse.leshan.server.registration.InMemoryRegistrationStore;
@@ -73,6 +74,7 @@ public class LwM2mObservationStoreTest {
     LwM2mObservationStore observationStore;
     InetAddress address;
     Registration registration;
+    private LwM2mModelProvider modelProvider;
 
     @BeforeEach
     public void setUp() throws UnknownHostException {
@@ -215,7 +217,7 @@ public class LwM2mObservationStoreTest {
     private void givenASimpleRegistration(Long lifetime) {
 
         Registration.Builder builder = new Registration.Builder(registrationId, ep, Identity.unsecure(address, port),
-                EndpointUriUtil.createUri("coap://localhost:5683"));
+                EndpointUriUtil.createUri("coap://localhost:5683"),modelProvider);
 
         registration = builder.lifeTimeInSec(lifetime).smsNumber(sms).bindingMode(binding).objectLinks(objectLinks)
                 .build();

@@ -30,6 +30,7 @@ import org.eclipse.leshan.core.link.Link;
 import org.eclipse.leshan.core.request.BindingMode;
 import org.eclipse.leshan.core.request.Identity;
 import org.eclipse.leshan.core.util.Validate;
+import org.eclipse.leshan.server.model.LwM2mModelProvider;
 
 /**
  * A container object for updating a LW-M2M client's registration properties on the server.
@@ -45,10 +46,12 @@ public class RegistrationUpdate {
     private final Link[] objectLinks;
     private final Map<String, String> additionalAttributes;
     private final Map<String, String> applicationData;
+    private LwM2mModelProvider modelProvider;
 
     public RegistrationUpdate(String registrationId, Identity identity, Long lifeTimeInSec, String smsNumber,
             EnumSet<BindingMode> bindingMode, Link[] objectLinks, Map<String, String> additionalAttributes,
-            Map<String, String> applicationData) {
+            Map<String, String> applicationData, LwM2mModelProvider modelProvider) {
+        this.modelProvider = modelProvider;
         Validate.notNull(registrationId);
         Validate.notNull(identity);
         this.registrationId = registrationId;
@@ -92,7 +95,7 @@ public class RegistrationUpdate {
         Date lastUpdate = new Date();
 
         Registration.Builder builder = new Registration.Builder(registration.getId(), registration.getEndpoint(),
-                identity, registration.getLastEndpointUsed());
+                identity, registration.getLastEndpointUsed(), modelProvider);
         builder.extractDataFromObjectLink(this.objectLinks != null); // we parse object link only if there was updated.
 
         builder.lwM2mVersion(registration.getLwM2mVersion()).lifeTimeInSec(lifeTimeInSec).smsNumber(smsNumber)

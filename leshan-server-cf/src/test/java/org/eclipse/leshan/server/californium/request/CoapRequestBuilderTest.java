@@ -55,6 +55,7 @@ import org.eclipse.leshan.core.request.WriteRequest.Mode;
 import org.eclipse.leshan.core.tlv.Tlv;
 import org.eclipse.leshan.core.tlv.Tlv.TlvType;
 import org.eclipse.leshan.core.tlv.TlvDecoder;
+import org.eclipse.leshan.server.model.LwM2mModelProvider;
 import org.eclipse.leshan.server.registration.Registration;
 import org.eclipse.leshan.server.registration.Registration.Builder;
 import org.junit.jupiter.api.BeforeAll;
@@ -68,6 +69,7 @@ public class CoapRequestBuilderTest {
     private static LwM2mModel model;
     private static LwM2mEncoder encoder;
     private static IdentityHandler identityHandler;
+    private LwM2mModelProvider modelProvider;
 
     @BeforeAll
     public static void loadModel() {
@@ -83,7 +85,7 @@ public class CoapRequestBuilderTest {
     private Registration newRegistration(String rootpath) throws UnknownHostException {
         Builder b = new Registration.Builder("regid", "endpoint",
                 Identity.unsecure(Inet4Address.getLoopbackAddress(), 12354),
-                EndpointUriUtil.createUri("coap://localhost:5683"));
+                EndpointUriUtil.createUri("coap://localhost:5683"),modelProvider);
         b.extractDataFromObjectLink(true);
         if (rootpath != null) {
             b.objectLinks(new Link[] { new Link(rootpath, new ResourceTypeAttribute("oma.lwm2m")) });

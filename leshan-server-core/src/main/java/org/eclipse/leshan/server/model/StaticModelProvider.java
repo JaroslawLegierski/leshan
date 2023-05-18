@@ -42,4 +42,9 @@ public class StaticModelProvider implements LwM2mModelProvider {
         // same model for all clients
         return model;
     }
+
+    @Override
+    public String getVersion(int objectId) {
+        return null;
+    }
 }

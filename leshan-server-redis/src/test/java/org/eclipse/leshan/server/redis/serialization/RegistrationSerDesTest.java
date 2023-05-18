@@ -33,12 +33,14 @@ import org.eclipse.leshan.core.link.attributes.UnquotedStringAttribute;
 import org.eclipse.leshan.core.link.attributes.ValuelessAttribute;
 import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.core.request.Identity;
+import org.eclipse.leshan.server.model.LwM2mModelProvider;
 import org.eclipse.leshan.server.registration.Registration;
 import org.junit.jupiter.api.Test;
 
 public class RegistrationSerDesTest {
 
     private final RegistrationSerDes registrationSerDes = new RegistrationSerDes();
+    private LwM2mModelProvider modelProvider;
 
     @Test
     public void ser_and_des_are_equals() {
@@ -54,7 +56,7 @@ public class RegistrationSerDesTest {
 
         Registration.Builder builder = new Registration.Builder("registrationId", "endpoint",
                 Identity.unsecure(Inet4Address.getLoopbackAddress(), 1),
-                EndpointUriUtil.createUri("coap://localhost:5683")).objectLinks(objs).rootPath("/")
+                EndpointUriUtil.createUri("coap://localhost:5683"),modelProvider).objectLinks(objs).rootPath("/")
                         .supportedContentFormats(ContentFormat.TLV, ContentFormat.TEXT);
         builder.registrationDate(new Date(100L));
         builder.extractDataFromObjectLink(true);
@@ -85,7 +87,7 @@ public class RegistrationSerDesTest {
 
         Registration.Builder builder = new Registration.Builder("registrationId", "endpoint",
                 Identity.unsecure(Inet4Address.getLoopbackAddress(), 1),
-                EndpointUriUtil.createUri("coap://localhost:5683")).objectLinks(objs).rootPath("/")
+                EndpointUriUtil.createUri("coap://localhost:5683"),modelProvider).objectLinks(objs).rootPath("/")
                         .supportedContentFormats(ContentFormat.TLV, ContentFormat.TEXT).applicationData(appData);
 
         builder.registrationDate(new Date(100L));

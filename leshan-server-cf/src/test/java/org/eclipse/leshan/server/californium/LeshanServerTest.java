@@ -119,7 +119,7 @@ public class LeshanServerTest {
 
     private void forceThreadsCreation(LeshanServer server) {
         Registration reg = new Registration.Builder("id", "endpoint", Identity.unsecure(new InetSocketAddress(5555)),
-                server.getEndpoint(Protocol.COAP).getURI()).bindingMode(EnumSet.of(BindingMode.U, BindingMode.Q))
+                server.getEndpoint(Protocol.COAP).getURI(), server.getModelProvider()).bindingMode(EnumSet.of(BindingMode.U, BindingMode.Q))
                         .build();
         // Force timer thread creation of preference service.
         if (server.getPresenceService() != null) {

@@ -26,6 +26,7 @@ import java.util.EnumSet;
 import org.eclipse.leshan.core.endpoint.EndpointUriUtil;
 import org.eclipse.leshan.core.request.BindingMode;
 import org.eclipse.leshan.core.request.Identity;
+import org.eclipse.leshan.server.model.LwM2mModelProvider;
 import org.eclipse.leshan.server.registration.Registration;
 import org.junit.jupiter.api.Test;
 
@@ -36,6 +37,7 @@ import org.junit.jupiter.api.Test;
 public class PresenceServiceTest {
     private final ClientAwakeTimeProvider awakeTimeProvider = new StaticClientAwakeTimeProvider();
     private final PresenceServiceImpl presenceService = new PresenceServiceImpl(awakeTimeProvider);
+    private LwM2mModelProvider modelProvider;
 
     @Test
     public void testSetOnlineForNonQueueMode() throws Exception {
@@ -67,7 +69,7 @@ public class PresenceServiceTest {
     private Registration givenASimpleClient() throws UnknownHostException {
         Registration.Builder builder = new Registration.Builder("ID", "urn:client",
                 Identity.unsecure(Inet4Address.getLoopbackAddress(), 12354),
-                EndpointUriUtil.createUri("coap://localhost:5683"));
+                EndpointUriUtil.createUri("coap://localhost:5683"), modelProvider);
 
         Registration reg = builder.build();
         presenceService.setAwake(reg);
@@ -78,7 +80,7 @@ public class PresenceServiceTest {
 
         Registration.Builder builder = new Registration.Builder("ID", "urn:client",
                 Identity.unsecure(Inet4Address.getLoopbackAddress(), 12354),
-                EndpointUriUtil.createUri("coap://localhost:5683"));
+                EndpointUriUtil.createUri("coap://localhost:5683"), modelProvider);
 
         Registration reg = builder.bindingMode(EnumSet.of(BindingMode.U, BindingMode.Q)).build();
         presenceService.setAwake(reg);

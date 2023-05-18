@@ -30,6 +30,7 @@ import org.eclipse.leshan.core.endpoint.EndpointUriUtil;
 import org.eclipse.leshan.core.link.Link;
 import org.eclipse.leshan.core.request.BindingMode;
 import org.eclipse.leshan.core.request.Identity;
+import org.eclipse.leshan.server.model.LwM2mModelProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -46,6 +47,7 @@ public class InMemoryRegistrationStoreTest {
     RegistrationStore store;
     InetAddress address;
     Registration registration;
+    private LwM2mModelProvider modelProvider;
 
     @BeforeEach
     public void setUp() throws UnknownHostException {
@@ -59,7 +61,7 @@ public class InMemoryRegistrationStoreTest {
         store.addRegistration(registration);
 
         RegistrationUpdate update = new RegistrationUpdate(registrationId, Identity.unsecure(address, port), null, null,
-                null, null, null, null);
+                null, null, null, null, modelProvider);
         UpdatedRegistration updatedRegistration = store.updateRegistration(update);
         assertEquals(lifetime, updatedRegistration.getUpdatedRegistration().getLifeTimeInSec());
         assertSame(binding, updatedRegistration.getUpdatedRegistration().getBindingMode());
@@ -87,7 +89,7 @@ public class InMemoryRegistrationStoreTest {
         assertFalse(registration.isAlive());
 
         RegistrationUpdate update = new RegistrationUpdate(registrationId, Identity.unsecure(address, port), lifetime,
-                null, null, null, null, null);
+                null, null, null, null, null, modelProvider);
         UpdatedRegistration updatedRegistration = store.updateRegistration(update);
         assertTrue(updatedRegistration.getUpdatedRegistration().isAlive());
 
@@ -98,7 +100,7 @@ public class InMemoryRegistrationStoreTest {
     private void givenASimpleRegistration(Long lifetime) {
 
         Registration.Builder builder = new Registration.Builder(registrationId, ep, Identity.unsecure(address, port),
-                EndpointUriUtil.createUri("coap://localhost:5683"));
+                EndpointUriUtil.createUri("coap://localhost:5683"),modelProvider);
 
         registration = builder.lifeTimeInSec(lifetime).smsNumber(sms).bindingMode(binding).objectLinks(objectLinks)
                 .build();

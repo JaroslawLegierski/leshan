@@ -48,6 +48,11 @@ public class VersionedModelProvider implements LwM2mModelProvider {
         return new DynamicModel(registration);
     }
 
+    @Override
+    public String getVersion(int objectId) {
+        return repository.getObjectModel(objectId).version;
+    }
+
     private class DynamicModel implements LwM2mModel {
 
         private final Registration registration;

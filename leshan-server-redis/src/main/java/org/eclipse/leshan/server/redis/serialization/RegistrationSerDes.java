@@ -44,6 +44,7 @@ import org.eclipse.leshan.core.link.lwm2m.attributes.MixedLwM2mAttributeSet;
 import org.eclipse.leshan.core.node.LwM2mPath;
 import org.eclipse.leshan.core.request.BindingMode;
 import org.eclipse.leshan.core.request.ContentFormat;
+import org.eclipse.leshan.server.model.LwM2mModelProvider;
 import org.eclipse.leshan.server.registration.Registration;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -59,6 +60,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class RegistrationSerDes {
 
     private final AttributeParser attributeParser;
+    private LwM2mModelProvider modelProvider;
 
     public RegistrationSerDes() {
         // Define all supported Attributes
@@ -165,7 +167,7 @@ public class RegistrationSerDes {
         }
 
         Registration.Builder b = new Registration.Builder(jObj.get("regId").asText(), jObj.get("ep").asText(),
-                IdentitySerDes.deserialize(jObj.get("identity")), lastEndpointUsed);
+                IdentitySerDes.deserialize(jObj.get("identity")), lastEndpointUsed, modelProvider);
 
         b.bindingMode(BindingMode.parse(jObj.get("bnd").asText()));
         if (jObj.get("qm") != null)

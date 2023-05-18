@@ -46,6 +46,7 @@ import org.eclipse.leshan.server.LeshanServer;
 import org.eclipse.leshan.server.endpoint.LwM2mServerEndpoint;
 import org.eclipse.leshan.server.endpoint.LwM2mServerEndpointsProvider;
 import org.eclipse.leshan.server.endpoint.ServerEndpointToolbox;
+import org.eclipse.leshan.server.model.LwM2mModelProvider;
 import org.eclipse.leshan.server.observation.LwM2mNotificationReceiver;
 import org.eclipse.leshan.server.observation.ObservationServiceImpl;
 import org.eclipse.leshan.server.profile.ClientProfile;
@@ -64,6 +65,7 @@ public class ObservationServiceTest {
     RegistrationStore store;
     Registration registration;
     Random r;
+    LwM2mModelProvider modelProvider;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -75,7 +77,7 @@ public class ObservationServiceTest {
     private Registration givenASimpleRegistration() throws UnknownHostException {
         Registration.Builder builder = new Registration.Builder("4711", "urn:endpoint",
                 Identity.unsecure(InetAddress.getLocalHost(), 23452),
-                EndpointUriUtil.createUri("coap://localhost:5683"));
+                EndpointUriUtil.createUri("coap://localhost:5683"), modelProvider);
         return builder.lifeTimeInSec(10000L).bindingMode(EnumSet.of(BindingMode.U))
                 .objectLinks(new Link[] { new Link("/3") }).build();
     }
@@ -163,7 +165,7 @@ public class ObservationServiceTest {
     }
 
     private void createDefaultObservationService() {
-        observationService = new ObservationServiceImpl(store, new DummyEndpointsProvider());
+        observationService = new ObservationServiceImpl(store, new DummyEndpointsProvider(), modelProvider);
     }
 
     private Observation givenAnObservation(String registrationId, LwM2mPath target) {
@@ -186,7 +188,7 @@ public class ObservationServiceTest {
         try {
             builder = new Registration.Builder(registrationId, registrationId + "_ep",
                     Identity.unsecure(InetAddress.getLocalHost(), 10000),
-                    EndpointUriUtil.createUri("coap://localhost:5683"));
+                    EndpointUriUtil.createUri("coap://localhost:5683"), modelProvider);
             return builder.build();
         } catch (UnknownHostException e) {
             throw new RuntimeException(e);

@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.eclipse.leshan.core.endpoint.EndpointUriUtil;
 import org.eclipse.leshan.core.request.Identity;
+import org.eclipse.leshan.server.model.LwM2mModelProvider;
 import org.eclipse.leshan.server.queue.PresenceService;
 import org.junit.jupiter.api.Test;
 
@@ -33,10 +34,12 @@ import org.junit.jupiter.api.Test;
  */
 public class RegistrationUpdateTest {
 
+    private LwM2mModelProvider modelProvider;
+
     @Test
     public void testAdditionalAttributesUpdate() throws Exception {
         Registration.Builder builder = new Registration.Builder("registrationId", "endpoint",
-                Identity.unsecure(Inet4Address.getLocalHost(), 1), EndpointUriUtil.createUri("coap://localhost:5683"));
+                Identity.unsecure(Inet4Address.getLocalHost(), 1), EndpointUriUtil.createUri("coap://localhost:5683"),modelProvider);
 
         Map<String, String> additionalAttributes = new HashMap<String, String>();
         additionalAttributes.put("x", "1");
@@ -53,7 +56,7 @@ public class RegistrationUpdateTest {
         updateAdditionalAttributes.put("h", "hello");
 
         RegistrationUpdate updateReg = new RegistrationUpdate(r.getId(), r.getIdentity(), null, null, null, null,
-                updateAdditionalAttributes, null);
+                updateAdditionalAttributes, null, modelProvider);
 
         r = updateReg.update(r);
 
@@ -70,7 +73,7 @@ public class RegistrationUpdateTest {
     public void testApplicationDataUpdate() throws Exception {
 
         Registration.Builder builder = new Registration.Builder("registrationId", "endpoint",
-                Identity.unsecure(Inet4Address.getLocalHost(), 1), EndpointUriUtil.createUri("coap://localhost:5683"));
+                Identity.unsecure(Inet4Address.getLocalHost(), 1), EndpointUriUtil.createUri("coap://localhost:5683"),modelProvider);
         Map<String, String> appData = new HashMap<String, String>();
         appData.put("x", "1");
         appData.put("y", "10");
@@ -79,7 +82,7 @@ public class RegistrationUpdateTest {
         Registration r = builder.build();
 
         RegistrationUpdate updateReg = new RegistrationUpdate(r.getId(), r.getIdentity(), null, null, null, null, null,
-                null);
+                null, modelProvider);
 
         r = updateReg.update(r);
 

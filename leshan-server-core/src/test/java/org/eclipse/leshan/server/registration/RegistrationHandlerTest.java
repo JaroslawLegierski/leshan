@@ -32,6 +32,7 @@ import org.eclipse.leshan.core.request.Identity;
 import org.eclipse.leshan.core.request.RegisterRequest;
 import org.eclipse.leshan.core.request.UpdateRequest;
 import org.eclipse.leshan.core.request.UplinkRequest;
+import org.eclipse.leshan.server.model.LwM2mModelProvider;
 import org.eclipse.leshan.server.security.Authorization;
 import org.eclipse.leshan.server.security.Authorizer;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,13 +43,14 @@ public class RegistrationHandlerTest {
     private RegistrationHandler registrationHandler;
     private RegistrationStore registrationStore;
     private TestAuthorizer authorizer;
+    private LwM2mModelProvider modelProvider;
 
     @BeforeEach
     public void setUp() throws UnknownHostException {
         authorizer = new TestAuthorizer();
         registrationStore = new InMemoryRegistrationStore();
         registrationHandler = new RegistrationHandler(new RegistrationServiceImpl(registrationStore), authorizer,
-                new RandomStringRegistrationIdProvider());
+                new RandomStringRegistrationIdProvider(), modelProvider);
     }
 
     @Test

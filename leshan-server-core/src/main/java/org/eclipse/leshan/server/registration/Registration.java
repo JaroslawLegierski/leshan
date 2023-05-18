@@ -41,13 +41,13 @@ import org.eclipse.leshan.core.link.attributes.ResourceTypeAttribute;
 import org.eclipse.leshan.core.link.lwm2m.MixedLwM2mLink;
 import org.eclipse.leshan.core.link.lwm2m.attributes.LwM2mAttribute;
 import org.eclipse.leshan.core.link.lwm2m.attributes.LwM2mAttributes;
-import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.core.node.LwM2mPath;
 import org.eclipse.leshan.core.request.BindingMode;
 import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.core.request.Identity;
 import org.eclipse.leshan.core.util.StringUtils;
 import org.eclipse.leshan.core.util.Validate;
+import org.eclipse.leshan.server.model.LwM2mModelProvider;
 import org.eclipse.leshan.server.security.Authorizer;
 
 /**
@@ -504,6 +504,7 @@ public class Registration {
 
         // builder setting
         private boolean extractData; // if true extract data from objectLinks
+        private LwM2mModelProvider modelProvider;
 
         public Builder(Registration registration) {
 
@@ -533,7 +534,8 @@ public class Registration {
             applicationData = registration.applicationData;
         }
 
-        public Builder(String registrationId, String endpoint, Identity identity, URI lastEndpointUsed) {
+        public Builder(String registrationId, String endpoint, Identity identity, URI lastEndpointUsed,
+                LwM2mModelProvider modelProvider) {
 
             Validate.notNull(registrationId);
             Validate.notEmpty(endpoint);
@@ -544,6 +546,7 @@ public class Registration {
             this.endpoint = endpoint;
             this.identity = identity;
             this.lastEndpointUsed = lastEndpointUsed;
+            this.modelProvider = modelProvider;
         }
 
         public Builder extractDataFromObjectLink(boolean extract) {
@@ -713,7 +716,8 @@ public class Registration {
                 // In this case we use the DEFAULT_VERSION only if this object stored as supported object.
                 Version currentVersion = supportedObjects.get(objectId);
                 if (currentVersion == null) {
-                    supportedObjects.put(objectId, new Version(ObjectModel.DEFAULT_VERSION));
+                    // supportedObjects.put(objectId, new Version(ObjectModel.DEFAULT_VERSION));
+                    supportedObjects.put(objectId, new Version(modelProvider.getVersion(objectId)));
                 }
             }
         }

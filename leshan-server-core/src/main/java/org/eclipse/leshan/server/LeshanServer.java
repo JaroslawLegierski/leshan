@@ -157,7 +157,7 @@ public class LeshanServer {
         ServerEndpointToolbox toolbox = new ServerEndpointToolbox(decoder, encoder, linkParser,
                 new DefaultClientProfileProvider(registrationStore, modelProvider));
         RegistrationHandler registrationHandler = new RegistrationHandler(registrationService, authorizer,
-                registrationIdProvider);
+                registrationIdProvider, getModelProvider());
         DefaultUplinkRequestReceiver requestReceiver = new DefaultUplinkRequestReceiver(registrationHandler,
                 sendService);
         endpointsProvider.createEndpoints(requestReceiver, observationService, toolbox, serverSecurityInfo, this);

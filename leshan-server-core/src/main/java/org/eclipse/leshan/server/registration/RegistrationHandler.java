@@ -29,6 +29,7 @@ import org.eclipse.leshan.core.response.DeregisterResponse;
 import org.eclipse.leshan.core.response.RegisterResponse;
 import org.eclipse.leshan.core.response.SendableResponse;
 import org.eclipse.leshan.core.response.UpdateResponse;
+import org.eclipse.leshan.server.model.LwM2mModelProvider;
 import org.eclipse.leshan.server.security.Authorization;
 import org.eclipse.leshan.server.security.Authorizer;
 import org.slf4j.Logger;
@@ -45,12 +46,14 @@ public class RegistrationHandler {
     private final RegistrationServiceImpl registrationService;
     private final RegistrationIdProvider registrationIdProvider;
     private final Authorizer authorizer;
+    private LwM2mModelProvider modelProvider;
 
     public RegistrationHandler(RegistrationServiceImpl registrationService, Authorizer authorizer,
-            RegistrationIdProvider registrationIdProvider) {
+            RegistrationIdProvider registrationIdProvider, LwM2mModelProvider modelProvider) {
         this.registrationService = registrationService;
         this.authorizer = authorizer;
         this.registrationIdProvider = registrationIdProvider;
+        this.modelProvider = modelProvider;
     }
 
     public SendableResponse<RegisterResponse> register(Identity sender, RegisterRequest registerRequest,
@@ -59,7 +62,7 @@ public class RegistrationHandler {
         // Create Registration from RegisterRequest
         Registration.Builder builder = new Registration.Builder(
                 registrationIdProvider.getRegistrationId(registerRequest), registerRequest.getEndpointName(), sender,
-                endpointUsed);
+                endpointUsed, modelProvider);
         builder.extractDataFromObjectLink(true);
 
         builder.lwM2mVersion(LwM2mVersion.get(registerRequest.getLwVersion()))
@@ -128,7 +131,7 @@ public class RegistrationHandler {
         final RegistrationUpdate update = new RegistrationUpdate(updateRequest.getRegistrationId(), sender,
                 updateRequest.getLifeTimeInSec(), updateRequest.getSmsNumber(), updateRequest.getBindingMode(),
                 updateRequest.getObjectLinks(), updateRequest.getAdditionalAttributes(),
-                authorization.getApplicationData());
+                authorization.getApplicationData(), modelProvider);
 
         // update registration
         final UpdatedRegistration updatedRegistration = registrationService.getStore().updateRegistration(update);

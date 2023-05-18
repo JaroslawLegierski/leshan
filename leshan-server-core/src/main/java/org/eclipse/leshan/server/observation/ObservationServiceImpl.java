@@ -33,6 +33,7 @@ import org.eclipse.leshan.core.response.ObserveCompositeResponse;
 import org.eclipse.leshan.core.response.ObserveResponse;
 import org.eclipse.leshan.server.endpoint.LwM2mServerEndpoint;
 import org.eclipse.leshan.server.endpoint.LwM2mServerEndpointsProvider;
+import org.eclipse.leshan.server.model.LwM2mModelProvider;
 import org.eclipse.leshan.server.profile.ClientProfile;
 import org.eclipse.leshan.server.registration.Registration;
 import org.eclipse.leshan.server.registration.RegistrationStore;
@@ -56,11 +57,13 @@ public class ObservationServiceImpl implements ObservationService, LwM2mNotifica
     private final boolean updateRegistrationOnNotification;
 
     private final List<ObservationListener> listeners = new CopyOnWriteArrayList<>();;
+    private LwM2mModelProvider modelProvider;
 
     /**
      * Creates an instance of {@link ObservationServiceImpl}
      */
-    public ObservationServiceImpl(RegistrationStore store, LwM2mServerEndpointsProvider endpointProvider) {
+    public ObservationServiceImpl(RegistrationStore store, LwM2mServerEndpointsProvider endpointProvider,
+            LwM2mModelProvider modelProvider) {
         this(store, endpointProvider, false);
     }
 
@@ -204,7 +207,7 @@ public class ObservationServiceImpl implements ObservationService, LwM2mNotifica
         if (updateRegistrationOnNotification) {
             Identity obsIdentity = profile.getIdentity();
             RegistrationUpdate regUpdate = new RegistrationUpdate(observation.getRegistrationId(), obsIdentity, null,
-                    null, null, null, null, null);
+                    null, null, null, null, null, modelProvider);
             UpdatedRegistration updatedRegistration = registrationStore.updateRegistration(regUpdate);
             if (updatedRegistration == null || updatedRegistration.getUpdatedRegistration() == null) {
                 LOG.error("Unexpected error: There is no registration with id {} for this observation {}",
