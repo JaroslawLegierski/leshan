@@ -39,7 +39,8 @@ public class RegistrationUpdateTest {
     @Test
     public void testAdditionalAttributesUpdate() throws Exception {
         Registration.Builder builder = new Registration.Builder("registrationId", "endpoint",
-                Identity.unsecure(Inet4Address.getLocalHost(), 1), EndpointUriUtil.createUri("coap://localhost:5683"),modelProvider);
+                Identity.unsecure(Inet4Address.getLocalHost(), 1), EndpointUriUtil.createUri("coap://localhost:5683"),
+                modelProvider);
 
         Map<String, String> additionalAttributes = new HashMap<String, String>();
         additionalAttributes.put("x", "1");
@@ -73,7 +74,8 @@ public class RegistrationUpdateTest {
     public void testApplicationDataUpdate() throws Exception {
 
         Registration.Builder builder = new Registration.Builder("registrationId", "endpoint",
-                Identity.unsecure(Inet4Address.getLocalHost(), 1), EndpointUriUtil.createUri("coap://localhost:5683"),modelProvider);
+                Identity.unsecure(Inet4Address.getLocalHost(), 1), EndpointUriUtil.createUri("coap://localhost:5683"),
+                modelProvider);
         Map<String, String> appData = new HashMap<String, String>();
         appData.put("x", "1");
         appData.put("y", "10");

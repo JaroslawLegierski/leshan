@@ -248,7 +248,7 @@ public class RegistrationTest {
     private Registration given_a_registration_with_object_link_like(String objectLinks) throws LinkParseException {
         Builder builder = new Registration.Builder("id", "endpoint",
                 Identity.unsecure(InetSocketAddress.createUnresolved("localhost", 0)),
-                EndpointUriUtil.createUri("coap://localhost:5683"),modelProvider);
+                EndpointUriUtil.createUri("coap://localhost:5683"), modelProvider);
         builder.extractDataFromObjectLink(true);
         builder.objectLinks(linkParser.parseCoreLinkFormat(objectLinks.getBytes()));
         return builder.build();

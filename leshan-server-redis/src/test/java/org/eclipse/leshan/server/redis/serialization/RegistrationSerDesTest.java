@@ -56,7 +56,7 @@ public class RegistrationSerDesTest {
 
         Registration.Builder builder = new Registration.Builder("registrationId", "endpoint",
                 Identity.unsecure(Inet4Address.getLoopbackAddress(), 1),
-                EndpointUriUtil.createUri("coap://localhost:5683"),modelProvider).objectLinks(objs).rootPath("/")
+                EndpointUriUtil.createUri("coap://localhost:5683"), modelProvider).objectLinks(objs).rootPath("/")
                         .supportedContentFormats(ContentFormat.TLV, ContentFormat.TEXT);
         builder.registrationDate(new Date(100L));
         builder.extractDataFromObjectLink(true);
@@ -87,7 +87,7 @@ public class RegistrationSerDesTest {
 
         Registration.Builder builder = new Registration.Builder("registrationId", "endpoint",
                 Identity.unsecure(Inet4Address.getLoopbackAddress(), 1),
-                EndpointUriUtil.createUri("coap://localhost:5683"),modelProvider).objectLinks(objs).rootPath("/")
+                EndpointUriUtil.createUri("coap://localhost:5683"), modelProvider).objectLinks(objs).rootPath("/")
                         .supportedContentFormats(ContentFormat.TLV, ContentFormat.TEXT).applicationData(appData);
 
         builder.registrationDate(new Date(100L));

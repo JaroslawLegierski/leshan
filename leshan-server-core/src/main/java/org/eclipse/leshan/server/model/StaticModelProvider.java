@@ -44,7 +44,7 @@ public class StaticModelProvider implements LwM2mModelProvider {
     }
 
     @Override
-    public String getVersion(int objectId) {
+    public String getVersion(int objectId, String lwM2mVersion) {
         return null;
     }
 }

@@ -85,7 +85,7 @@ public class CoapRequestBuilderTest {
     private Registration newRegistration(String rootpath) throws UnknownHostException {
         Builder b = new Registration.Builder("regid", "endpoint",
                 Identity.unsecure(Inet4Address.getLoopbackAddress(), 12354),
-                EndpointUriUtil.createUri("coap://localhost:5683"),modelProvider);
+                EndpointUriUtil.createUri("coap://localhost:5683"), modelProvider);
         b.extractDataFromObjectLink(true);
         if (rootpath != null) {
             b.objectLinks(new Link[] { new Link(rootpath, new ResourceTypeAttribute("oma.lwm2m")) });

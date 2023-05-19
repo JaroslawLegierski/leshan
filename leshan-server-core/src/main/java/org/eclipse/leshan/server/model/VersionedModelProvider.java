@@ -49,8 +49,8 @@ public class VersionedModelProvider implements LwM2mModelProvider {
     }
 
     @Override
-    public String getVersion(int objectId) {
-        return repository.getObjectModel(objectId).version;
+    public String getVersion(int objectId, String lwM2mVersion) {
+        return repository.getObjectModelByLwM2mVersion(objectId, lwM2mVersion).version;
     }
 
     private class DynamicModel implements LwM2mModel {

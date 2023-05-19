@@ -717,7 +717,8 @@ public class Registration {
                 Version currentVersion = supportedObjects.get(objectId);
                 if (currentVersion == null) {
                     // supportedObjects.put(objectId, new Version(ObjectModel.DEFAULT_VERSION));
-                    supportedObjects.put(objectId, new Version(modelProvider.getVersion(objectId)));
+                    supportedObjects.put(objectId,
+                            new Version(modelProvider.getVersion(objectId, lwM2mVersion.toString())));
                 }
             }
         }

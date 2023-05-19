@@ -217,7 +217,7 @@ public class LwM2mObservationStoreTest {
     private void givenASimpleRegistration(Long lifetime) {
 
         Registration.Builder builder = new Registration.Builder(registrationId, ep, Identity.unsecure(address, port),
-                EndpointUriUtil.createUri("coap://localhost:5683"),modelProvider);
+                EndpointUriUtil.createUri("coap://localhost:5683"), modelProvider);
 
         registration = builder.lifeTimeInSec(lifetime).smsNumber(sms).bindingMode(binding).objectLinks(objectLinks)
                 .build();

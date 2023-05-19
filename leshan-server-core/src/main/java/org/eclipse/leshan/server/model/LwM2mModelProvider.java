@@ -41,5 +41,11 @@ public interface LwM2mModelProvider {
      */
     LwM2mModel getObjectModel(Registration registration);
 
-    String getVersion(int objectId);
+    /**
+     * Returns object's version
+     *
+     * @param objectId
+     * @return Version of the object
+     */
+    String getVersion(int objectId, String lwM2mVersion);
 }

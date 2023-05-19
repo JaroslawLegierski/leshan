@@ -94,7 +94,6 @@ public interface LwM2m {
         public static Version V1_0 = new Version("1.0");
         public static final Version MAX = new Version(Short.MAX_VALUE, Short.MIN_VALUE);
 
-
         protected final Short major;
         protected final Short minor;
 

@@ -38,10 +38,10 @@ public class RegistrationSortObjectLinksTest {
         objs[1] = new Link("/0/2");
         objs[2] = null;
 
-        LwM2mModelProvider modelProvider= null;
+        LwM2mModelProvider modelProvider = null;
         Registration.Builder builder = new Registration.Builder("registrationId", "endpoint",
-                Identity.unsecure(Inet4Address.getLocalHost(), 1), EndpointUriUtil.createUri("coap://localhost:5683"),modelProvider)
-                        .objectLinks(objs);
+                Identity.unsecure(Inet4Address.getLocalHost(), 1), EndpointUriUtil.createUri("coap://localhost:5683"),
+                modelProvider).objectLinks(objs);
 
         Registration r = builder.build();
 

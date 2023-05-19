@@ -166,6 +166,25 @@ public class LwM2mModelRepository {
         return objects.get(floorKey);
     }
 
+    /**
+     * @return oldest version of the model that supports given lwm2mVersion.
+     */
+    public ObjectModel getObjectModelByLwM2mVersion(Integer objectId, String lwm2mVersion) {
+        LwM2mNodeUtil.validateObjectId(objectId);
+        ObjectModel objectModel = null;
+
+        for (Key key : objects.navigableKeySet()) {
+            if (key.id.equals(objectId)) {
+                objectModel = objects.get(key);
+                if (objectModel.lwm2mVersion.equals(lwm2mVersion)) {
+                    break;
+                }
+            }
+        }
+
+        return objectModel;
+    }
+
     private Key getKey(Integer objectId, String version) {
         return getKey(objectId, new Version(version));
     }
