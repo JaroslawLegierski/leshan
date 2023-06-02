@@ -29,6 +29,7 @@ import org.eclipse.californium.core.CoapServer;
 import org.eclipse.californium.core.coap.CoAP.ResponseCode;
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
 import org.eclipse.californium.core.coap.Request;
+import org.eclipse.californium.core.coap.Response;
 import org.eclipse.californium.core.server.resources.CoapExchange;
 import org.eclipse.leshan.client.californium.endpoint.ServerIdentityExtractor;
 import org.eclipse.leshan.client.endpoint.ClientEndpointToolbox;
@@ -50,6 +51,8 @@ import org.eclipse.leshan.core.response.ObserveCompositeResponse;
 import org.eclipse.leshan.core.response.ReadCompositeResponse;
 import org.eclipse.leshan.core.response.WriteCompositeResponse;
 import org.eclipse.leshan.core.util.StringUtils;
+
+import com.sun.org.apache.bcel.internal.classfile.Code;
 
 /**
  * A root {@link CoapResource} resource in charge of handling Bootstrap Delete requests targeting the "/" URI.
@@ -84,9 +87,11 @@ public class RootResource extends LwM2mClientCoapResource {
         if (response.getCode().isError()) {
             exchange.respond(toCoapResponseCode(response.getCode()), response.getErrorMessage());
         } else {
-            exchange.respond(toCoapResponseCode(response.getCode()),
-                    toolbox.getLinkSerializer().serializeCoreLinkFormat(response.getObjectLinks()),
-                    MediaTypeRegistry.APPLICATION_LINK_FORMAT);
+//            exchange.respond(toCoapResponseCode(response.getCode()),
+//                    toolbox.getLinkSerializer().serializeCoreLinkFormat(response.getObjectLinks()),
+//                    MediaTypeRegistry.APPLICATION_LINK_FORMAT);
+            //JL test simulaton no discover support on device
+            exchange.respond(ResponseCode.NOT_FOUND, "no registration found");
         }
         return;
     }
