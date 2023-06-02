@@ -97,9 +97,11 @@ public class DefaultRegistrationDataExtractor implements RegistrationDataExtract
         Set<ContentFormat> supportedContentFormats = new HashSet<>();
 
         // add content format from ct attributes
-        ContentFormatAttribute ctValue = rootLink.getAttributes().get(Attributes.CT);
-        if (ctValue != null) {
-            supportedContentFormats.addAll(ctValue.getValue());
+        if (rootLink != null) {
+            ContentFormatAttribute ctValue = rootLink.getAttributes().get(Attributes.CT);
+            if (ctValue != null) {
+                supportedContentFormats.addAll(ctValue.getValue());
+            }
         }
 
         // add mandatory content format
