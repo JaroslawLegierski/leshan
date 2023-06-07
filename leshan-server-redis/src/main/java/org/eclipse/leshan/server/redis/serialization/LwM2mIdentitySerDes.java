@@ -41,7 +41,7 @@ public class LwM2mIdentitySerDes {
     protected static final String KEY_CN = "cn";
     protected static final String KEY_RPK = "rpk";
     // identity field key and types
-    protected static final String KEY_LWM2MIDENTITY_TYPE = "identitytype";
+    protected static final String KEY_LWM2MIDENTITY_TYPE = "type";
     protected static final String LWM2MIDENTITY_TYPE_UNSECURE = "unsecure";
     protected static final String LWM2MIDENTITY_TYPE_PSK = "psk";
     protected static final String LWM2MIDENTITY_TYPE_X509 = "cn";

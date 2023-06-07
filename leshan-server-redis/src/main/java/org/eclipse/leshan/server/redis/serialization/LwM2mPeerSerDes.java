@@ -28,7 +28,7 @@ public class LwM2mPeerSerDes {
 
     // LwM2mPeer keys
     protected static final String KEY_IDENTITY = "identity";
-    protected static final String KEY_LWM2MPEERTYPE = "peertype";
+    protected static final String KEY_LWM2MPEERTYPE = "type";
     protected static final String DEFAULT_LWM2MPEERTYPE = "ippeer";
     // IpPeer keys
     protected static final String KEY_ADDRESS = "address";
