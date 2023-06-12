@@ -35,7 +35,10 @@ public class DefaultClientProfileProvider implements ClientProfileProvider {
     public ClientProfile getProfile(LwM2mIdentity identity) {
         Registration registration = registrationStore.getRegistrationByIdentity(identity);
         LwM2mModel model = modelProvider.getObjectModel(registration);
-        return new ClientProfile(registration, model);
+        if (registration == null)
+            return null;
+        else
+            return new ClientProfile(registration, model);
     }
 
 }
