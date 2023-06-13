@@ -41,6 +41,7 @@ import org.eclipse.leshan.core.demo.LwM2mDemoConstant;
 import org.eclipse.leshan.core.demo.cli.ShortErrorMessageHandler;
 import org.eclipse.leshan.core.endpoint.EndpointUriUtil;
 import org.eclipse.leshan.core.endpoint.Protocol;
+import org.eclipse.leshan.core.link.attributes.DefaultAttributeParser;
 import org.eclipse.leshan.core.model.ObjectLoader;
 import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.server.LeshanServer;
@@ -51,6 +52,8 @@ import org.eclipse.leshan.server.californium.endpoint.coap.CoapServerProtocolPro
 import org.eclipse.leshan.server.californium.endpoint.coaps.CoapsServerProtocolProvider;
 import org.eclipse.leshan.server.core.demo.json.servlet.SecurityServlet;
 import org.eclipse.leshan.server.demo.cli.LeshanServerDemoCLI;
+import org.eclipse.leshan.server.demo.model.CustomDefaultRegistrationDataExtractor;
+import org.eclipse.leshan.server.demo.model.CustomRegistrationSerDes;
 import org.eclipse.leshan.server.demo.servlet.ClientServlet;
 import org.eclipse.leshan.server.demo.servlet.EventServlet;
 import org.eclipse.leshan.server.demo.servlet.ObjectSpecServlet;
@@ -149,7 +152,7 @@ public class LeshanServerDemo {
         }
         LwM2mModelProvider modelProvider = new VersionedModelProvider(models);
         builder.setObjectModelProvider(modelProvider);
-
+        builder.setRegistrationDataExtractor(new CustomDefaultRegistrationDataExtractor());
         // Set securityStore & registrationStore
         EditableSecurityStore securityStore;
         if (cli.main.redis == null) {
@@ -158,7 +161,14 @@ public class LeshanServerDemo {
         } else {
             // use Redis Store
             securityStore = new RedisSecurityStore(cli.main.redis);
-            builder.setRegistrationStore(new RedisRegistrationStore(cli.main.redis));
+
+            RedisRegistrationStore.Builder redisregistrationstorebuilder = new RedisRegistrationStore.Builder(
+                    cli.main.redis);
+            CustomRegistrationSerDes customRegistrationSerDesserds = new CustomRegistrationSerDes(
+                    new DefaultAttributeParser(), new CustomDefaultRegistrationDataExtractor());
+            redisregistrationstorebuilder.setRegistrationSerDes(customRegistrationSerDesserds);
+            builder.setRegistrationStore(redisregistrationstorebuilder.build());
+
         }
         builder.setSecurityStore(securityStore);
 
