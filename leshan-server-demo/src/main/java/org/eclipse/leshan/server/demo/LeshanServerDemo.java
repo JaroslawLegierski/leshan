@@ -51,6 +51,7 @@ import org.eclipse.leshan.server.californium.endpoint.coap.CoapServerProtocolPro
 import org.eclipse.leshan.server.californium.endpoint.coaps.CoapsServerProtocolProvider;
 import org.eclipse.leshan.server.core.demo.json.servlet.SecurityServlet;
 import org.eclipse.leshan.server.demo.cli.LeshanServerDemoCLI;
+import org.eclipse.leshan.server.demo.model.CustomDefaultRegistrationDataExtractor;
 import org.eclipse.leshan.server.demo.servlet.ClientServlet;
 import org.eclipse.leshan.server.demo.servlet.EventServlet;
 import org.eclipse.leshan.server.demo.servlet.ObjectSpecServlet;
@@ -150,6 +151,7 @@ public class LeshanServerDemo {
         LwM2mModelProvider modelProvider = new VersionedModelProvider(models);
         builder.setObjectModelProvider(modelProvider);
 
+        builder.setRegistrationDataExtractor(new CustomDefaultRegistrationDataExtractor());
         // Set securityStore & registrationStore
         EditableSecurityStore securityStore;
         if (cli.main.redis == null) {
