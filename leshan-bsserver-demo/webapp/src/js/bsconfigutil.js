@@ -49,6 +49,7 @@ var configFromRestToUI = function (config) {
   }
   newConfig.toDelete = config.toDelete;
   newConfig.autoIdForSecurityObject = config.autoIdForSecurityObject;
+  newConfig.enhancedSequenceMode = config.enhancedSequenceMode;
   return newConfig;
 };
 var configsFromRestToUI = function (configs) {
@@ -93,6 +94,7 @@ var configFromUIToRest = function (c) {
   }
   newConfig.toDelete = config.toDelete;
   newConfig.autoIdForSecurityObject = config.autoIdForSecurityObject;
+  newConfig.enhancedSequenceMode = config.enhancedSequenceMode;
   return newConfig;
 };
 

@@ -41,6 +41,7 @@
         so Leshan will start the Bootstrap session with a Discover request to
         know which Security instance ID is used for the Bootstrap Server.
       </p>
+
     </v-card-text>
     <v-form ref="form" :value="valid" @input="$emit('update:valid', $event)">
       <v-switch
@@ -48,6 +49,19 @@
         label="Auto ID For Security Object"
         :value="autoId"
         @change="$emit('update:autoId', $event)"
+      />
+      <v-card-text class="pb-0">
+       <p>
+         If activated, bootstrap server will start the bootstrap using Discover
+         but if it fails, then it continue as an failover bootstrap procedure
+         without Discovery
+       </p>
+       </v-card-text>
+      <v-switch
+         class="pl-6"
+         label="Activate Enhanced Bootstrap Mode"
+         :value="enhancedMode"
+         @change="$emit('update:enhancedMode', $event)"
       />
       <paths-input
         :value="pathToDelete"
@@ -65,6 +79,7 @@ export default {
   props: {
     pathToDelete: Array, // path to delete
     autoId: Boolean, // auto id for security Object
+    enhancedMode: Boolean, // use bootstrap enhanced Mode
     valid: Boolean, // validation state of the form
   },
   methods: {

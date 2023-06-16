@@ -62,10 +62,24 @@ public class BootstrapConfigStoreTaskProvider implements BootstrapTaskProvider {
             if (previousResponse != null) {
                 BootstrapDiscoverResponse response = (BootstrapDiscoverResponse) previousResponse.get(0);
                 if (!response.isSuccess()) {
-                    LOG.warn(
-                            "Bootstrap Discover return error {} : unable to continue bootstrap session with autoIdForSecurityObject mode. {}",
-                            response, session);
-                    return null;
+
+                    if (shouldUseEnhancedSequenceMode(config)) {
+                        tasks.requestsToSend = BootstrapUtil.toRequests(config,
+                                config.contentFormat != null ? config.contentFormat : session.getContentFormat());
+                        tasks.supportedObjects = new HashMap<>();
+                        tasks.supportedObjects.put(0, "1.1");
+                        tasks.supportedObjects.put(1, "1.1");
+                        tasks.supportedObjects.put(2, "1.0");
+                        return tasks;
+
+                    } else {
+
+                        LOG.warn(
+                                "Bootstrap Discover return error {} : unable to continue bootstrap session with autoIdForSecurityObject mode. {}",
+                                response, session);
+                        return null;
+                    }
+
                 }
 
                 Integer bootstrapServerInstanceId = findBootstrapServerInstanceId(response.getObjectLinks());
@@ -99,6 +113,10 @@ public class BootstrapConfigStoreTaskProvider implements BootstrapTaskProvider {
 
     protected boolean shouldStartWithDiscover(BootstrapConfig config) {
         return config.autoIdForSecurityObject;
+    }
+
+    protected boolean shouldUseEnhancedSequenceMode(BootstrapConfig config) {
+        return config.enhancedSequenceMode;
     }
 
     protected Integer findBootstrapServerInstanceId(LwM2mLink[] objectLinks) {

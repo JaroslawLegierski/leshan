@@ -67,6 +67,7 @@
               :valid.sync="valid[3]"
               :pathToDelete.sync="config.toDelete"
               :autoId.sync="config.autoIdForSecurityObject"
+              :enhancedMode.sync="config.enhancedSequenceMode"
             />
           </v-stepper-content>
           <v-stepper-content step="4">
@@ -195,6 +196,7 @@ export default {
           bs: null,
           toDelete: ["/0", "/1", "/21"],
           autoIdForSecurityObject: false,
+          enhancedSequenceMode: false,
         };
         this.currentStep = 1;
         for (let i = 1; i <= this.nbSteps; i++) {

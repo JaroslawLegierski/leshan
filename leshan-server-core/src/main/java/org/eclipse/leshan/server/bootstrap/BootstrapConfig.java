@@ -65,6 +65,12 @@ public class BootstrapConfig {
     public boolean autoIdForSecurityObject = false;
 
     /**
+     * If activated, bootstrap server will start the bootstrap using {@link BootstrapDiscoverRequest} but if DISCOVER
+     * fails, then it continue as a failover bootstrap procedure without {@link BootstrapDiscoverRequest}
+     */
+    public boolean enhancedSequenceMode = true;
+
+    /**
      * Content format used to send requests.
      * <p>
      * if <code>null</code> content format used is the preferred one by the client (pct attribute from BootstrapRequest)
