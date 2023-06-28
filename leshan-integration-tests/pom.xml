@@ -83,6 +83,12 @@ Contributors:
       <artifactId>logback-classic</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.eclipse.californium</groupId>
+      <artifactId>cf-nat</artifactId>
+      <version>3.8.0</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>

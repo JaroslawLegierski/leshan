@@ -1,6 +1,39 @@
+/*******************************************************************************
+ * Copyright (c) 2021 Sierra Wireless and others.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v2.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v20.html
+ * and the Eclipse Distribution License is available at
+ *    http://www.eclipse.org/org/documents/edl-v10.html.
+ *
+ * Contributors:
+ *     Sierra Wireless - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.leshan.integration.tests;
 
-import org.assertj.core.api.Assertions;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.eclipse.leshan.integration.tests.util.Credentials.GOOD_PSK_ID;
+import static org.eclipse.leshan.integration.tests.util.Credentials.GOOD_PSK_KEY;
+import static org.eclipse.leshan.integration.tests.util.Credentials.clientPrivateKey;
+import static org.eclipse.leshan.integration.tests.util.Credentials.clientPrivateKeyFromCert;
+import static org.eclipse.leshan.integration.tests.util.Credentials.clientPublicKey;
+import static org.eclipse.leshan.integration.tests.util.Credentials.clientX509Cert;
+import static org.eclipse.leshan.integration.tests.util.Credentials.serverPrivateKey;
+import static org.eclipse.leshan.integration.tests.util.Credentials.serverPrivateKeyFromCert;
+import static org.eclipse.leshan.integration.tests.util.Credentials.serverPublicKey;
+import static org.eclipse.leshan.integration.tests.util.Credentials.serverX509Cert;
+import static org.eclipse.leshan.integration.tests.util.Credentials.trustedCertificates;
+import static org.eclipse.leshan.integration.tests.util.LeshanTestClientBuilder.givenClientUsing;
+import static org.eclipse.leshan.integration.tests.util.assertion.Assertions.assertThat;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.security.cert.CertificateEncodingException;
+
 import org.eclipse.californium.util.nat.NioNatUtil;
 import org.eclipse.leshan.core.endpoint.Protocol;
 import org.eclipse.leshan.core.request.ReadRequest;
@@ -9,35 +42,27 @@ import org.eclipse.leshan.integration.tests.util.LeshanTestClient;
 import org.eclipse.leshan.integration.tests.util.LeshanTestClientBuilder;
 import org.eclipse.leshan.integration.tests.util.LeshanTestServer;
 import org.eclipse.leshan.integration.tests.util.LeshanTestServerBuilder;
+import org.eclipse.leshan.integration.tests.util.assertion.Assertions;
 import org.eclipse.leshan.server.registration.Registration;
 import org.eclipse.leshan.server.security.InMemorySecurityStore;
 import org.eclipse.leshan.server.security.NonUniqueSecurityInfoException;
 import org.eclipse.leshan.server.security.SecurityInfo;
-import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.security.cert.CertificateEncodingException;
-
-import static org.eclipse.leshan.integration.tests.util.Credentials.*;
-import static org.eclipse.leshan.integration.tests.util.Credentials.clientPublicKey;
-import static org.eclipse.leshan.integration.tests.util.LeshanTestClientBuilder.givenClientUsing;
-import static org.eclipse.leshan.integration.tests.util.assertion.Assertions.assertThat;
 
 public class IpChangeTest {
     Protocol givenProtocol = Protocol.COAPS;
 
-    //TODO fill those
+    // TODO fill those
     String givenClientEndpointProvider = "";
     String givenServerEndpointProvider = "";
 
     private InetSocketAddress first_ip = new InetSocketAddress("127.0.0.1", 0);
     private InetSocketAddress second_ip = new InetSocketAddress("127.0.0.2", 0);
+
     protected LeshanTestServerBuilder givenServerUsing(Protocol givenProtocol) {
         return new LeshanTestServerBuilder(givenProtocol).with(new InMemorySecurityStore());
     }
 
-    private Thread create_redirect(InetSocketAddress bindAddress, InetSocketAddress destination){
+    private Thread create_redirect(InetSocketAddress bindAddress, InetSocketAddress destination) {
         NioNatUtil natUtil;
         try {
             natUtil = new NioNatUtil(bindAddress, destination);
@@ -48,9 +73,10 @@ public class IpChangeTest {
         return new Thread(natUtil);
     }
 
-    public void unsecured(){
-        //TODO
+    public void unsecured() {
+        // TODO
     }
+
     @Test
     public void registered_device_with_psk_to_server_with_psk()
             throws NonUniqueSecurityInfoException, InterruptedException {
@@ -168,8 +194,6 @@ public class IpChangeTest {
 
         givenServer = givenServerUsing(givenProtocol).with(givenServerEndpointProvider);
         givenClient = givenClientUsing(givenProtocol).with(givenClientEndpointProvider);
-
-
 
         // Create X509 server & start it
         server = givenServer //
