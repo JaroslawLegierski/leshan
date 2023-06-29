@@ -25,6 +25,9 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
 
+import java.net.InetSocketAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.cert.Certificate;
 import java.util.List;
 import java.util.Map;
@@ -59,11 +62,11 @@ public class LeshanTestClient extends LeshanClient {
     private final InOrder inOrder;
 
     public LeshanTestClient(String endpoint, List<? extends LwM2mObjectEnabler> objectEnablers,
-            List<DataSender> dataSenders, List<Certificate> trustStore, RegistrationEngineFactory engineFactory,
-            BootstrapConsistencyChecker checker, Map<String, String> additionalAttributes,
-            Map<String, String> bsAdditionalAttributes, LwM2mEncoder encoder, LwM2mDecoder decoder,
-            ScheduledExecutorService sharedExecutor, LinkSerializer linkSerializer, LinkFormatHelper linkFormatHelper,
-            LwM2mAttributeParser attributeParser, LwM2mClientEndpointsProvider endpointsProvider) {
+                            List<DataSender> dataSenders, List<Certificate> trustStore, RegistrationEngineFactory engineFactory,
+                            BootstrapConsistencyChecker checker, Map<String, String> additionalAttributes,
+                            Map<String, String> bsAdditionalAttributes, LwM2mEncoder encoder, LwM2mDecoder decoder,
+                            ScheduledExecutorService sharedExecutor, LinkSerializer linkSerializer, LinkFormatHelper linkFormatHelper,
+                            LwM2mAttributeParser attributeParser, LwM2mClientEndpointsProvider endpointsProvider) {
         super(endpoint, objectEnablers, dataSenders, trustStore, engineFactory, checker, additionalAttributes,
                 bsAdditionalAttributes, encoder, decoder, sharedExecutor, linkSerializer, linkFormatHelper,
                 attributeParser, endpointsProvider);
@@ -98,33 +101,67 @@ public class LeshanTestClient extends LeshanClient {
         waitForRegistrationTo(server, 1, TimeUnit.SECONDS);
     }
 
-    public void waitForRegistrationTo(LeshanTestServer server, long timeout, TimeUnit unit) {
-        inOrder.verify(clientObserver, timeout(unit.toMillis(timeout)).times(1)).onRegistrationStarted(assertArg( //
-                s -> {
-                    assertThat(server.getEndpoints()) //
-                            .filteredOn(ep -> ep.getURI().toString().equals(s.getUri())) //
-                            .hasSize(1);
+    public void waitForRegistrationTo(SimpleNat nat) {
+        waitForRegistrationTo(nat, 1, TimeUnit.SECONDS);
+    }
 
-                }), //
+    public void waitForRegistrationTo(SimpleNat nat, long timeout, TimeUnit unit) {
+        inOrder.verify(clientObserver, timeout(unit.toMillis(timeout)).times(1)).onRegistrationStarted(assertArg( //
+                        s -> {
+                            // TODO this is crap we need to think about a better way to check this.
+                            URI uri;
+                            try {
+                                uri = new URI(s.getUri());
+                                assertThat(new InetSocketAddress(uri.getHost(), uri.getPort())).isEqualTo(nat.getAddress());
+                            } catch (URISyntaxException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                        }), //
                 isNotNull());
         inOrder.verify(clientObserver, timeout(unit.toMillis(timeout)).times(1)).onRegistrationSuccess(assertArg( //
-                s -> assertThat(server.getEndpoints()) //
-                        .filteredOn(ep -> ep.getURI().toString().equals(s.getUri())) //
-                        .hasSize(1)), //
+                        s -> {
+                            // TODO this is crap we need to think about a better way to check this.
+                            URI uri;
+                            try {
+                                uri = new URI(s.getUri());
+                                assertThat(new InetSocketAddress(uri.getHost(), uri.getPort())).isEqualTo(nat.getAddress());
+                            } catch (URISyntaxException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                        }), //
+                isNotNull(), isNotNull());
+        inOrder.verifyNoMoreInteractions();
+    }
+
+    public void waitForRegistrationTo(LeshanTestServer server, long timeout, TimeUnit unit) {
+        inOrder.verify(clientObserver, timeout(unit.toMillis(timeout)).times(1)).onRegistrationStarted(assertArg( //
+                        s -> {
+                            assertThat(server.getEndpoints()) //
+                                    .filteredOn(ep -> ep.getURI().toString().equals(s.getUri())) //
+                                    .hasSize(1);
+
+                        }), //
+                isNotNull());
+        inOrder.verify(clientObserver, timeout(unit.toMillis(timeout)).times(1)).onRegistrationSuccess(assertArg( //
+                        s -> assertThat(server.getEndpoints()) //
+                                .filteredOn(ep -> ep.getURI().toString().equals(s.getUri())) //
+                                .hasSize(1)), //
                 isNotNull(), isNotNull());
         inOrder.verifyNoMoreInteractions();
     }
 
     public void waitForUpdateTo(LeshanTestServer server, long timeout, TimeUnit unit) {
         inOrder.verify(clientObserver, timeout(unit.toMillis(timeout)).times(1)).onUpdateStarted(assertArg( //
-                s -> assertThat(server.getEndpoints()) //
-                        .filteredOn(ep -> ep.getURI().toString().equals(s.getUri())) //
-                        .hasSize(1)), //
+                        s -> assertThat(server.getEndpoints()) //
+                                .filteredOn(ep -> ep.getURI().toString().equals(s.getUri())) //
+                                .hasSize(1)), //
                 notNull());
         inOrder.verify(clientObserver, timeout(unit.toMillis(timeout)).times(1)).onUpdateSuccess(assertArg( //
-                s -> assertThat(server.getEndpoints()) //
-                        .filteredOn(ep -> ep.getURI().toString().equals(s.getUri())) //
-                        .hasSize(1)), //
+                        s -> assertThat(server.getEndpoints()) //
+                                .filteredOn(ep -> ep.getURI().toString().equals(s.getUri())) //
+                                .hasSize(1)), //
                 notNull());
         inOrder.verifyNoMoreInteractions();
     }
@@ -135,17 +172,17 @@ public class LeshanTestClient extends LeshanClient {
 
     public void waitForDeregistrationTo(LeshanTestServer server, long timeout, TimeUnit unit) {
         inOrder.verify(clientObserver, timeout(unit.toMillis(timeout)).times(1)).onDeregistrationStarted(assertArg( //
-                s -> {
-                    assertThat(server.getEndpoints()) //
-                            .filteredOn(ep -> ep.getURI().toString().equals(s.getUri())) //
-                            .hasSize(1);
+                        s -> {
+                            assertThat(server.getEndpoints()) //
+                                    .filteredOn(ep -> ep.getURI().toString().equals(s.getUri())) //
+                                    .hasSize(1);
 
-                }), //
+                        }), //
                 isNotNull());
         inOrder.verify(clientObserver, timeout(unit.toMillis(timeout)).times(1)).onDeregistrationSuccess(assertArg( //
-                s -> assertThat(server.getEndpoints()) //
-                        .filteredOn(ep -> ep.getURI().toString().equals(s.getUri())) //
-                        .hasSize(1)), //
+                        s -> assertThat(server.getEndpoints()) //
+                                .filteredOn(ep -> ep.getURI().toString().equals(s.getUri())) //
+                                .hasSize(1)), //
                 isNotNull());
         inOrder.verifyNoMoreInteractions();
     }
@@ -156,15 +193,15 @@ public class LeshanTestClient extends LeshanClient {
 
     public void waitForUpdateTimeoutTo(LeshanTestServer server, long timeout, TimeUnit unit) {
         inOrder.verify(clientObserver, timeout(unit.toMillis(timeout)).times(1)).onUpdateStarted(assertArg( //
-                s -> assertThat(server.getEndpoints()) //
-                        .filteredOn(ep -> ep.getURI().toString().equals(s.getUri())) //
-                        .hasSize(1)), //
+                        s -> assertThat(server.getEndpoints()) //
+                                .filteredOn(ep -> ep.getURI().toString().equals(s.getUri())) //
+                                .hasSize(1)), //
                 notNull());
 
         inOrder.verify(clientObserver, timeout(unit.toMillis(timeout)).times(1)).onUpdateTimeout(assertArg( //
-                s -> assertThat(server.getEndpoints()) //
-                        .filteredOn(ep -> ep.getURI().toString().equals(s.getUri())) //
-                        .hasSize(1)), //
+                        s -> assertThat(server.getEndpoints()) //
+                                .filteredOn(ep -> ep.getURI().toString().equals(s.getUri())) //
+                                .hasSize(1)), //
                 notNull());
         // if client update timeout, it will retry again then try a register so all events can not be consume by inOrder
         // ...
@@ -176,14 +213,14 @@ public class LeshanTestClient extends LeshanClient {
 
     public void waitForUpdateFailureTo(LeshanTestServer server, long timeout, TimeUnit unit) {
         inOrder.verify(clientObserver, timeout(unit.toMillis(timeout)).times(1)).onUpdateStarted(assertArg( //
-                s -> assertThat(server.getEndpoints()) //
-                        .filteredOn(ep -> ep.getURI().toString().equals(s.getUri())) //
-                        .hasSize(1)), //
+                        s -> assertThat(server.getEndpoints()) //
+                                .filteredOn(ep -> ep.getURI().toString().equals(s.getUri())) //
+                                .hasSize(1)), //
                 notNull());
         inOrder.verify(clientObserver, timeout(unit.toMillis(timeout)).times(1)).onUpdateFailure(assertArg( //
-                s -> assertThat(server.getEndpoints()) //
-                        .filteredOn(ep -> ep.getURI().toString().equals(s.getUri())) //
-                        .hasSize(1)), //
+                        s -> assertThat(server.getEndpoints()) //
+                                .filteredOn(ep -> ep.getURI().toString().equals(s.getUri())) //
+                                .hasSize(1)), //
                 notNull(), //
                 notNull(), // TODO we should be able to check response code
                 any(), //
@@ -194,15 +231,15 @@ public class LeshanTestClient extends LeshanClient {
 
     public void waitForBootstrapSuccess(LeshanBootstrapServer server, long timeout, TimeUnit unit) {
         inOrder.verify(clientObserver, timeout(unit.toMillis(timeout)).times(1)).onBootstrapStarted(assertArg( //
-                s -> assertThat(server.getEndpoints()) //
-                        .filteredOn(ep -> ep.getURI().toString().equals(s.getUri())) //
-                        .hasSize(1)), //
+                        s -> assertThat(server.getEndpoints()) //
+                                .filteredOn(ep -> ep.getURI().toString().equals(s.getUri())) //
+                                .hasSize(1)), //
                 notNull());
 
         inOrder.verify(clientObserver, timeout(unit.toMillis(timeout)).times(1)).onBootstrapSuccess(assertArg( //
-                s -> assertThat(server.getEndpoints()) //
-                        .filteredOn(ep -> ep.getURI().toString().equals(s.getUri())) //
-                        .hasSize(1)), //
+                        s -> assertThat(server.getEndpoints()) //
+                                .filteredOn(ep -> ep.getURI().toString().equals(s.getUri())) //
+                                .hasSize(1)), //
                 notNull());
     }
 
@@ -210,15 +247,15 @@ public class LeshanTestClient extends LeshanClient {
         final ArgumentCaptor<Exception> c = ArgumentCaptor.forClass(Exception.class);
 
         inOrder.verify(clientObserver, timeout(unit.toMillis(timeout)).times(1)).onBootstrapStarted(assertArg( //
-                s -> assertThat(server.getEndpoints()) //
-                        .filteredOn(ep -> ep.getURI().toString().equals(s.getUri())) //
-                        .hasSize(1)), //
+                        s -> assertThat(server.getEndpoints()) //
+                                .filteredOn(ep -> ep.getURI().toString().equals(s.getUri())) //
+                                .hasSize(1)), //
                 notNull());
 
         inOrder.verify(clientObserver, timeout(unit.toMillis(timeout)).times(1)).onBootstrapFailure(assertArg( //
-                s -> assertThat(server.getEndpoints()) //
-                        .filteredOn(ep -> ep.getURI().toString().equals(s.getUri())) //
-                        .hasSize(1)), //
+                        s -> assertThat(server.getEndpoints()) //
+                                .filteredOn(ep -> ep.getURI().toString().equals(s.getUri())) //
+                                .hasSize(1)), //
                 notNull(), //
                 isNull(), // TODO we should be able to check response code
                 any(), //

@@ -18,6 +18,7 @@ package org.eclipse.leshan.integration.tests.util;
 import static org.eclipse.leshan.core.LwM2mId.OSCORE;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
@@ -106,6 +107,8 @@ public class LeshanTestClientBuilder extends LeshanClientBuilder {
     private CertificateUsage certificageUsage;
     private OscoreSetting oscoreSetting;
 
+    private SimpleNat nat;
+
     public LeshanTestClientBuilder(Protocol protocolToUse) {
         this();
         using(protocolToUse);
@@ -130,6 +133,11 @@ public class LeshanTestClientBuilder extends LeshanClientBuilder {
             if (server != null) {
                 LwM2mServerEndpoint endpoint = server.getEndpoint(protocolToUse);
                 URI uri = endpoint.getURI();
+                if (nat != null) {
+                    uri = new URI(protocolToUse.getUriScheme(), null, nat.getAddress().getHostString(),
+                            nat.getAddress().getPort(), null, null, null);
+                }
+
                 int serverID = 12345;
 
                 if (pskIdentity != null && pskKey != null) {
@@ -184,7 +192,7 @@ public class LeshanTestClientBuilder extends LeshanClientBuilder {
                 initializer.setInstancesForObject(LwM2mId.SECURITY, securityEnabler);
                 initializer.setClassForObject(LwM2mId.SERVER, Server.class);
             }
-        } catch (CertificateEncodingException e) {
+        } catch (CertificateEncodingException | URISyntaxException e) {
             throw new IllegalStateException(e);
         }
 
@@ -217,11 +225,11 @@ public class LeshanTestClientBuilder extends LeshanClientBuilder {
 
     @Override
     protected LeshanTestClient createLeshanClient(String endpoint, List<? extends LwM2mObjectEnabler> objectEnablers,
-            List<DataSender> dataSenders, List<Certificate> trustStore, RegistrationEngineFactory engineFactory,
-            BootstrapConsistencyChecker checker, Map<String, String> additionalAttributes,
-            Map<String, String> bsAdditionalAttributes, LwM2mEncoder encoder, LwM2mDecoder decoder,
-            ScheduledExecutorService sharedExecutor, LinkSerializer linkSerializer, LinkFormatHelper linkFormatHelper,
-            LwM2mAttributeParser attributeParser, LwM2mClientEndpointsProvider endpointsProvider) {
+                                                  List<DataSender> dataSenders, List<Certificate> trustStore, RegistrationEngineFactory engineFactory,
+                                                  BootstrapConsistencyChecker checker, Map<String, String> additionalAttributes,
+                                                  Map<String, String> bsAdditionalAttributes, LwM2mEncoder encoder, LwM2mDecoder decoder,
+                                                  ScheduledExecutorService sharedExecutor, LinkSerializer linkSerializer, LinkFormatHelper linkFormatHelper,
+                                                  LwM2mAttributeParser attributeParser, LwM2mClientEndpointsProvider endpointsProvider) {
         String endpointName;
         if (this.endpointName != null) {
             endpointName = this.endpointName;
@@ -350,7 +358,7 @@ public class LeshanTestClientBuilder extends LeshanClientBuilder {
     }
 
     public LeshanTestClientBuilder trusting(X509Certificate serverCertificate, CertificateUsage usage,
-            X509Certificate... trustedStore) {
+                                            X509Certificate... trustedStore) {
         this.serverCertificate = serverCertificate;
         this.certificageUsage = usage;
         this.setTrustStore(Arrays.asList(trustedStore));
@@ -424,5 +432,10 @@ public class LeshanTestClientBuilder extends LeshanClientBuilder {
                 return super.execute(server, resourceid, arguments);
             }
         }
+    }
+
+    public LeshanTestClientBuilder behind(SimpleNat nat) {
+        this.nat = nat;
+        return this;
     }
 }

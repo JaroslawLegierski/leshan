@@ -16,228 +16,137 @@
 package org.eclipse.leshan.integration.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.eclipse.leshan.integration.tests.util.Credentials.GOOD_PSK_ID;
-import static org.eclipse.leshan.integration.tests.util.Credentials.GOOD_PSK_KEY;
-import static org.eclipse.leshan.integration.tests.util.Credentials.clientPrivateKey;
-import static org.eclipse.leshan.integration.tests.util.Credentials.clientPrivateKeyFromCert;
-import static org.eclipse.leshan.integration.tests.util.Credentials.clientPublicKey;
-import static org.eclipse.leshan.integration.tests.util.Credentials.clientX509Cert;
-import static org.eclipse.leshan.integration.tests.util.Credentials.serverPrivateKey;
-import static org.eclipse.leshan.integration.tests.util.Credentials.serverPrivateKeyFromCert;
-import static org.eclipse.leshan.integration.tests.util.Credentials.serverPublicKey;
-import static org.eclipse.leshan.integration.tests.util.Credentials.serverX509Cert;
-import static org.eclipse.leshan.integration.tests.util.Credentials.trustedCertificates;
 import static org.eclipse.leshan.integration.tests.util.LeshanTestClientBuilder.givenClientUsing;
-import static org.eclipse.leshan.integration.tests.util.assertion.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verify;
 
-import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.net.InetSocketAddress;
-import java.security.cert.CertificateEncodingException;
+import java.net.URI;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.stream.Stream;
 
-import org.eclipse.californium.util.nat.NioNatUtil;
+import org.eclipse.leshan.client.servers.LwM2mServer;
 import org.eclipse.leshan.core.endpoint.Protocol;
-import org.eclipse.leshan.core.request.ReadRequest;
-import org.eclipse.leshan.core.response.ReadResponse;
+import org.eclipse.leshan.core.node.LwM2mNode;
+import org.eclipse.leshan.core.node.LwM2mPath;
+import org.eclipse.leshan.core.node.LwM2mResource;
+import org.eclipse.leshan.core.node.TimestampedLwM2mNodes;
+import org.eclipse.leshan.core.request.ContentFormat;
+import org.eclipse.leshan.core.response.ErrorCallback;
+import org.eclipse.leshan.core.response.ResponseCallback;
+import org.eclipse.leshan.core.response.SendResponse;
 import org.eclipse.leshan.integration.tests.util.LeshanTestClient;
-import org.eclipse.leshan.integration.tests.util.LeshanTestClientBuilder;
 import org.eclipse.leshan.integration.tests.util.LeshanTestServer;
 import org.eclipse.leshan.integration.tests.util.LeshanTestServerBuilder;
+import org.eclipse.leshan.integration.tests.util.SimpleNat;
 import org.eclipse.leshan.integration.tests.util.assertion.Assertions;
-import org.eclipse.leshan.server.registration.Registration;
-import org.eclipse.leshan.server.security.InMemorySecurityStore;
-import org.eclipse.leshan.server.security.NonUniqueSecurityInfoException;
-import org.eclipse.leshan.server.security.SecurityInfo;
+import org.eclipse.leshan.integration.tests.util.junit5.extensions.ArgumentsUtil;
+import org.eclipse.leshan.integration.tests.util.junit5.extensions.BeforeEachParameterizedResolver;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
+@ExtendWith(BeforeEachParameterizedResolver.class)
 public class IpChangeTest {
-    Protocol givenProtocol = Protocol.COAPS;
 
-    // TODO fill those
-    String givenClientEndpointProvider = "";
-    String givenServerEndpointProvider = "";
+    /*---------------------------------/
+     *  Parameterized Tests
+     * -------------------------------*/
+    @ParameterizedTest(name = "{0} over {1} - Client using {2} - Server using {3}")
+    @MethodSource("transports")
+    @Retention(RetentionPolicy.RUNTIME)
+    private @interface TestAllCases {
+    }
 
-    private InetSocketAddress first_ip = new InetSocketAddress("127.0.0.1", 0);
-    private InetSocketAddress second_ip = new InetSocketAddress("127.0.0.2", 0);
+    static Stream<Arguments> transports() {
+
+        Object[][] transports = new Object[][] {
+                // ProtocolUsed - Client Endpoint Provider - Server Endpoint Provider
+                { Protocol.COAP, "Californium", "Californium" } };
+
+        Object[] contentFormats = new Object[] { //
+                ContentFormat.SENML_JSON, //
+                ContentFormat.SENML_CBOR };
+
+
+        // for each transport, create 1 test by format.
+        return Stream.of(ArgumentsUtil.combine(contentFormats, transports));
+    }
+
+    /*---------------------------------/
+     *  Set-up and Tear-down Tests
+     * -------------------------------*/
+
+    LeshanTestServer server;
+    LeshanTestClient client;
+    SimpleNat nat;
+
+    @BeforeEach
+    public void start(ContentFormat format, Protocol givenProtocol, String givenClientEndpointProvider,
+                      String givenServerEndpointProvider) {
+        server = givenServerUsing(givenProtocol).with(givenServerEndpointProvider).build();
+        server.start();
+
+        URI uri = server.getEndpoint(givenProtocol).getURI();
+        nat = new SimpleNat(new InetSocketAddress("localhost", 0), new InetSocketAddress(uri.getHost(), uri.getPort()));
+        nat.start();
+
+        client = givenClientUsing(givenProtocol).with(givenClientEndpointProvider).connectingTo(server).behind(nat)
+                .build();
+        client.start();
+        server.waitForNewRegistrationOf(client);
+        client.waitForRegistrationTo(nat);
+    }
 
     protected LeshanTestServerBuilder givenServerUsing(Protocol givenProtocol) {
-        return new LeshanTestServerBuilder(givenProtocol).with(new InMemorySecurityStore());
+        return new LeshanTestServerBuilder(givenProtocol);
     }
 
-    private Thread create_redirect(InetSocketAddress bindAddress, InetSocketAddress destination) {
-        NioNatUtil natUtil;
-        try {
-            natUtil = new NioNatUtil(bindAddress, destination);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return new Thread(natUtil);
-    }
-
-    public void unsecured() {
-        // TODO
-    }
-
-    @Test
-    public void registered_device_with_psk_to_server_with_psk()
-            throws NonUniqueSecurityInfoException, InterruptedException {
-        LeshanTestServerBuilder givenServer;
-        LeshanTestServer server;
-        LeshanTestClientBuilder givenClient;
-        LeshanTestClient client;
-
-        givenServer = givenServerUsing(givenProtocol).with(givenServerEndpointProvider);
-        givenClient = givenClientUsing(givenProtocol).with(givenClientEndpointProvider);
-
-        // Create PSK server & start it
-        server = givenServer.build(); // default server support PSK
-        server.start();
-
-        // Create PSK Client
-        client = givenClient.connectingTo(server).usingPsk(GOOD_PSK_ID, GOOD_PSK_KEY).build();
-
-        // Add client credentials to the server
-        server.getSecurityStore()
-                .add(SecurityInfo.newPreSharedKeyInfo(client.getEndpointName(), GOOD_PSK_ID, GOOD_PSK_KEY));
-
-        // Check client is not registered
-        assertThat(client).isNotRegisteredAt(server);
-
-        // Start it and wait for registration
-        client.start();
-        server.waitForNewRegistrationOf(client);
-
-        // Check client is well registered
-        assertThat(client).isRegisteredAt(server);
-        Registration registration = server.getRegistrationFor(client);
-
-        // check we can send request to client.
-        ReadResponse response = server.send(registration, new ReadRequest(3, 0, 1), 500);
-        Assertions.assertThat(response.isSuccess()).isTrue();
-
-        Thread redirect = create_redirect(first_ip, second_ip);
-
-        redirect.start();
-
-        // check we can send request to client.
-        response = server.send(registration, new ReadRequest(3, 0, 1), 500);
-        Assertions.assertThat(response.isSuccess()).isTrue();
-
-        redirect.stop();
-
+    @AfterEach
+    public void stop() throws InterruptedException {
         if (client != null)
             client.destroy(false);
         if (server != null)
             server.destroy();
     }
 
-    @Test
-    public void registered_device_with_rpk_to_server_with_rpk()
-            throws NonUniqueSecurityInfoException, InterruptedException {
-        LeshanTestServerBuilder givenServer;
-        LeshanTestServer server;
-        LeshanTestClientBuilder givenClient;
-        LeshanTestClient client;
+    /*---------------------------------/
+     *  Tests
+     * -------------------------------*/
+    @TestAllCases
+    public void can_send_resources_unsecured(ContentFormat contentformat, Protocol givenProtocol,
+                                   String givenClientEndpointProvider, String givenServerEndpointProvider)
+            throws InterruptedException, TimeoutException {
 
-        givenServer = givenServerUsing(givenProtocol).with(givenServerEndpointProvider);
-        givenClient = givenClientUsing(givenProtocol).with(givenClientEndpointProvider);
+        // Send Data
+        LwM2mServer registeredServer = client.getRegisteredServers().values().iterator().next();
+        nat.changeAddress();
 
-        // Create RPK server & start it
-        server = givenServer.using(serverPublicKey, serverPrivateKey).build();
-        server.start();
-
-        // Create RPK Client
-        client = givenClient.connectingTo(server) //
-                .using(clientPublicKey, clientPrivateKey)//
-                .trusting(serverPublicKey).build();
-
-        // Add client credentials to the server
-        server.getSecurityStore().add(SecurityInfo.newRawPublicKeyInfo(client.getEndpointName(), clientPublicKey));
-
-        // Check client is not registered
-        assertThat(client).isNotRegisteredAt(server);
-
-        // Start it and wait for registration
-        client.start();
-        server.waitForNewRegistrationOf(client);
-
-        // Check client is well registered
-        assertThat(client).isRegisteredAt(server);
-        Registration registration = server.getRegistrationFor(client);
-
-        // check we can send request to client.
-        ReadResponse response = server.send(registration, new ReadRequest(3, 0, 1), 500);
+        SendResponse response = client.getSendService().sendData(registeredServer, contentformat,
+                Arrays.asList("/3/0/1", "/3/0/2"), 1000);
         assertThat(response.isSuccess()).isTrue();
 
-        Thread redirect = create_redirect(first_ip, second_ip);
+        // wait for data and check result
+        TimestampedLwM2mNodes data = server.waitForData(client.getEndpointName(), 1, TimeUnit.SECONDS);
+        Map<LwM2mPath, LwM2mNode> nodes = data.getNodes();
+        LwM2mResource modelnumber = (LwM2mResource) nodes.get(new LwM2mPath("/3/0/1"));
+        assertThat(modelnumber.getId()).isEqualTo(1);
+        assertThat(modelnumber.getValue()).isEqualTo("IT-TEST-123");
 
-        redirect.start();
-
-        // check we can send request to client.
-        response = server.send(registration, new ReadRequest(3, 0, 1), 500);
-        Assertions.assertThat(response.isSuccess()).isTrue();
-
-        redirect.stop();
-
-        if (client != null)
-            client.destroy(false);
-        if (server != null)
-            server.destroy();
+        LwM2mResource serialnumber = (LwM2mResource) nodes.get(new LwM2mPath("/3/0/2"));
+        assertThat(serialnumber.getId()).isEqualTo(2);
+        assertThat(serialnumber.getValue()).isEqualTo("12345");
     }
 
-    @Test
-    public void registered_device_with_x509cert_to_server_with_x509cert()
-            throws NonUniqueSecurityInfoException, CertificateEncodingException, InterruptedException {
-        LeshanTestServerBuilder givenServer;
-        LeshanTestServer server;
-        LeshanTestClientBuilder givenClient;
-        LeshanTestClient client;
-
-        givenServer = givenServerUsing(givenProtocol).with(givenServerEndpointProvider);
-        givenClient = givenClientUsing(givenProtocol).with(givenClientEndpointProvider);
-
-        // Create X509 server & start it
-        server = givenServer //
-                .actingAsServerOnly()//
-                .using(serverX509Cert, serverPrivateKeyFromCert)//
-                .trusting(trustedCertificates).build();
-        server.start();
-
-        // Create X509 Client
-        client = givenClient.connectingTo(server) //
-                .using(clientX509Cert, clientPrivateKeyFromCert)//
-                .trusting(serverX509Cert).build();
-
-        // Add client credentials to the server
-        server.getSecurityStore().add(SecurityInfo.newX509CertInfo(client.getEndpointName()));
-
-        // Check client is not registered
-        assertThat(client).isNotRegisteredAt(server);
-
-        // Start it and wait for registration
-        client.start();
-        server.waitForNewRegistrationOf(client);
-
-        // Check client is well registered
-        assertThat(client).isRegisteredAt(server);
-        Registration registration = server.getRegistrationFor(client);
-
-        // check we can send request to client.
-        ReadResponse response = server.send(registration, new ReadRequest(3, 0, 1), 500);
-        assertThat(response.isSuccess()).isTrue();
-
-        Thread redirect = create_redirect(first_ip, second_ip);
-
-        redirect.start();
-
-        // check we can send request to client.
-        response = server.send(registration, new ReadRequest(3, 0, 1), 500);
-        Assertions.assertThat(response.isSuccess()).isTrue();
-
-        redirect.stop();
-
-        if (client != null)
-            client.destroy(false);
-        if (server != null)
-            server.destroy();
-    }
 }
