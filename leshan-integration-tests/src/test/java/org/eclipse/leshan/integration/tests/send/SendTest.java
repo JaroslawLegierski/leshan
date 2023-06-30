@@ -27,6 +27,8 @@ import static org.mockito.Mockito.verify;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.net.InetSocketAddress;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -46,6 +48,7 @@ import org.eclipse.leshan.core.response.SendResponse;
 import org.eclipse.leshan.integration.tests.util.LeshanTestClient;
 import org.eclipse.leshan.integration.tests.util.LeshanTestServer;
 import org.eclipse.leshan.integration.tests.util.LeshanTestServerBuilder;
+import org.eclipse.leshan.integration.tests.util.SimpleNat;
 import org.eclipse.leshan.integration.tests.util.assertion.Assertions;
 import org.eclipse.leshan.integration.tests.util.junit5.extensions.ArgumentsUtil;
 import org.eclipse.leshan.integration.tests.util.junit5.extensions.BeforeEachParameterizedResolver;
@@ -91,6 +94,7 @@ public class SendTest {
 
     LeshanTestServer server;
     LeshanTestClient client;
+    SimpleNat nat;
 
 
     protected LeshanTestServerBuilder givenServerUsing(Protocol givenProtocol) {
@@ -113,9 +117,15 @@ public class SendTest {
             String givenClientEndpointProvider, String givenServerEndpointProvider)
             throws InterruptedException, TimeoutException, NonUniqueSecurityInfoException {
 
-        server = givenServerUsing(givenProtocol).with(givenServerEndpointProvider).build();
+        //server = givenServerUsing(givenProtocol).with(givenServerEndpointProvider).build();
+        server =givenServerUsing(new Protocol("COAPS", "coaps")).with(givenServerEndpointProvider).build();
         server.start();
-        client = givenClientUsing(givenProtocol).with(givenClientEndpointProvider)
+
+        URI uri = server.getEndpoint(new Protocol("COAPS", "coaps")).getURI();
+        nat = new SimpleNat(new InetSocketAddress("localhost", 0), new InetSocketAddress(uri.getHost(), uri.getPort()));
+        nat.start();
+
+        client = givenClientUsing(new Protocol("COAPS", "coaps")).with(givenClientEndpointProvider)
                 .connectingTo(server)
                 .usingPsk(GOOD_PSK_ID, GOOD_PSK_KEY)
                 .build();
@@ -128,7 +138,7 @@ public class SendTest {
         client.start();
         server.waitForNewRegistrationOf(client);
         client.waitForRegistrationTo(server);
-
+        nat.changeAddress();
         // Send Data
         LwM2mServer registeredServer = client.getRegisteredServers().values().iterator().next();
         SendResponse response = client.getSendService().sendData(registeredServer, contentformat,

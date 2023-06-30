@@ -130,7 +130,7 @@ public class IpChangeTest {
 
         // Send Data
         LwM2mServer registeredServer = client.getRegisteredServers().values().iterator().next();
-        //nat.changeAddress();
+        nat.changeAddress();
 
         SendResponse response = client.getSendService().sendData(registeredServer, contentformat,
                 Arrays.asList("/3/0/1", "/3/0/2"), 1000);
