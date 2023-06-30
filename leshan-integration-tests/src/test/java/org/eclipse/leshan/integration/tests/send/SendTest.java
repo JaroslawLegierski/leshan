@@ -16,6 +16,8 @@
 package org.eclipse.leshan.integration.tests.send;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.eclipse.leshan.integration.tests.util.Credentials.GOOD_PSK_ID;
+import static org.eclipse.leshan.integration.tests.util.Credentials.GOOD_PSK_KEY;
 import static org.eclipse.leshan.integration.tests.util.LeshanTestClientBuilder.givenClientUsing;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -47,6 +49,9 @@ import org.eclipse.leshan.integration.tests.util.LeshanTestServerBuilder;
 import org.eclipse.leshan.integration.tests.util.assertion.Assertions;
 import org.eclipse.leshan.integration.tests.util.junit5.extensions.ArgumentsUtil;
 import org.eclipse.leshan.integration.tests.util.junit5.extensions.BeforeEachParameterizedResolver;
+import org.eclipse.leshan.server.security.InMemorySecurityStore;
+import org.eclipse.leshan.server.security.NonUniqueSecurityInfoException;
+import org.eclipse.leshan.server.security.SecurityInfo;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -87,19 +92,9 @@ public class SendTest {
     LeshanTestServer server;
     LeshanTestClient client;
 
-    @BeforeEach
-    public void start(ContentFormat format, Protocol givenProtocol, String givenClientEndpointProvider,
-            String givenServerEndpointProvider) {
-        server = givenServerUsing(givenProtocol).with(givenServerEndpointProvider).build();
-        server.start();
-        client = givenClientUsing(givenProtocol).with(givenClientEndpointProvider).connectingTo(server).build();
-        client.start();
-        server.waitForNewRegistrationOf(client);
-        client.waitForRegistrationTo(server);
-    }
 
     protected LeshanTestServerBuilder givenServerUsing(Protocol givenProtocol) {
-        return new LeshanTestServerBuilder(givenProtocol);
+        return new LeshanTestServerBuilder(givenProtocol).with(new InMemorySecurityStore());
     }
 
     @AfterEach
@@ -114,9 +109,26 @@ public class SendTest {
      *  Tests
      * -------------------------------*/
     @TestAllCases
-    public void can_send_resources(ContentFormat contentformat, Protocol givenProtocol,
+    public void can_send_resources_psk(ContentFormat contentformat, Protocol givenProtocol,
             String givenClientEndpointProvider, String givenServerEndpointProvider)
-            throws InterruptedException, TimeoutException {
+            throws InterruptedException, TimeoutException, NonUniqueSecurityInfoException {
+
+        server = givenServerUsing(givenProtocol).with(givenServerEndpointProvider).build();
+        server.start();
+        client = givenClientUsing(givenProtocol).with(givenClientEndpointProvider)
+                .connectingTo(server)
+                .usingPsk(GOOD_PSK_ID, GOOD_PSK_KEY)
+                .build();
+
+        server.getSecurityStore()
+                .add(SecurityInfo.newPreSharedKeyInfo(client.getEndpointName(), GOOD_PSK_ID, GOOD_PSK_KEY));
+
+
+
+        client.start();
+        server.waitForNewRegistrationOf(client);
+        client.waitForRegistrationTo(server);
+
         // Send Data
         LwM2mServer registeredServer = client.getRegisteredServers().values().iterator().next();
         SendResponse response = client.getSendService().sendData(registeredServer, contentformat,
@@ -135,23 +147,24 @@ public class SendTest {
         assertThat(serialnumber.getValue()).isEqualTo("12345");
     }
 
+
     @TestAllCases
-    public void can_send_resources_asynchronously(ContentFormat contentformat, Protocol givenProtocol,
+    public void can_send_resources(ContentFormat contentformat, Protocol givenProtocol,
             String givenClientEndpointProvider, String givenServerEndpointProvider)
             throws InterruptedException, TimeoutException {
 
-        // Send Data
-        @SuppressWarnings("unchecked")
-        ResponseCallback<SendResponse> responseCallback = mock(ResponseCallback.class);
-        ErrorCallback errorCallback = mock(ErrorCallback.class);
-        LwM2mServer registeredServer = client.getRegisteredServers().values().iterator().next();
-        client.getSendService().sendData(registeredServer, contentformat, Arrays.asList("/3/0/1", "/3/0/2"), 1000,
-                responseCallback, errorCallback);
+        server = givenServerUsing(givenProtocol).with(givenServerEndpointProvider).build();
+        server.start();
+        client = givenClientUsing(givenProtocol).with(givenClientEndpointProvider).connectingTo(server).build();
+        client.start();
+        server.waitForNewRegistrationOf(client);
+        client.waitForRegistrationTo(server);
 
-        verify(responseCallback, timeout(1000).times(1)).onResponse(Assertions.assertArg(r -> {
-            assertThat(r.isSuccess()).isTrue();
-        }));
-        verify(errorCallback, never()).onError(any());
+        // Send Data
+        LwM2mServer registeredServer = client.getRegisteredServers().values().iterator().next();
+        SendResponse response = client.getSendService().sendData(registeredServer, contentformat,
+                Arrays.asList("/3/0/1", "/3/0/2"), 1000);
+        assertThat(response.isSuccess()).isTrue();
 
         // wait for data and check result
         TimestampedLwM2mNodes data = server.waitForData(client.getEndpointName(), 1, TimeUnit.SECONDS);
@@ -163,6 +176,9 @@ public class SendTest {
         LwM2mResource serialnumber = (LwM2mResource) nodes.get(new LwM2mPath("/3/0/2"));
         assertThat(serialnumber.getId()).isEqualTo(2);
         assertThat(serialnumber.getValue()).isEqualTo("12345");
+
+
     }
+
 
 }

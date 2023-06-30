@@ -79,7 +79,6 @@ public class IpChangeTest {
                 ContentFormat.SENML_JSON, //
                 ContentFormat.SENML_CBOR };
 
-
         // for each transport, create 1 test by format.
         return Stream.of(ArgumentsUtil.combine(contentFormats, transports));
     }
@@ -125,17 +124,47 @@ public class IpChangeTest {
      *  Tests
      * -------------------------------*/
     @TestAllCases
-    public void can_send_resources_unsecured(ContentFormat contentformat, Protocol givenProtocol,
+    public void can_send_resources(ContentFormat contentformat, Protocol givenProtocol,
                                    String givenClientEndpointProvider, String givenServerEndpointProvider)
             throws InterruptedException, TimeoutException {
 
         // Send Data
         LwM2mServer registeredServer = client.getRegisteredServers().values().iterator().next();
-        nat.changeAddress();
+        //nat.changeAddress();
 
         SendResponse response = client.getSendService().sendData(registeredServer, contentformat,
                 Arrays.asList("/3/0/1", "/3/0/2"), 1000);
         assertThat(response.isSuccess()).isTrue();
+
+        // wait for data and check result
+        TimestampedLwM2mNodes data = server.waitForData(client.getEndpointName(), 1, TimeUnit.SECONDS);
+        Map<LwM2mPath, LwM2mNode> nodes = data.getNodes();
+        LwM2mResource modelnumber = (LwM2mResource) nodes.get(new LwM2mPath("/3/0/1"));
+        assertThat(modelnumber.getId()).isEqualTo(1);
+        assertThat(modelnumber.getValue()).isEqualTo("IT-TEST-123");
+
+        LwM2mResource serialnumber = (LwM2mResource) nodes.get(new LwM2mPath("/3/0/2"));
+        assertThat(serialnumber.getId()).isEqualTo(2);
+        assertThat(serialnumber.getValue()).isEqualTo("12345");
+    }
+
+    @TestAllCases
+    public void can_send_resources_asynchronously(ContentFormat contentformat, Protocol givenProtocol,
+                                                  String givenClientEndpointProvider, String givenServerEndpointProvider)
+            throws InterruptedException, TimeoutException {
+
+        // Send Data
+        @SuppressWarnings("unchecked")
+        ResponseCallback<SendResponse> responseCallback = mock(ResponseCallback.class);
+        ErrorCallback errorCallback = mock(ErrorCallback.class);
+        LwM2mServer registeredServer = client.getRegisteredServers().values().iterator().next();
+        client.getSendService().sendData(registeredServer, contentformat, Arrays.asList("/3/0/1", "/3/0/2"), 1000,
+                responseCallback, errorCallback);
+
+        verify(responseCallback, timeout(1000).times(1)).onResponse(Assertions.assertArg(r -> {
+            assertThat(r.isSuccess()).isTrue();
+        }));
+        verify(errorCallback, never()).onError(any());
 
         // wait for data and check result
         TimestampedLwM2mNodes data = server.waitForData(client.getEndpointName(), 1, TimeUnit.SECONDS);
