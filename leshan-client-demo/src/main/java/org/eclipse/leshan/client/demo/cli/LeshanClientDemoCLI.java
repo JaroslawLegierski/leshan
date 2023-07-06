@@ -84,6 +84,15 @@ public class LeshanClientDemoCLI implements Runnable {
                         "  - " + DEFAULT_COAPS_URL + " for coaps" })
         public String url;
 
+        @Option(names = { "-ssid", "--short-server-id" },
+                defaultValue = "123",
+                description = { //
+                        "Set the short server ID. If value is missing it will be added automatically with default value 123.", //
+                        "Default: ", //
+                        "  - " + "123" },
+                converter = StrictlyPositiveIntegerConverter.class)
+        public Integer shortServerId;
+
         @Option(names = { "-b", "--bootstrap" },
                 description = { "Do bootstrap instead of registration.",
                         "In this case your server-url should target a LWM2M bootstrap server instead of a LWM2M server." })
