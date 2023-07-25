@@ -193,29 +193,30 @@ public class LeshanClientDemo {
         } else {
             if (cli.identity.isPSK()) {
                 // TODO OSCORE support OSCORE with DTLS/PSK
-                initializer.setInstancesForObject(SECURITY, psk(cli.main.url, 123,
+                initializer.setInstancesForObject(SECURITY, psk(cli.main.url, cli.main.shortServerId,
                         cli.identity.getPsk().identity.getBytes(), cli.identity.getPsk().sharekey.getBytes()));
-                initializer.setInstancesForObject(SERVER, new Server(123, cli.main.lifetimeInSec));
+                initializer.setInstancesForObject(SERVER, new Server(cli.main.shortServerId, cli.main.lifetimeInSec));
             } else if (cli.identity.isRPK()) {
                 // TODO OSCORE support OSCORE with DTLS/RPK
                 initializer.setInstancesForObject(SECURITY,
-                        rpk(cli.main.url, 123, cli.identity.getRPK().cpubk.getEncoded(),
+                        rpk(cli.main.url, cli.main.shortServerId, cli.identity.getRPK().cpubk.getEncoded(),
                                 cli.identity.getRPK().cprik.getEncoded(), cli.identity.getRPK().spubk.getEncoded()));
-                initializer.setInstancesForObject(SERVER, new Server(123, cli.main.lifetimeInSec));
+                initializer.setInstancesForObject(SERVER, new Server(cli.main.shortServerId, cli.main.lifetimeInSec));
             } else if (cli.identity.isx509()) {
                 // TODO OSCORE support OSCORE with DTLS/X509
                 initializer.setInstancesForObject(SECURITY,
-                        x509(cli.main.url, 123, cli.identity.getX509().ccert.getEncoded(),
+                        x509(cli.main.url, cli.main.shortServerId, cli.identity.getX509().ccert.getEncoded(),
                                 cli.identity.getX509().cprik.getEncoded(), cli.identity.getX509().scert.getEncoded(),
                                 cli.identity.getX509().certUsage.code));
-                initializer.setInstancesForObject(SERVER, new Server(123, cli.main.lifetimeInSec));
+                initializer.setInstancesForObject(SERVER, new Server(cli.main.shortServerId, cli.main.lifetimeInSec));
             } else {
                 if (oscoreObjectInstanceId != null) {
-                    initializer.setInstancesForObject(SECURITY, oscoreOnly(cli.main.url, 123, oscoreObjectInstanceId));
+                    initializer.setInstancesForObject(SECURITY,
+                            oscoreOnly(cli.main.url, cli.main.shortServerId, oscoreObjectInstanceId));
                 } else {
-                    initializer.setInstancesForObject(SECURITY, noSec(cli.main.url, 123));
+                    initializer.setInstancesForObject(SECURITY, noSec(cli.main.url, cli.main.shortServerId));
                 }
-                initializer.setInstancesForObject(SERVER, new Server(123, cli.main.lifetimeInSec));
+                initializer.setInstancesForObject(SERVER, new Server(cli.main.shortServerId, cli.main.lifetimeInSec));
             }
         }
         initializer.setInstancesForObject(DEVICE, new MyDevice());
