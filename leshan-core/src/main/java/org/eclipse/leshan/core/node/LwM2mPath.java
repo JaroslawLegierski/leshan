@@ -337,16 +337,45 @@ public class LwM2mPath implements Comparable<LwM2mPath> {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         LwM2mPath other = (LwM2mPath) obj;
-        return Objects.equals(objectId, other.objectId) && Objects.equals(objectInstanceId, other.objectInstanceId)
-                && Objects.equals(resourceId, other.resourceId)
-                && Objects.equals(resourceInstanceId, other.resourceInstanceId);
+        if (objectId == null) {
+            if (other.objectId != null) {
+                return false;
+            }
+        } else if (!objectId.equals(other.objectId)) {
+            return false;
+        }
+        if (objectInstanceId == null) {
+            if (other.objectInstanceId != null) {
+                return false;
+            }
+        } else if (!objectInstanceId.equals(other.objectInstanceId)) {
+            return false;
+        }
+        if (resourceId == null) {
+            if (other.resourceId != null) {
+                return false;
+            }
+        } else if (!resourceId.equals(other.resourceId)) {
+            return false;
+        }
+        if (resourceInstanceId == null) {
+            if (other.resourceInstanceId != null) {
+                return false;
+            }
+        } else if (!resourceInstanceId.equals(other.resourceInstanceId)) {
+            return false;
+        }
+        return true;
     }
 
     @Override
