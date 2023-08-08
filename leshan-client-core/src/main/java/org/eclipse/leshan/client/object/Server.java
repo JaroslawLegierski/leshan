@@ -70,6 +70,10 @@ public class Server extends BaseInstanceEnabler {
         this(shortServerId, lifetime, EnumSet.of(BindingMode.U), false, BindingMode.U);
     }
 
+    public Server(int shortServerId, long lifetime, boolean notifyWhenDisable) {
+        this(shortServerId, lifetime, EnumSet.of(BindingMode.U), notifyWhenDisable, BindingMode.U);
+    }
+
     @Override
     public ReadResponse read(LwM2mServer server, int resourceid) {
         if (!server.isSystem())
