@@ -49,6 +49,8 @@ public class MyDevice extends BaseInstanceEnabler implements Destroyable {
 
     private final Timer timer;
 
+    private Map<String, String> initResources;
+
     public MyDevice() {
         // notify new date each 5 second
         this.timer = new Timer("Device-Current Time");
@@ -58,6 +60,19 @@ public class MyDevice extends BaseInstanceEnabler implements Destroyable {
                 fireResourceChange(13);
             }
         }, 5000, 5000);
+
+    }
+
+    public MyDevice(Map<String, String> initResources) {
+        // notify new date each 5 second
+        this.timer = new Timer("Device-Current Time");
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                fireResourceChange(13);
+            }
+        }, 5000, 5000);
+        this.initResources = initResources;
     }
 
     @Override
@@ -148,7 +163,10 @@ public class MyDevice extends BaseInstanceEnabler implements Destroyable {
     }
 
     private String getManufacturer() {
-        return "Leshan Demo Device";
+        String Manufacturer = initResources == null || initResources.get("/3/0/0") == null ? "Leshan Demo Device"
+                : initResources.get("/3/0/0");
+
+        return Manufacturer;
     }
 
     private String getModelNumber() {
