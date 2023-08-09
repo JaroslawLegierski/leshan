@@ -49,6 +49,8 @@ public class MyDevice extends BaseInstanceEnabler implements Destroyable {
 
     private final Timer timer;
 
+    private Map<String, String> initResources;
+
     public MyDevice() {
         // notify new date each 5 second
         this.timer = new Timer("Device-Current Time");
@@ -58,6 +60,18 @@ public class MyDevice extends BaseInstanceEnabler implements Destroyable {
                 fireResourceChange(13);
             }
         }, 5000, 5000);
+    }
+
+    public MyDevice(Map<String, String> initResources) {
+        // notify new date each 5 second
+        this.timer = new Timer("Device-Current Time");
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                fireResourceChange(13);
+            }
+        }, 5000, 5000);
+        this.initResources = initResources;
     }
 
     @Override
@@ -148,31 +162,46 @@ public class MyDevice extends BaseInstanceEnabler implements Destroyable {
     }
 
     private String getManufacturer() {
-        return "Leshan Demo Device";
+        String manufacturer = initResources == null || initResources.get("/3/0/0") == null ? "Leshan Demo Device"
+                : initResources.get("/3/0/0");
+        return manufacturer;
     }
 
     private String getModelNumber() {
-        return "Model 500";
+        String modelNumber = initResources == null || initResources.get("/3/0/1") == null ? "Model 500"
+                : initResources.get("/3/0/1");
+        return modelNumber;
     }
 
     private String getSerialNumber() {
-        return "LT-500-000-0001";
+        String serialNumber = initResources == null || initResources.get("/3/0/2") == null ? "LT-500-000-0001"
+                : initResources.get("/3/0/2");
+        return serialNumber;
     }
 
     private String getFirmwareVersion() {
-        return "1.0.0";
+        String firmwareVersion = initResources == null || initResources.get("/3/0/3") == null ? "1.0.0"
+                : initResources.get("/3/0/3");
+        return firmwareVersion;
     }
 
     private long getErrorCode() {
-        return 0;
+        Long errorCode = initResources == null || initResources.get("/3/0/11") == null ? 0
+                : Long.valueOf(initResources.get("/3/0/11"));
+        return errorCode;
     }
 
     private int getBatteryLevel() {
-        return RANDOM.nextInt(101);
+        int batteryLevel = initResources == null || initResources.get("/3/0/9") == null ? RANDOM.nextInt(101)
+                : Integer.valueOf(initResources.get("/3/0/9"));
+        return batteryLevel;
     }
 
     private long getMemoryFree() {
-        return Runtime.getRuntime().freeMemory() / 1024;
+        Long memoryFree = initResources == null || initResources.get("/3/0/10") == null
+                ? Runtime.getRuntime().freeMemory() / 1024
+                : Long.valueOf(initResources.get("/3/0/10"));
+        return memoryFree;
     }
 
     private Date getCurrentTime() {
@@ -182,7 +211,9 @@ public class MyDevice extends BaseInstanceEnabler implements Destroyable {
     private String utcOffset = new SimpleDateFormat("X").format(Calendar.getInstance().getTime());
 
     private String getUtcOffset() {
-        return utcOffset;
+        String offset = initResources == null || initResources.get("/3/0/14") == null ? utcOffset
+                : initResources.get("/3/0/14");
+        return offset;
     }
 
     private void setUtcOffset(String t) {
@@ -192,7 +223,9 @@ public class MyDevice extends BaseInstanceEnabler implements Destroyable {
     private String timeZone = TimeZone.getDefault().getID();
 
     private String getTimezone() {
-        return timeZone;
+        String tmZone = initResources == null || initResources.get("/3/0/15") == null ? timeZone
+                : initResources.get("/3/0/15");
+        return tmZone;
     }
 
     private void setTimezone(String t) {
@@ -200,27 +233,40 @@ public class MyDevice extends BaseInstanceEnabler implements Destroyable {
     }
 
     private String getSupportedBinding() {
-        return "U";
+        String supportedBinding = initResources == null || initResources.get("/3/0/16") == null ? "U"
+                : initResources.get("/3/0/16");
+        return supportedBinding;
     }
 
     private String getDeviceType() {
-        return "Demo";
+        String deviceType = initResources == null || initResources.get("/3/0/17") == null ? "Demo"
+                : initResources.get("/3/0/17");
+        return deviceType;
     }
 
     private String getHardwareVersion() {
-        return "1.0.1";
+        String hardwareVersion = initResources == null || initResources.get("/3/0/18") == null ? "1.0.1"
+                : initResources.get("/3/0/18");
+        return hardwareVersion;
     }
 
     private String getSoftwareVersion() {
-        return "1.0.2";
+        String softwareVersion = initResources == null || initResources.get("/3/0/19") == null ? "1.0.2"
+                : initResources.get("/3/0/19");
+        return softwareVersion;
     }
 
     private int getBatteryStatus() {
-        return RANDOM.nextInt(7);
+        int batteryStatus = initResources == null || initResources.get("/3/0/20") == null ? RANDOM.nextInt(7)
+                : Integer.valueOf(initResources.get("/3/0/20"));
+        return batteryStatus;
     }
 
     private long getMemoryTotal() {
-        return Runtime.getRuntime().totalMemory() / 1024;
+        long memoryTotal = initResources == null || initResources.get("/3/0/21") == null
+                ? Runtime.getRuntime().totalMemory() / 1024
+                : Long.valueOf(initResources.get("/3/0/21"));
+        return memoryTotal;
     }
 
     @Override
