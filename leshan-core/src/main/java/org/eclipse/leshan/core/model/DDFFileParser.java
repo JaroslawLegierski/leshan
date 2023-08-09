@@ -77,6 +77,7 @@ public class DDFFileParser {
     private DDFFileParser(DDFFileValidator ddfValidator, DDFFileValidatorFactory ddfFileValidatorFactory) {
         factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
+        factory.setExpandEntityReferences(false);
         this.ddfValidator = ddfValidator;
         this.ddfValidatorFactory = ddfFileValidatorFactory;
     }
