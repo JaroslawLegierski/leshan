@@ -24,6 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -89,8 +90,10 @@ public class DDFFileParser {
      * @throws IOException see {@link FileInputStream#FileInputStream(File)} or
      *         {@link DocumentBuilder#parse(InputStream)}
      */
-    public List<ObjectModel> parse(File ddfFile) throws InvalidDDFFileException, IOException {
+    public List<ObjectModel> parse(File ddfFile)
+            throws InvalidDDFFileException, IOException, ParserConfigurationException {
         try (InputStream input = new FileInputStream(ddfFile)) {
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING,true);
             return parse(input, ddfFile.getName());
         }
     }
