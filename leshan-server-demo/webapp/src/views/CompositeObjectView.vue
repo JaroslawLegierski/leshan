@@ -50,7 +50,30 @@
       </h4>
       <!-- root case -->
       <span v-if="node.path.type == 'root'" class="text-body-2">
-        Root Path is not yet supported by Leshan.
+  <v-list dense>
+    <v-list-item-group>
+      <v-list-item
+              v-for="object in Object.keys(state.data)"
+              :key=object
+      >
+        <v-list-item-content>
+          <v-list-item-title>
+            {{ object }}
+            ></v-list-item-title
+          >
+          <v-list-item-subtitle>
+            {{ "Value: " + state.data[object].val }}
+          </v-list-item-subtitle>
+           <v-list-item-subtitle>
+            {{ "Supposed: " + state.data[object].supposed }}
+          </v-list-item-subtitle>
+          <v-list-item-subtitle>
+            {{ "Single: " + state.data[object].isSingle }}
+          </v-list-item-subtitle>
+        </v-list-item-content>
+      </v-list-item>
+    </v-list-item-group>
+  </v-list>
       </span>
       <!-- object case -->
       <span v-else-if="node.unknowObject" class="text-body-2">
