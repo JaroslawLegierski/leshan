@@ -16,6 +16,7 @@
 package org.eclipse.leshan.core.californium.oscore.cf;
 
 import org.eclipse.californium.oscore.CoapOSException;
+import org.eclipse.californium.oscore.ContextRederivation;
 import org.eclipse.californium.oscore.HashMapCtxDB;
 import org.eclipse.californium.oscore.OSCoreCtx;
 import org.eclipse.californium.oscore.OSCoreCtxDB;
@@ -29,13 +30,13 @@ import org.slf4j.LoggerFactory;
  *
  */
 // TODO OSCORE this should be moved in californium.
-public class InMemoryOscoreContextDB extends HashMapCtxDB {
+public class InMemoryOscoreContextDBClient extends HashMapCtxDB {
 
     private static final Logger LOG = LoggerFactory.getLogger(InMemoryOscoreContextDB.class);
 
     private final OscoreStore store;
 
-    public InMemoryOscoreContextDB(OscoreStore oscoreStore) {
+    public InMemoryOscoreContextDBClient(OscoreStore oscoreStore) {
         this.store = oscoreStore;
     }
 
@@ -43,6 +44,10 @@ public class InMemoryOscoreContextDB extends HashMapCtxDB {
     public synchronized OSCoreCtx getContext(byte[] rid, byte[] IDContext) throws CoapOSException {
         // search in local DB
         OSCoreCtx osCoreCtx = super.getContext(rid, null);
+
+        if (osCoreCtx == null && IDContext != null) {
+            throw new IllegalArgumentException("Internal Leshan operations should always use a null ID Context");
+        }
 
         // if nothing found
         if (osCoreCtx == null) {
@@ -96,11 +101,12 @@ public class InMemoryOscoreContextDB extends HashMapCtxDB {
 
     private static OSCoreCtx deriveContext(OscoreParameters oscoreParameters) {
         try {
-            OSCoreCtx osCoreCtx = new OSCoreCtx(oscoreParameters.getMasterSecret(), false,
+            OSCoreCtx osCoreCtx = new OSCoreCtx(oscoreParameters.getMasterSecret(), true,
                     oscoreParameters.getAeadAlgorithm(), oscoreParameters.getSenderId(),
                     oscoreParameters.getRecipientId(), oscoreParameters.getHmacAlgorithm(), 32,
                     oscoreParameters.getMasterSalt(), null, 4096);
             osCoreCtx.setContextRederivationEnabled(true);
+            osCoreCtx.setContextRederivationPhase(ContextRederivation.PHASE.CLIENT_INITIATE);
             return osCoreCtx;
         } catch (OSException e) {
             LOG.error("Unable to derive context from {}", oscoreParameters, e);
