@@ -33,7 +33,7 @@ import org.eclipse.leshan.client.californium.CaliforniumConnectionController;
 import org.eclipse.leshan.client.servers.ServerIdentity;
 import org.eclipse.leshan.client.servers.ServerInfo;
 import org.eclipse.leshan.core.californium.identity.IdentityHandler;
-import org.eclipse.leshan.core.californium.oscore.cf.InMemoryOscoreContextDB;
+import org.eclipse.leshan.core.californium.oscore.cf.InMemoryOscoreContextDBClient;
 import org.eclipse.leshan.core.californium.oscore.cf.OscoreParameters;
 import org.eclipse.leshan.core.californium.oscore.cf.StaticOscoreStore;
 import org.eclipse.leshan.core.oscore.InvalidOscoreSettingException;
@@ -102,7 +102,8 @@ public class CoapOscoreClientEndpointFactory extends CoapClientEndpointFactory {
                     serverInfo.oscoreSetting.getRecipientId(), serverInfo.oscoreSetting.getMasterSecret(), aeadAlg,
                     hkdfAlg, masterSalt);
 
-            InMemoryOscoreContextDB oscoreCtxDB = new InMemoryOscoreContextDB(new StaticOscoreStore(oscoreParameters));
+            InMemoryOscoreContextDBClient oscoreCtxDB = new InMemoryOscoreContextDBClient(
+                    new StaticOscoreStore(oscoreParameters));
             builder.setCustomCoapStackArgument(oscoreCtxDB).setCoapStackFactory(new OSCoreCoapStackFactory());
         }
 

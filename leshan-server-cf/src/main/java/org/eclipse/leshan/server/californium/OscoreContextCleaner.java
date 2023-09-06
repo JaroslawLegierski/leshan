@@ -74,6 +74,9 @@ public class OscoreContextCleaner implements RegistrationListener, SecurityStore
     private void removeContext(byte[] rid) {
         OSCoreCtx context = oscoreCtxDB.getContext(rid);
         if (context != null)
-            oscoreCtxDB.removeContext(context);
+            // JL test
+            if (!oscoreCtxDB.getContext(rid).getContextRederivationEnabled()) {
+                oscoreCtxDB.removeContext(context);
+            }
     }
 }
