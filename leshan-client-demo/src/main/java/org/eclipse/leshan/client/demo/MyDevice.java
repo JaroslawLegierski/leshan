@@ -132,27 +132,6 @@ public class MyDevice extends BaseInstanceEnabler implements Destroyable {
         LOG.info("Write on Device resource /{}/{}/{}", getModel().id, getId(), resourceid);
 
         switch (resourceid) {
-        case 0:
-            manufacturer = value.getValue().toString();
-            return writeSuccess(getManufacturer(), manufacturer, resourceid);
-        case 1:
-            modelNumber = value.getValue().toString();
-            return writeSuccess(getModelNumber(), modelNumber, resourceid);
-        case 2:
-            serialNumber = value.getValue().toString();
-            return writeSuccess(getSerialNumber(), serialNumber, resourceid);
-        case 3:
-            firmwareVersion = value.getValue().toString();
-            return writeSuccess(getFirmwareVersion(), firmwareVersion, resourceid);
-        case 9:
-            batteryLevel = Integer.valueOf(value.getValue().toString());
-            return writeSuccess(getBatteryLevel(), batteryLevel, resourceid);
-        case 10:
-            memoryFree = Integer.valueOf(value.getValue().toString());
-            return writeSuccess(getMemoryFree(), memoryFree, resourceid);
-        case 11:
-            errorCode = Integer.valueOf(value.getValue().toString());
-            return writeSuccess(getErrorCode(), errorCode, resourceid);
         case 13:
             return WriteResponse.notFound();
         case 14:
@@ -163,69 +142,37 @@ public class MyDevice extends BaseInstanceEnabler implements Destroyable {
             setTimezone((String) value.getValue());
             fireResourceChange(resourceid);
             return WriteResponse.success();
-        case 16:
-            supportedBinding = value.getValue().toString();
-            return writeSuccess(getSupportedBinding(), supportedBinding, resourceid);
-        case 17:
-            deviceType = value.getValue().toString();
-            return writeSuccess(getDeviceType(), deviceType, resourceid);
-        case 18:
-            hardwareVersion = value.getValue().toString();
-            return writeSuccess(getHardwareVersion(), hardwareVersion, resourceid);
-        case 19:
-            softwareVersion = value.getValue().toString();
-            return writeSuccess(getSoftwareVersion(), softwareVersion, resourceid);
-        case 20:
-            batteryStatus = Integer.valueOf(value.getValue().toString());
-            return writeSuccess(getBatteryStatus(), batteryStatus, resourceid);
-        case 21:
-            memoryTotal = Integer.valueOf(value.getValue().toString());
-            return writeSuccess(getMemoryTotal(), memoryTotal, resourceid);
         default:
             return super.write(server, replace, resourceid, value);
         }
     }
 
-    private String manufacturer;
-
     private String getManufacturer() {
-        return manufacturer != null ? manufacturer : "Leshan Demo Device";
+        return "Leshan Demo Device";
     }
-
-    private String modelNumber;
 
     private String getModelNumber() {
-        return modelNumber != null ? modelNumber : "Model 500";
+        return "Model 500";
     }
-
-    private String serialNumber;
 
     private String getSerialNumber() {
-        return serialNumber != null ? serialNumber : "LT-500-000-0001";
+        return "LT-500-000-0001";
     }
-
-    private String firmwareVersion;
 
     private String getFirmwareVersion() {
-        return firmwareVersion != null ? firmwareVersion : "1.0.0";
+        return "1.0.0";
     }
-
-    private long errorCode;
 
     private long getErrorCode() {
-        return errorCode != 0 ? errorCode : 0;
+        return 0;
     }
-
-    private int batteryLevel;
 
     private int getBatteryLevel() {
-        return batteryLevel != 0 ? batteryLevel : RANDOM.nextInt(101);
+        return RANDOM.nextInt(101);
     }
 
-    private long memoryFree;
-
     private long getMemoryFree() {
-        return memoryFree != 0 ? memoryFree : Runtime.getRuntime().freeMemory() / 1024;
+        return Runtime.getRuntime().freeMemory() / 1024;
     }
 
     private Date getCurrentTime() {
@@ -252,40 +199,28 @@ public class MyDevice extends BaseInstanceEnabler implements Destroyable {
         timeZone = t;
     }
 
-    private String supportedBinding;
-
     private String getSupportedBinding() {
-        return supportedBinding != null ? supportedBinding : "U";
+        return "U";
     }
-
-    private String deviceType;
 
     private String getDeviceType() {
-        return deviceType != null ? deviceType : "Demo";
+        return "Demo";
     }
-
-    private String hardwareVersion;
 
     private String getHardwareVersion() {
-        return hardwareVersion != null ? hardwareVersion : "1.0.1";
+        return "1.0.1";
     }
-
-    private String softwareVersion;
 
     private String getSoftwareVersion() {
-        return softwareVersion != null ? softwareVersion : "1.0.2";
+        return "1.0.2";
     }
-
-    private int batteryStatus;
 
     private int getBatteryStatus() {
-        return batteryStatus != 0 ? batteryStatus : RANDOM.nextInt(7);
+        return RANDOM.nextInt(7);
     }
 
-    private long memoryTotal;
-
     private long getMemoryTotal() {
-        return memoryTotal != 0 ? memoryTotal : Runtime.getRuntime().totalMemory() / 1024;
+        return Runtime.getRuntime().totalMemory() / 1024;
     }
 
     @Override
@@ -296,17 +231,5 @@ public class MyDevice extends BaseInstanceEnabler implements Destroyable {
     @Override
     public void destroy() {
         timer.cancel();
-    }
-
-    private WriteResponse writeSuccess(String previousValue, String newValue, int resourceid) {
-        if (!previousValue.equals(newValue))
-            fireResourceChange(resourceid);
-        return WriteResponse.success();
-    }
-
-    private WriteResponse writeSuccess(long previousValue, long newValue, int resourceid) {
-        if (previousValue != newValue)
-            fireResourceChange(resourceid);
-        return WriteResponse.success();
     }
 }

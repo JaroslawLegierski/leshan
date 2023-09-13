@@ -27,11 +27,9 @@ import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
 import org.eclipse.leshan.client.servers.LwM2mServer;
 import org.eclipse.leshan.core.Destroyable;
 import org.eclipse.leshan.core.model.ObjectModel;
-import org.eclipse.leshan.core.node.LwM2mResource;
 import org.eclipse.leshan.core.request.argument.Arguments;
 import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
-import org.eclipse.leshan.core.response.WriteResponse;
 import org.eclipse.leshan.core.util.NamedThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,11 +49,8 @@ public class RandomTemperatureSensor extends BaseInstanceEnabler implements Dest
     private final ScheduledExecutorService scheduler;
     private final Random rng = new Random();
     private double currentTemp = 20d;
-    private double sensorValue;
-    private double minMeasuredValue;
-    private double defaultMinMeasuredValue = currentTemp;
-    private double maxMeasuredValue;
-    private double defaultMaxMeasuredValue = currentTemp;
+    private double minMeasuredValue = currentTemp;
+    private double maxMeasuredValue = currentTemp;
 
     public RandomTemperatureSensor() {
         this.scheduler = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("Temperature Sensor"));
@@ -73,43 +68,15 @@ public class RandomTemperatureSensor extends BaseInstanceEnabler implements Dest
         LOG.info("Read on Temperature resource /{}/{}/{}", getModel().id, getId(), resourceId);
         switch (resourceId) {
         case MIN_MEASURED_VALUE:
-            return ReadResponse.success(resourceId, getCurrentValue(defaultMinMeasuredValue, minMeasuredValue));
+            return ReadResponse.success(resourceId, getTwoDigitValue(minMeasuredValue));
         case MAX_MEASURED_VALUE:
-            return ReadResponse.success(resourceId, getCurrentValue(defaultMaxMeasuredValue, maxMeasuredValue));
+            return ReadResponse.success(resourceId, getTwoDigitValue(maxMeasuredValue));
         case SENSOR_VALUE:
-            return ReadResponse.success(resourceId, getCurrentValue(currentTemp, sensorValue));
+            return ReadResponse.success(resourceId, getTwoDigitValue(currentTemp));
         case UNITS:
             return ReadResponse.success(resourceId, UNIT_CELSIUS);
         default:
             return super.read(server, resourceId);
-        }
-    }
-
-    @Override
-    public WriteResponse write(LwM2mServer server, boolean replace, int resourceid, LwM2mResource value) {
-        LOG.info("Write on Temperature resource /{}/{}/{}", getModel().id, getId(), resourceid);
-
-        switch (resourceid) {
-        case SENSOR_VALUE:
-            double previousCurrentTemp = currentTemp;
-            sensorValue = Float.valueOf(value.getValue().toString());
-            if (previousCurrentTemp != sensorValue)
-                fireResourceChange(resourceid);
-            return WriteResponse.success();
-        case MIN_MEASURED_VALUE:
-            double previousMinMeasuredValue = getTwoDigitValue(defaultMinMeasuredValue);
-            minMeasuredValue = Float.valueOf(value.getValue().toString());
-            if (previousMinMeasuredValue != minMeasuredValue)
-                fireResourceChange(resourceid);
-            return WriteResponse.success();
-        case MAX_MEASURED_VALUE:
-            double previousMaxMeasuredValue = getTwoDigitValue(defaultMaxMeasuredValue);
-            maxMeasuredValue = Float.valueOf(value.getValue().toString());
-            if (previousMaxMeasuredValue != maxMeasuredValue)
-                fireResourceChange(resourceid);
-            return WriteResponse.success();
-        default:
-            return super.write(server, replace, resourceid, value);
         }
     }
 
@@ -128,10 +95,6 @@ public class RandomTemperatureSensor extends BaseInstanceEnabler implements Dest
     private double getTwoDigitValue(double value) {
         BigDecimal toBeTruncated = BigDecimal.valueOf(value);
         return toBeTruncated.setScale(2, RoundingMode.HALF_UP).doubleValue();
-    }
-
-    private double getCurrentValue(double defaultValue, double newValue) {
-        return newValue != 0 ? newValue : defaultValue;
     }
 
     private void adjustTemperature() {

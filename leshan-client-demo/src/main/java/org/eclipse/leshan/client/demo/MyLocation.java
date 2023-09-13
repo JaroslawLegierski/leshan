@@ -22,9 +22,7 @@ import java.util.Random;
 import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
 import org.eclipse.leshan.client.servers.LwM2mServer;
 import org.eclipse.leshan.core.model.ObjectModel;
-import org.eclipse.leshan.core.node.LwM2mResource;
 import org.eclipse.leshan.core.response.ReadResponse;
-import org.eclipse.leshan.core.response.WriteResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,28 +72,6 @@ public class MyLocation extends BaseInstanceEnabler {
         }
     }
 
-    @Override
-    public WriteResponse write(LwM2mServer server, boolean replace, int resourceid, LwM2mResource value) {
-        LOG.info("Write on Location resource /{}/{}/{}", getModel().id, getId(), resourceid);
-
-        switch (resourceid) {
-        case 0:
-            float previousLatitude = getLatitude();
-            latitude = Float.valueOf(value.getValue().toString());
-            if (previousLatitude != latitude)
-                fireResourceChange(resourceid);
-            return WriteResponse.success();
-        case 1:
-            float previousLongitude = getLongitude();
-            longitude = Float.valueOf(value.getValue().toString());
-            if (previousLongitude != longitude)
-                fireResourceChange(resourceid);
-            return WriteResponse.success();
-        default:
-            return super.write(server, replace, resourceid, value);
-        }
-    }
-
     public void moveLocation(String nextMove) {
         switch (nextMove.charAt(0)) {
         case 'w':
@@ -130,11 +106,11 @@ public class MyLocation extends BaseInstanceEnabler {
     }
 
     public float getLatitude() {
-        return latitude != 0 ? latitude : latitude - 90.0f;
+        return latitude - 90.0f;
     }
 
     public float getLongitude() {
-        return longitude != 0 ? longitude : longitude - 180.f;
+        return longitude - 180.f;
     }
 
     public Date getTimestamp() {
