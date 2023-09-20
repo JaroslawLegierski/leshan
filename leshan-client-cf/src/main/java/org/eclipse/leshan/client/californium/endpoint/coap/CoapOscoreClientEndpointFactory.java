@@ -60,8 +60,8 @@ public class CoapOscoreClientEndpointFactory extends CoapClientEndpointFactory {
      */
     @Override
     protected CoapEndpoint.Builder createEndpointBuilder(InetSocketAddress address, ServerInfo serverInfo,
-            Configuration coapConfig) {
-        CoapEndpoint.Builder builder = super.createEndpointBuilder(address, serverInfo, coapConfig);
+            Configuration coapConfig, boolean fallbackdetected) {
+        CoapEndpoint.Builder builder = super.createEndpointBuilder(address, serverInfo, coapConfig, fallbackdetected);
 
         // handle oscore
         if (serverInfo.useOscore) {
@@ -103,7 +103,7 @@ public class CoapOscoreClientEndpointFactory extends CoapClientEndpointFactory {
                     hkdfAlg, masterSalt);
 
             InMemoryOscoreContextDBClient oscoreCtxDB = new InMemoryOscoreContextDBClient(
-                    new StaticOscoreStore(oscoreParameters));
+                    new StaticOscoreStore(oscoreParameters), fallbackdetected);
             builder.setCustomCoapStackArgument(oscoreCtxDB).setCoapStackFactory(new OSCoreCoapStackFactory());
         }
 

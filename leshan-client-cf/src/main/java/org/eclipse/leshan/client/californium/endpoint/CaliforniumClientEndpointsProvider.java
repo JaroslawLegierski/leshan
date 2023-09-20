@@ -78,6 +78,7 @@ public class CaliforniumClientEndpointsProvider implements LwM2mClientEndpointsP
     private ServerIdentity currentServer;
     private CaliforniumClientEndpoint endpoint;
     private CoapServer coapServer;
+    private boolean fallbackdetected;
 
     public CaliforniumClientEndpointsProvider() {
         this(new Builder().generateDefaultValue());
@@ -87,6 +88,7 @@ public class CaliforniumClientEndpointsProvider implements LwM2mClientEndpointsP
         this.serverConfig = builder.configuration;
         this.endpointsFactory = builder.endpointsFactory;
         this.clientAddress = builder.clientAddress;
+        this.fallbackdetected = builder.fallbackdetected;
 
         // create identity handler provider
         identityHandlerProvider = new IdentityHandlerProvider();
@@ -164,7 +166,7 @@ public class CaliforniumClientEndpointsProvider implements LwM2mClientEndpointsP
             if (endpointFactory.getProtocol().getUriScheme().equals(serverInfo.getFullUri().getScheme())) {
                 // create Californium endpoint
                 Endpoint coapEndpoint = endpointFactory.createCoapEndpoint(clientAddress, serverConfig, serverInfo,
-                        clientInitiatedOnly, trustStore, toolbox);
+                        clientInitiatedOnly, trustStore, toolbox, fallbackdetected);
 
                 if (coapEndpoint != null) {
                     // create identity handler and add it to provider
@@ -303,6 +305,7 @@ public class CaliforniumClientEndpointsProvider implements LwM2mClientEndpointsP
     public static class Builder {
 
         private final List<ClientProtocolProvider> protocolProviders;
+        public boolean fallbackdetected;
         private Configuration configuration;
         private final List<CaliforniumClientEndpointFactory> endpointsFactory;
         private InetAddress clientAddress;

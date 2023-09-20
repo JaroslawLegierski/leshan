@@ -67,8 +67,9 @@ public class CoapClientEndpointFactory implements CaliforniumClientEndpointFacto
     @Override
     public Endpoint createCoapEndpoint(InetAddress clientAddress, Configuration defaultConfiguration,
             ServerInfo serverInfo, boolean clientInitiatedOnly, List<Certificate> trustStore,
-            ClientEndpointToolbox toolbox) {
-        return createEndpointBuilder(new InetSocketAddress(clientAddress, 0), serverInfo, defaultConfiguration).build();
+            ClientEndpointToolbox toolbox, boolean fallbackdetected) {
+        return createEndpointBuilder(new InetSocketAddress(clientAddress, 0), serverInfo, defaultConfiguration,
+                fallbackdetected).build();
     }
 
     /**
@@ -77,10 +78,11 @@ public class CoapClientEndpointFactory implements CaliforniumClientEndpointFacto
      * @param address the IP address and port, if null the connector is bound to an ephemeral port on the wildcard
      *        address.
      * @param coapConfig the CoAP config used to create this endpoint.
+     * @param fallbackdetected
      * @return the {@link Builder} used for unsecured communication.
      */
     protected CoapEndpoint.Builder createEndpointBuilder(InetSocketAddress address, ServerInfo serverInfo,
-            Configuration coapConfig) {
+            Configuration coapConfig, boolean fallbackdetected) {
         CoapEndpoint.Builder builder = new CoapEndpoint.Builder();
         builder.setConnector(createConnector(address, coapConfig));
         builder.setConfiguration(coapConfig);

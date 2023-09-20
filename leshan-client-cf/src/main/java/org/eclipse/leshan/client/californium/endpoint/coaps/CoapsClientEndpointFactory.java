@@ -110,7 +110,7 @@ public class CoapsClientEndpointFactory extends CoapClientEndpointFactory {
     @Override
     public Endpoint createCoapEndpoint(InetAddress clientAddress, Configuration defaultConfiguration,
             ServerInfo serverInfo, boolean clientInitiatedOnly, List<Certificate> trustStore,
-            ClientEndpointToolbox toolbox) {
+            ClientEndpointToolbox toolbox, boolean fallbackdetected) {
 
         // we can not create CoAPs endpoint if server is not secure data.
         if (!serverInfo.isSecure()) {

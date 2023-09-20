@@ -33,7 +33,8 @@ public interface CaliforniumClientEndpointFactory {
     Protocol getProtocol();
 
     Endpoint createCoapEndpoint(InetAddress clientAddress, Configuration defaultConfiguration, ServerInfo serverInfo,
-            boolean clientInitiatedOnly, List<Certificate> trustStore, ClientEndpointToolbox toolbox);
+            boolean clientInitiatedOnly, List<Certificate> trustStore, ClientEndpointToolbox toolbox,
+            boolean fallbackdetected);
 
     CaliforniumConnectionController createConnectionController();
 

@@ -72,6 +72,8 @@ import picocli.CommandLine;
 
 public class LeshanClientDemo {
 
+    private static File ctxFile = new File("ctx.txt");
+
     static {
         // Define a default logback.configurationFile
         String property = System.getProperty("logback.configurationFile");
@@ -116,6 +118,7 @@ public class LeshanClientDemo {
                 @Override
                 public void run() {
                     client.destroy(true); // send de-registration request before destroy
+                    ctxFile.delete();
                 }
             });
 
@@ -130,6 +133,7 @@ public class LeshanClientDemo {
             printer.printf("%n%n");
             printer.print(command.getColorScheme().stackTraceText(e));
             printer.flush();
+            ctxFile.delete();
             System.exit(1);
         }
     }
@@ -261,6 +265,14 @@ public class LeshanClientDemo {
         // Create client endpoints Provider
         CaliforniumClientEndpointsProvider.Builder endpointsBuilder = new CaliforniumClientEndpointsProvider.Builder(
                 new CoapOscoreProtocolProvider(), customCoapsProtocolProvider);
+        // Client restart detection for OSCORE
+
+        if (ctxFile.isFile()) {
+            endpointsBuilder.fallbackdetected = true;
+        } else {
+            endpointsBuilder.fallbackdetected = false;
+            ctxFile.createNewFile();
+        }
 
         // Create Californium Configuration
         Configuration clientCoapConfig = endpointsBuilder.createDefaultConfiguration();
