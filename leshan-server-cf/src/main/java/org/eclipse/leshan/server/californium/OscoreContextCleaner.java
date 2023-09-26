@@ -17,6 +17,7 @@ package org.eclipse.leshan.server.californium;
 
 import java.util.Collection;
 
+import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.oscore.OSCoreCtx;
 import org.eclipse.californium.oscore.OSCoreCtxDB;
 import org.eclipse.leshan.core.observation.Observation;
@@ -74,6 +75,9 @@ public class OscoreContextCleaner implements RegistrationListener, SecurityStore
     private void removeContext(byte[] rid) {
         OSCoreCtx context = oscoreCtxDB.getContext(rid);
         if (context != null)
-            oscoreCtxDB.removeContext(context);
+            // TODO check why POST is generating unregister event!
+            if (context.getCoAPCode() != CoAP.Code.POST) {
+                oscoreCtxDB.removeContext(context);
+            }
     }
 }

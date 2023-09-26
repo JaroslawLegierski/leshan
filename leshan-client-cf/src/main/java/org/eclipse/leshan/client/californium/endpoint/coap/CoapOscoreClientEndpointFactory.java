@@ -33,7 +33,8 @@ import org.eclipse.leshan.client.californium.CaliforniumConnectionController;
 import org.eclipse.leshan.client.servers.ServerIdentity;
 import org.eclipse.leshan.client.servers.ServerInfo;
 import org.eclipse.leshan.core.californium.identity.IdentityHandler;
-import org.eclipse.leshan.core.californium.oscore.cf.InMemoryOscoreContextDB;
+import org.eclipse.leshan.core.californium.oscore.cf.InMemoryOscoreContextDBClient;
+import org.eclipse.leshan.core.californium.oscore.cf.OscoreFallback;
 import org.eclipse.leshan.core.californium.oscore.cf.OscoreParameters;
 import org.eclipse.leshan.core.californium.oscore.cf.StaticOscoreStore;
 import org.eclipse.leshan.core.oscore.InvalidOscoreSettingException;
@@ -49,6 +50,7 @@ import com.upokecenter.cbor.CBORObject;
 public class CoapOscoreClientEndpointFactory extends CoapClientEndpointFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(CoapOscoreClientEndpointFactory.class);
+    private OscoreFallback oscoreFallback;
 
     /**
      * This method is intended to be overridden.
@@ -101,8 +103,9 @@ public class CoapOscoreClientEndpointFactory extends CoapClientEndpointFactory {
             OscoreParameters oscoreParameters = new OscoreParameters(serverInfo.oscoreSetting.getSenderId(),
                     serverInfo.oscoreSetting.getRecipientId(), serverInfo.oscoreSetting.getMasterSecret(), aeadAlg,
                     hkdfAlg, masterSalt);
-
-            InMemoryOscoreContextDB oscoreCtxDB = new InMemoryOscoreContextDB(new StaticOscoreStore(oscoreParameters));
+            oscoreFallback = new OscoreFallback(false);
+            InMemoryOscoreContextDBClient oscoreCtxDB = new InMemoryOscoreContextDBClient(
+                    new StaticOscoreStore(oscoreParameters), oscoreFallback);
             builder.setCustomCoapStackArgument(oscoreCtxDB).setCoapStackFactory(new OSCoreCoapStackFactory());
         }
 
@@ -147,6 +150,7 @@ public class CoapOscoreClientEndpointFactory extends CoapClientEndpointFactory {
             @Override
             public void forceReconnection(Endpoint endpoint, ServerIdentity identity, boolean resume) {
                 // TODO TL : how to force oscore connection ?
+                oscoreFallback.setFallbackdetected(true);
             }
         };
     }

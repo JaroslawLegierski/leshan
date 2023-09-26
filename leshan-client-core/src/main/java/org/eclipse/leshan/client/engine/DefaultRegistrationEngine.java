@@ -351,6 +351,29 @@ public class DefaultRegistrationEngine implements RegistrationEngine {
             } else {
                 LOG.info("Registration failed: {} {}.", response.getCode(), response.getErrorMessage());
                 if (observer != null) {
+                    if (server.getIdentity().isOSCORE() && response.getCode() == ResponseCode.UNAUTHORIZED)
+                    // OSCORE Appendix B.2 support
+                    {
+                        endpointsManager.forceReconnection(server, resumeOnConnect);
+                        request = new RegisterRequest(endpoint, dmInfo.lifetime, lwM2mVersion.toString(),
+                                supportedBindingMode, queueMode, null, links, additionalAttributes);
+                        if (observer != null) {
+                            observer.onRegistrationStarted(server, request);
+                        }
+                        registeringServers.add(server);
+                        response = sender.send(server, request, requestTimeoutInMs);
+                        if (response.isSuccess()) {
+                            // Add server to registered one
+                            String registrationID = response.getRegistrationID();
+                            registeredServers.put(registrationID, server);
+                            LOG.info("Registered with location '{}'.", registrationID);
+
+                            // Update every lifetime period
+                            long delay = calculateNextUpdate(server, dmInfo.lifetime);
+                            scheduleUpdate(server, registrationID, new RegistrationUpdate(), delay);
+                            return Status.SUCCESS;
+                        }
+                    }
                     observer.onRegistrationFailure(server, request, response.getCode(), response.getErrorMessage(),
                             null);
                 }
