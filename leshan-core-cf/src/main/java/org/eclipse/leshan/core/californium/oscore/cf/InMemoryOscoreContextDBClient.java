@@ -16,6 +16,7 @@
 package org.eclipse.leshan.core.californium.oscore.cf;
 
 import org.eclipse.californium.oscore.CoapOSException;
+import org.eclipse.californium.oscore.ContextRederivation;
 import org.eclipse.californium.oscore.HashMapCtxDB;
 import org.eclipse.californium.oscore.OSCoreCtx;
 import org.eclipse.californium.oscore.OSCoreCtxDB;
@@ -29,44 +30,35 @@ import org.slf4j.LoggerFactory;
  *
  */
 // TODO OSCORE this should be moved in californium.
-public class InMemoryOscoreContextDB extends HashMapCtxDB {
+public class InMemoryOscoreContextDBClient extends HashMapCtxDB {
 
     private static final Logger LOG = LoggerFactory.getLogger(InMemoryOscoreContextDB.class);
-
     private final OscoreStore store;
+    OscoreFallback oscoreFallback;
 
-    public InMemoryOscoreContextDB(OscoreStore oscoreStore) {
+    public InMemoryOscoreContextDBClient(OscoreStore oscoreStore, OscoreFallback oscoreFallback) {
         this.store = oscoreStore;
+        this.oscoreFallback = oscoreFallback;
     }
 
     @Override
     public synchronized OSCoreCtx getContext(byte[] rid, byte[] IDContext) throws CoapOSException {
-        // search in local DB based on rid and IDContext
-
-        OSCoreCtx osCoreCtx;
-        osCoreCtx = super.getContext(rid, IDContext);
-
-        // Check if the Appendix B.2 procedure for this context is already in progress if so search in local DB based on
-        // rid
-        if (super.getContext(rid) != null && (super.getContext(rid).getContextRederivationEnabled())) {
-            {
-                return super.getContext(rid);
-            }
-        }
+        // search in local DB
+        OSCoreCtx osCoreCtx = super.getContext(rid, IDContext);
 
         // if nothing found
         if (osCoreCtx == null) {
             // try to derive new context from OSCORE parameter in OSCORE Store
             OscoreParameters params = store.getOscoreParameters(rid);
+
             if (params != null) {
-                osCoreCtx = deriveContext(params, IDContext);
-                // add new new context in local DB
-                if (super.getContext(rid) != null) {
-                    super.removeContext(super.getContext(rid));
-                    super.addContext(osCoreCtx);
+                if (oscoreFallback.isFallbackdetected()) {
+                    osCoreCtx = deriveContext(params, IDContext);
                 } else {
-                    super.addContext(osCoreCtx);
+                    osCoreCtx = createContex(params, IDContext);
                 }
+                // add new new context in local DB
+                super.addContext(osCoreCtx);
             }
         }
         return osCoreCtx;
@@ -75,13 +67,22 @@ public class InMemoryOscoreContextDB extends HashMapCtxDB {
     @Override
     public synchronized OSCoreCtx getContext(byte[] rid) {
         OSCoreCtx osCoreCtx = super.getContext(rid);
-
+        if (oscoreFallback.isFallbackdetected()) {
+            OscoreParameters params = store.getOscoreParameters(rid);
+            osCoreCtx = deriveContext(params, null);
+            super.addContext(osCoreCtx);
+        }
         // if nothing found
         if (osCoreCtx == null) {
             // try to derive new context from OSCORE parameter in OSCORE Store
             OscoreParameters params = store.getOscoreParameters(rid);
             if (params != null) {
-                osCoreCtx = deriveContext(params, null);
+                if (oscoreFallback.isFallbackdetected()) {
+
+                    osCoreCtx = deriveContext(params, null);
+                } else {
+                    osCoreCtx = createContex(params, null);
+                }
                 // add new new context in local DB
                 super.addContext(osCoreCtx);
             }
@@ -109,21 +110,27 @@ public class InMemoryOscoreContextDB extends HashMapCtxDB {
         return osCoreCtx;
     }
 
-    private static OSCoreCtx deriveContext(OscoreParameters oscoreParameters, byte[] IDContext) {
+    private static OSCoreCtx createContex(OscoreParameters oscoreParameters, byte[] IDContext) {
+        OSCoreCtx osCoreCtx = null;
         try {
-            OSCoreCtx osCoreCtx = new OSCoreCtx(oscoreParameters.getMasterSecret(), false,
-                    oscoreParameters.getAeadAlgorithm(), oscoreParameters.getSenderId(),
-                    oscoreParameters.getRecipientId(), oscoreParameters.getHmacAlgorithm(), 32,
-                    oscoreParameters.getMasterSalt(), IDContext, 4096);
-
-            osCoreCtx.setContextRederivationEnabled(true);
-
-            LOG.info("!!! server rederivation enabled");
-
-            return osCoreCtx;
+            osCoreCtx = new OSCoreCtx(oscoreParameters.getMasterSecret(), true, oscoreParameters.getAeadAlgorithm(),
+                    oscoreParameters.getSenderId(), oscoreParameters.getRecipientId(),
+                    oscoreParameters.getHmacAlgorithm(), 32, oscoreParameters.getMasterSalt(), IDContext, 4096);
         } catch (OSException e) {
-            LOG.error("Unable to derive context from {}", oscoreParameters, e);
+            LOG.error("Unable to create n context from {}", oscoreParameters, e);
             return null;
         }
+        return osCoreCtx;
+    }
+
+    private static OSCoreCtx deriveContext(OscoreParameters oscoreParameters, byte[] IDContext) {
+        OSCoreCtx osCoreCtx = null;
+        osCoreCtx = createContex(oscoreParameters, IDContext);
+        if (osCoreCtx != null) {
+            osCoreCtx.setContextRederivationEnabled(true);
+            osCoreCtx.setContextRederivationPhase(ContextRederivation.PHASE.CLIENT_INITIATE);
+        }
+        return osCoreCtx;
+
     }
 }
