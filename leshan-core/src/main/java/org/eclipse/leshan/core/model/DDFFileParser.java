@@ -39,7 +39,9 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 /**
  * A parser for Object DDF files.
@@ -138,6 +140,22 @@ public class DDFFileParser {
         try {
             // Parse XML file
             DocumentBuilder builder = factory.newDocumentBuilder();
+            builder.setErrorHandler(new ErrorHandler() {
+                @Override
+                public void warning(SAXParseException exception) throws SAXException {
+                    LOG.info("warn level exception while parsing XML : {}", exception.getMessage());
+                }
+
+                @Override
+                public void fatalError(SAXParseException exception) throws SAXException {
+                    LOG.info("fatal level exception while parsing XML : {}", exception.getMessage());
+                }
+
+                @Override
+                public void error(SAXParseException exception) throws SAXException {
+                    LOG.info("error level exception while parsing XML : {}", exception.getMessage());
+                }
+            });
             Document document = builder.parse(inputStream);
 
             // Get DDF file validator
