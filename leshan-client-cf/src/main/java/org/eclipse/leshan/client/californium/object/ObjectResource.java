@@ -23,7 +23,9 @@ package org.eclipse.leshan.client.californium.object;
 
 import static org.eclipse.leshan.core.californium.ResponseCodeUtil.toCoapResponseCode;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.californium.core.coap.CoAP.ResponseCode;
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
@@ -46,6 +48,7 @@ import org.eclipse.leshan.core.node.LwM2mObject;
 import org.eclipse.leshan.core.node.LwM2mObjectInstance;
 import org.eclipse.leshan.core.node.LwM2mPath;
 import org.eclipse.leshan.core.node.LwM2mResource;
+import org.eclipse.leshan.core.node.TimestampedLwM2mNodes;
 import org.eclipse.leshan.core.node.codec.CodecException;
 import org.eclipse.leshan.core.request.BootstrapDeleteRequest;
 import org.eclipse.leshan.core.request.BootstrapDiscoverRequest;
@@ -148,8 +151,24 @@ public class ObjectResource extends LwM2mClientCoapResource implements ObjectLis
                     LwM2mPath path = getPath(URI);
                     LwM2mNode content = response.getContent();
                     ContentFormat format = getContentFormat(observeRequest, requestedContentFormat);
-                    exchange.respond(ResponseCode.CONTENT,
-                            toolbox.getEncoder().encode(content, format, path, toolbox.getModel()), format.getCode());
+
+                    // PoC Observe-Composite with timestamped data
+                    if (response.getTimestampedLwM2mNode() != null) {
+                        TimestampedLwM2mNodes.Builder builder = new TimestampedLwM2mNodes.Builder();
+                        Map<LwM2mPath, LwM2mNode> currentValues = new HashMap<>();
+                        currentValues.put(path, content);
+
+                        builder.addNodes(response.getTimestampedLwM2mNode().get(0).getTimestamp(), currentValues);
+
+                        exchange.respond(ResponseCode.CONTENT, toolbox.getEncoder()
+                                .encodeTimestampedNodes(builder.build(), format, toolbox.getModel()), format.getCode());
+
+                        return;
+                    } else {
+                        exchange.respond(ResponseCode.CONTENT,
+                                toolbox.getEncoder().encode(content, format, path, toolbox.getModel()),
+                                format.getCode());
+                    }
                     return;
                 } else {
                     exchange.respond(toCoapResponseCode(response.getCode()), response.getErrorMessage());

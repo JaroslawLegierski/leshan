@@ -125,7 +125,8 @@ public class ServerCoapMessageTranslator {
                 Map<LwM2mPath, LwM2mNode> nodes = toolbox.getDecoder().decodeNodes(coapResponse.getPayload(),
                         contentFormat, compositeObservation.getPaths(), profile.getModel());
 
-                return new ObserveCompositeResponse(responseCode, nodes, null, coapResponse, compositeObservation);
+                return new ObserveCompositeResponse(responseCode, nodes, null, coapResponse, compositeObservation,
+                        null);
             }
 
             throw new IllegalStateException(

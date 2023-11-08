@@ -15,6 +15,7 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.response;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
 
@@ -30,6 +31,7 @@ import org.eclipse.leshan.core.util.datatype.ULong;
 public class ReadResponse extends AbstractLwM2mResponse {
 
     protected final LwM2mNode content;
+    protected Instant timestamp;
 
     public ReadResponse(ResponseCode code, LwM2mNode content, String errorMessage) {
         this(code, content, errorMessage, null);
@@ -43,6 +45,17 @@ public class ReadResponse extends AbstractLwM2mResponse {
                 throw new InvalidResponseException("Content is mandatory for successful response");
         }
         this.content = content;
+    }
+
+    public ReadResponse(ResponseCode code, LwM2mNode content, String errorMessage, Object coapResponse,
+            Instant timestamp) {
+        super(code, errorMessage, coapResponse);
+        if (ResponseCode.CONTENT.equals(code)) {
+            if (content == null)
+                throw new InvalidResponseException("Content is mandatory for successful response");
+        }
+        this.content = content;
+        this.timestamp = timestamp;
     }
 
     @Override
@@ -115,6 +128,11 @@ public class ReadResponse extends AbstractLwM2mResponse {
         return new ReadResponse(ResponseCode.CONTENT, LwM2mSingleResource.newFloatResource(resourceId, value), null);
     }
 
+    public static ReadResponse success(int resourceId, Instant timestamp, double value) {
+        return new ReadResponse(ResponseCode.CONTENT, LwM2mSingleResource.newFloatResource(resourceId, value), null,
+                null, timestamp);
+    }
+
     public static ReadResponse success(int resourceId, boolean value) {
         return new ReadResponse(ResponseCode.CONTENT, LwM2mSingleResource.newBooleanResource(resourceId, value), null);
     }
@@ -149,5 +167,9 @@ public class ReadResponse extends AbstractLwM2mResponse {
 
     public static ReadResponse internalServerError(String errorMessage) {
         return new ReadResponse(ResponseCode.INTERNAL_SERVER_ERROR, null, errorMessage);
+    }
+
+    public Instant getTimestamp() {
+        return timestamp;
     }
 }

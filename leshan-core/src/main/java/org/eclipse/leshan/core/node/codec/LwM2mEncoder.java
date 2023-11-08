@@ -74,6 +74,9 @@ public interface LwM2mEncoder {
     byte[] encodeTimestampedData(List<TimestampedLwM2mNode> timestampedNodes, ContentFormat format, LwM2mPath path,
             LwM2mModel model) throws CodecException;
 
+    byte[] encodeTimestampedData(List<TimestampedLwM2mNode> timestampedNodes, ContentFormat format,
+            List<LwM2mPath> paths, LwM2mModel model) throws CodecException;
+
     /**
      * Serializes a multiple time-stamped nodes contained in {@link TimestampedLwM2mNodes} with the given content
      * format.

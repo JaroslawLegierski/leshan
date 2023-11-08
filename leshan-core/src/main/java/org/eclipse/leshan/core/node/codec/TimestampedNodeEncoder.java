@@ -41,4 +41,7 @@ public interface TimestampedNodeEncoder extends NodeEncoder {
      */
     byte[] encodeTimestampedData(List<TimestampedLwM2mNode> timestampedNodes, LwM2mPath path, LwM2mModel model,
             LwM2mValueConverter converter) throws CodecException;
+
+    byte[] encodeTimestampedData(List<TimestampedLwM2mNode> timestampedNodes, List<LwM2mPath> paths, LwM2mModel model,
+            LwM2mValueConverter converter) throws CodecException;
 }

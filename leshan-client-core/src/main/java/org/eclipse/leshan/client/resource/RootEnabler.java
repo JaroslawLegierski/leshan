@@ -16,6 +16,7 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.resource;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ import org.eclipse.leshan.core.node.LwM2mPath;
 import org.eclipse.leshan.core.node.LwM2mResource;
 import org.eclipse.leshan.core.node.LwM2mResourceInstance;
 import org.eclipse.leshan.core.node.LwM2mSingleResource;
+import org.eclipse.leshan.core.node.TimestampedLwM2mNode;
 import org.eclipse.leshan.core.request.ObserveCompositeRequest;
 import org.eclipse.leshan.core.request.ObserveRequest;
 import org.eclipse.leshan.core.request.ReadCompositeRequest;
@@ -41,6 +43,7 @@ import org.eclipse.leshan.core.request.WriteCompositeRequest;
 import org.eclipse.leshan.core.request.WriteRequest;
 import org.eclipse.leshan.core.request.WriteRequest.Mode;
 import org.eclipse.leshan.core.response.ObserveCompositeResponse;
+import org.eclipse.leshan.core.response.ObserveResponse;
 import org.eclipse.leshan.core.response.ReadCompositeResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.response.WriteCompositeResponse;
@@ -215,6 +218,8 @@ public class RootEnabler implements LwM2mRootEnabler {
         // Read Nodes
         Map<LwM2mPath, LwM2mNode> content = new HashMap<>();
         boolean isEmpty = true; // true if don't succeed to read any of requested path
+        boolean isTimestamped = false;
+        List<TimestampedLwM2mNode> timestampedValues = new ArrayList<>();
         for (LwM2mPath path : paths) {
             // Get corresponding object enabler
             Integer objectId = path.getObjectId();
@@ -226,6 +231,11 @@ public class RootEnabler implements LwM2mRootEnabler {
                         new ObserveRequest(request.getResponseContentFormat(), path, request.getCoapRequest()));
                 if (response.isSuccess()) {
                     node = response.getContent();
+                    // PoC Observe-Composite with timestamped data
+                    if (((ObserveResponse) response).getTimestampedLwM2mNode().get(0) != null) {
+                        timestampedValues.add(((ObserveResponse) response).getTimestampedLwM2mNode().get(0));
+                        isTimestamped = true;
+                    }
                     isEmpty = false;
                 } else {
                     LOG.debug("Server {} try to read node {} in a Observe-Composite Request {} but it failed for {} "
@@ -241,7 +251,11 @@ public class RootEnabler implements LwM2mRootEnabler {
         if (isEmpty) {
             return ObserveCompositeResponse.notFound();
         } else {
-            return ObserveCompositeResponse.success(content);
+            if (isTimestamped) {
+                return ObserveCompositeResponse.success(timestampedValues);
+            } else {
+                return ObserveCompositeResponse.success(content);
+            }
         }
     }
 

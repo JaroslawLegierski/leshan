@@ -33,6 +33,7 @@ import org.eclipse.leshan.core.node.LwM2mObjectInstance;
 import org.eclipse.leshan.core.node.LwM2mPath;
 import org.eclipse.leshan.core.node.LwM2mResource;
 import org.eclipse.leshan.core.node.LwM2mResourceInstance;
+import org.eclipse.leshan.core.node.TimestampedLwM2mNode;
 import org.eclipse.leshan.core.request.argument.Arguments;
 import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.eclipse.leshan.core.response.ObserveResponse;
@@ -254,7 +255,14 @@ public class BaseInstanceEnabler implements LwM2mInstanceEnabler {
     public ObserveResponse observe(LwM2mServer server, int resourceid) {
         // Perform a read by default
         ReadResponse readResponse = this.read(server, resourceid);
-        return new ObserveResponse(readResponse.getCode(), readResponse.getContent(), null, null,
+        List<TimestampedLwM2mNode> timestampedValues = new ArrayList<>();
+        // PoC Observe-Composite with timestamped data
+        if (readResponse.getTimestamp() != null) {
+            timestampedValues.add(new TimestampedLwM2mNode(readResponse.getTimestamp(), readResponse.getContent()));
+        } else {
+            timestampedValues = null;
+        }
+        return new ObserveResponse(readResponse.getCode(), readResponse.getContent(), timestampedValues, null,
                 readResponse.getErrorMessage());
     }
 

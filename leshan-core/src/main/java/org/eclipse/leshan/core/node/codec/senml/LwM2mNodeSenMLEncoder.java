@@ -163,10 +163,48 @@ public class LwM2mNodeSenMLEncoder implements TimestampedNodeEncoder, MultiNodeE
     }
 
     @Override
+    public byte[] encodeTimestampedData(List<TimestampedLwM2mNode> timestampedNodes, List<LwM2mPath> paths,
+            LwM2mModel model, LwM2mValueConverter converter) throws CodecException {
+        Validate.notNull(timestampedNodes);
+        Validate.notNull(paths);
+        Validate.notNull(model);
+
+        SenMLPack pack = new SenMLPack();
+        for (TimestampedLwM2mNode timestampedLwM2mNode : timestampedNodes) {
+
+            if (timestampedLwM2mNode.getTimestamp().getEpochSecond() < 268_435_456) {
+                // The smallest absolute Time value that can be expressed (2**28) is 1978-07-04 21:24:16 UTC.
+                // see https://tools.ietf.org/html/rfc8428#section-4.5.3
+                throw new CodecException(
+                        "Unable to encode timestamped node[path:%s] : invalid timestamp %s, timestamp should be greater or equals to 268,435,456",
+                        paths, timestampedLwM2mNode.getTimestamp());
+            }
+            // JL
+            InternalEncoder internalEncoder = new InternalEncoder();
+            internalEncoder.objectId = paths.get(timestampedNodes.indexOf(timestampedLwM2mNode)).getObjectId();
+            internalEncoder.model = model;
+            internalEncoder.requestPath = paths.get(timestampedNodes.indexOf(timestampedLwM2mNode));
+            internalEncoder.converter = converter;
+            internalEncoder.records = new ArrayList<>();
+            timestampedLwM2mNode.getNode().accept(internalEncoder);
+            BigDecimal timestampInSeconds = TimestampUtil.fromInstant(timestampedLwM2mNode.getTimestamp());
+            internalEncoder.records.get(0).setBaseTime(timestampInSeconds);
+            pack.addRecords(internalEncoder.records);
+
+        }
+
+        try {
+            return encoder.toSenML(pack);
+        } catch (SenMLException e) {
+            throw new CodecException(e, "Unable to encode timestamped node[path:%s] : %s", paths, timestampedNodes);
+        }
+    }
+
+    @Override
     public byte[] encodeTimestampedNodes(TimestampedLwM2mNodes timestampedNodes, LwM2mModel model,
             LwM2mValueConverter converter) throws CodecException {
         Validate.notEmpty(timestampedNodes.getTimestamps());
-
+        Instant basetimestamp = Instant.now();
         SenMLPack pack = new SenMLPack();
         for (Instant timestamp : timestampedNodes.getTimestamps()) {
             Map<LwM2mPath, LwM2mNode> nodesAtTimestamp = timestampedNodes.getNodesAt(timestamp);
@@ -183,9 +221,19 @@ public class LwM2mNodeSenMLEncoder implements TimestampedNodeEncoder, MultiNodeE
                     node.accept(internalEncoder);
 
                     List<SenMLRecord> records = internalEncoder.records;
-                    if (!records.isEmpty()) {
-                        records.get(0).setBaseTime(TimestampUtil.fromInstant(timestamp));
+                    if (pack.getRecords().isEmpty() && !records.isEmpty()) {
+                        basetimestamp = timestamp;
+                        records.get(0).setBaseTime(TimestampUtil.fromInstant(basetimestamp));
                         pack.addRecords(records);
+                    } else {
+                        if (!records.isEmpty()) {
+                            if ((pack.getRecords().get(0).getBaseName()).equals(records.get(0).getBaseName())) {
+                                records.get(0).setBaseName(null);
+                            }
+                            records.get(0).setTime(
+                                    TimestampUtil.fromInstant(timestamp.minusMillis(basetimestamp.toEpochMilli())));
+                            pack.addRecords(records);
+                        }
                     }
                 }
             }
