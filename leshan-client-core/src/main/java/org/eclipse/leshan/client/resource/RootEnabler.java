@@ -232,7 +232,7 @@ public class RootEnabler implements LwM2mRootEnabler {
                 if (response.isSuccess()) {
                     node = response.getContent();
                     // PoC Observe-Composite with timestamped data
-                    if (((ObserveResponse) response).getTimestampedLwM2mNode().get(0) != null) {
+                    if (((ObserveResponse) response).getTimestampedLwM2mNode() != null) {
                         timestampedValues.add(((ObserveResponse) response).getTimestampedLwM2mNode().get(0));
                         isTimestamped = true;
                     }

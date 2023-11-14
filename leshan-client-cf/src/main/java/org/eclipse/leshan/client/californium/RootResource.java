@@ -38,6 +38,7 @@ import org.eclipse.leshan.core.californium.ObserveUtil;
 import org.eclipse.leshan.core.californium.identity.IdentityHandlerProvider;
 import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.node.LwM2mPath;
+import org.eclipse.leshan.core.node.TimestampedLwM2mNode;
 import org.eclipse.leshan.core.node.TimestampedLwM2mNodes;
 import org.eclipse.leshan.core.request.BootstrapDeleteRequest;
 import org.eclipse.leshan.core.request.BootstrapDiscoverRequest;
@@ -135,12 +136,14 @@ public class RootResource extends LwM2mClientCoapResource {
                     TimestampedLwM2mNodes.Builder builder = new TimestampedLwM2mNodes.Builder();
                     Map<LwM2mPath, LwM2mNode> currentValues = new HashMap<>();
                     for (LwM2mPath path : paths) {
-
-                        currentValues.put(path, response.getTimestampedLwM2mNode().get(paths.indexOf(path)).getNode());
-                        builder.addNodes(response.getTimestampedLwM2mNode().get(paths.indexOf(path)).getTimestamp(),
-                                currentValues);
-                        currentValues.clear();
-
+                        // Workaround check if all nodes in the path are timestamped
+                        for (TimestampedLwM2mNode node : response.getTimestampedLwM2mNode()) {
+                            if (node.getNode().getId() == path.getResourceId()) {
+                                currentValues.put(path, node.getNode());
+                                builder.addNodes(node.getTimestamp(), currentValues);
+                                currentValues.clear();
+                            }
+                        }
                     }
 
                     exchange.respond(

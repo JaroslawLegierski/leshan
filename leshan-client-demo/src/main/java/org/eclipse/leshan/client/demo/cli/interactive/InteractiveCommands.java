@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.eclipse.leshan.client.LeshanClient;
 import org.eclipse.leshan.client.demo.MyLocation;
+import org.eclipse.leshan.client.demo.TimestampedMyLocation;
 import org.eclipse.leshan.client.demo.cli.interactive.InteractiveCommands.CollectCommand;
 import org.eclipse.leshan.client.demo.cli.interactive.InteractiveCommands.CreateCommand;
 import org.eclipse.leshan.client.demo.cli.interactive.InteractiveCommands.DeleteCommand;
@@ -386,8 +387,8 @@ public class InteractiveCommands extends JLineInteractiveCommands implements Run
             LwM2mObjectEnabler objectEnabler = parent.client.getObjectTree().getObjectEnabler(LwM2mId.LOCATION);
             if (objectEnabler != null && objectEnabler instanceof ObjectEnabler) {
                 LwM2mInstanceEnabler instance = ((ObjectEnabler) objectEnabler).getInstance(0);
-                if (instance instanceof MyLocation) {
-                    MyLocation location = (MyLocation) instance;
+                if (instance instanceof TimestampedMyLocation) {
+                    TimestampedMyLocation location = (TimestampedMyLocation) instance;
                     if (north)
                         location.moveLocation("w");
                     if (east)

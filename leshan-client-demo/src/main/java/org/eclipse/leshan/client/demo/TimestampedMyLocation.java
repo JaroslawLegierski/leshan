@@ -66,7 +66,6 @@ public class TimestampedMyLocation extends BaseInstanceEnabler {
 
             Instant currentTimestamp = Instant.now().plusMillis(100);
             return ReadResponse.success(resourceid, currentTimestamp, getLatitude());
-        // return ReadResponse.success(resourceid, getLatitude());
 
         case 1:
             return ReadResponse.success(resourceid, getLongitude());
