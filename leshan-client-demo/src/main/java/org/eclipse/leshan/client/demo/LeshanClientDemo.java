@@ -157,7 +157,7 @@ public class LeshanClientDemo {
 
     public static LeshanClient createClient(LeshanClientDemoCLI cli, LwM2mModelRepository repository) throws Exception {
         // create Leshan client from command line option
-        final MyLocation locationInstance = new MyLocation(cli.location.position.latitude,
+        final TimestampedMyLocation locationInstance = new TimestampedMyLocation(cli.location.position.latitude,
                 cli.location.position.longitude, cli.location.scaleFactor);
 
         // Initialize object list
@@ -230,7 +230,7 @@ public class LeshanClientDemo {
         }
         initializer.setInstancesForObject(DEVICE, new MyDevice());
         initializer.setInstancesForObject(LOCATION, locationInstance);
-        initializer.setInstancesForObject(OBJECT_ID_TEMPERATURE_SENSOR, new RandomTemperatureSensor());
+        initializer.setInstancesForObject(OBJECT_ID_TEMPERATURE_SENSOR, new TimestampedRandomTemperatureSensor());
         initializer.setInstancesForObject(OBJECT_ID_LWM2M_TEST_OBJECT, new LwM2mTestObject());
 
         List<LwM2mObjectEnabler> enablers = initializer.createAll();

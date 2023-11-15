@@ -37,6 +37,11 @@ public class LwM2mRoot implements LwM2mNode {
     }
 
     @Override
+    public int getId() {
+        return 0;
+    }
+
+    @Override
     public void accept(LwM2mNodeVisitor visitor) {
         visitor.visit(this);
     }

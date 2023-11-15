@@ -163,7 +163,7 @@ public class CoapNotificationReceiver implements NotificationsReceiver {
             Map<LwM2mPath, LwM2mNode> nodes = decoder.decodeNodes(coapResponse.getPayload().getBytes(), contentFormat,
                     compositeObservation.getPaths(), profile.getModel());
 
-            return new ObserveCompositeResponse(responseCode, nodes, null, coapResponse, compositeObservation);
+            return new ObserveCompositeResponse(responseCode, nodes, null, coapResponse, compositeObservation, null);
         }
         return null;
     }

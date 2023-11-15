@@ -201,6 +201,29 @@ public class DefaultLwM2mEncoder implements LwM2mEncoder {
     }
 
     @Override
+    public byte[] encodeTimestampedData(List<TimestampedLwM2mNode> timestampedNodes, ContentFormat format,
+            List<LwM2mPath> paths, LwM2mModel model) throws CodecException {
+        Validate.notEmpty(timestampedNodes);
+        if (format == null) {
+            throw new CodecException("Content format is mandatory. [%s]", paths);
+        }
+
+        NodeEncoder encoder = nodeEncoders.get(format);
+        if (encoder == null) {
+            throw new CodecException("Content format %s is not supported [%s]", format, paths);
+        }
+        if (!(encoder instanceof TimestampedNodeEncoder)) {
+            throw new CodecException("Cannot encode timestampedNode with format %s. [%s]", format, paths);
+        }
+        LOG.trace("Encoding time-stamped nodes for path {} and format {}", timestampedNodes, paths, format);
+        byte[] encoded = ((TimestampedNodeEncoder) encoder).encodeTimestampedData(timestampedNodes, paths, model,
+                converter);
+        LOG.trace("Encoded node timestampedNode: {}", timestampedNodes, encoded);
+        return encoded;
+
+    }
+
+    @Override
     public byte[] encodeTimestampedNodes(TimestampedLwM2mNodes timestampedNodes, ContentFormat format, LwM2mModel model)
             throws CodecException {
         Validate.notNull(timestampedNodes);

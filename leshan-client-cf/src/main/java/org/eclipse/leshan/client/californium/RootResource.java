@@ -38,6 +38,8 @@ import org.eclipse.leshan.core.californium.ObserveUtil;
 import org.eclipse.leshan.core.californium.identity.IdentityHandlerProvider;
 import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.node.LwM2mPath;
+import org.eclipse.leshan.core.node.TimestampedLwM2mNode;
+import org.eclipse.leshan.core.node.TimestampedLwM2mNodes;
 import org.eclipse.leshan.core.request.BootstrapDeleteRequest;
 import org.eclipse.leshan.core.request.BootstrapDiscoverRequest;
 import org.eclipse.leshan.core.request.ContentFormat;
@@ -129,10 +131,34 @@ public class RootResource extends LwM2mClientCoapResource {
                 exchange.respond(toCoapResponseCode(response.getCode()), response.getErrorMessage());
                 return;
             } else {
-                exchange.respond(toCoapResponseCode(response.getCode()), toolbox.getEncoder()
-                        .encodeNodes(response.getContent(), responseContentFormat, toolbox.getModel()),
-                        responseContentFormat.getCode());
-                return;
+                if (response.getTimestampedLwM2mNode() != null) {
+                    // PoC Observe-Composite with timestamped data
+                    TimestampedLwM2mNodes.Builder builder = new TimestampedLwM2mNodes.Builder();
+                    Map<LwM2mPath, LwM2mNode> currentValues = new HashMap<>();
+                    for (LwM2mPath path : paths) {
+                        // Workaround check if all nodes in the path are timestamped
+                        for (TimestampedLwM2mNode node : response.getTimestampedLwM2mNode()) {
+                            if (node.getNode().getId() == path.getResourceId()) {
+                                currentValues.put(path, node.getNode());
+                                builder.addNodes(node.getTimestamp(), currentValues);
+                                currentValues.clear();
+                            }
+                        }
+                    }
+
+                    exchange.respond(
+                            toCoapResponseCode(response.getCode()), toolbox.getEncoder()
+                                    .encodeTimestampedNodes(builder.build(), responseContentFormat, toolbox.getModel()),
+                            responseContentFormat.getCode());
+                    return;
+                } else {
+                    exchange.respond(
+                            toCoapResponseCode(response.getCode()), toolbox.getEncoder()
+                                    .encodeNodes(response.getContent(), responseContentFormat, toolbox.getModel()),
+                            responseContentFormat.getCode());
+                    return;
+                }
+
             }
         } else {
             // Manage Read Composite request

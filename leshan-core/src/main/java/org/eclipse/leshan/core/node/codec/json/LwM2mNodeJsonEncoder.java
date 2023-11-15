@@ -137,6 +137,47 @@ public class LwM2mNodeJsonEncoder implements TimestampedNodeEncoder {
 
     }
 
+    // PoC Observe-Composite with timestamped data
+    @Override
+    public byte[] encodeTimestampedData(List<TimestampedLwM2mNode> timestampedNodes, List<LwM2mPath> paths,
+            LwM2mModel model, LwM2mValueConverter converter) {
+        Validate.notNull(timestampedNodes);
+        Validate.notNull(paths);
+        Validate.notNull(model);
+
+        InternalEncoder internalEncoder = new InternalEncoder();
+        ArrayList<JsonArrayEntry> entries = new ArrayList<>();
+        String baseName = null;
+        for (TimestampedLwM2mNode timestampedLwM2mNode : timestampedNodes) {
+            internalEncoder.objectId = paths.get(0).getObjectId();
+            internalEncoder.model = model;
+            internalEncoder.requestPath = paths.get(0);
+            internalEncoder.converter = converter;
+            internalEncoder.resourceList = null;
+            internalEncoder.timestampInSeconds = TimestampUtil.fromInstant(timestampedLwM2mNode.getTimestamp());
+            timestampedLwM2mNode.getNode().accept(internalEncoder);
+            entries.addAll(internalEncoder.resourceList);
+            if (baseName != null) {
+                if (!baseName.equals(internalEncoder.baseName)) {
+                    throw new CodecException(
+                            "Unexpected baseName %s (%s expected) when encoding timestamped nodes for request %s",
+                            internalEncoder.baseName, baseName, paths);
+                }
+            } else {
+                baseName = internalEncoder.baseName;
+            }
+        }
+        JsonRootObject jsonObject = new JsonRootObject();
+        jsonObject.setResourceList(entries);
+        jsonObject.setBaseName(internalEncoder.baseName);
+        try {
+            return encoder.toJsonLwM2m(jsonObject).getBytes();
+        } catch (LwM2mJsonException e) {
+            throw new CodecException(e, "Unable to encode timestamped nodes[path:%s] : %s", paths, timestampedNodes);
+        }
+
+    }
+
     private class InternalEncoder implements LwM2mNodeVisitor {
         // visitor inputs
         private int objectId;
