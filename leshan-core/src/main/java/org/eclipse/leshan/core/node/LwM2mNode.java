@@ -20,8 +20,6 @@ package org.eclipse.leshan.core.node;
  */
 public interface LwM2mNode {
 
-    int getId();
-
     /**
      * Accept a visitor for this node.
      */
