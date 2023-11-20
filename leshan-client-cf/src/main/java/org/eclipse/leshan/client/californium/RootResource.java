@@ -36,9 +36,7 @@ import org.eclipse.leshan.client.request.DownlinkRequestReceiver;
 import org.eclipse.leshan.client.servers.LwM2mServer;
 import org.eclipse.leshan.core.californium.ObserveUtil;
 import org.eclipse.leshan.core.californium.identity.IdentityHandlerProvider;
-import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.node.LwM2mNode;
-import org.eclipse.leshan.core.node.LwM2mNodeUtil;
 import org.eclipse.leshan.core.node.LwM2mPath;
 import org.eclipse.leshan.core.node.LwM2mSingleResource;
 import org.eclipse.leshan.core.node.TimestampedLwM2mNode;
@@ -55,8 +53,6 @@ import org.eclipse.leshan.core.response.ObserveCompositeResponse;
 import org.eclipse.leshan.core.response.ReadCompositeResponse;
 import org.eclipse.leshan.core.response.WriteCompositeResponse;
 import org.eclipse.leshan.core.util.StringUtils;
-
-import com.sun.org.apache.xpath.internal.objects.XNodeSet;
 
 /**
  * A root {@link CoapResource} resource in charge of handling Bootstrap Delete requests targeting the "/" URI.
@@ -143,7 +139,7 @@ public class RootResource extends LwM2mClientCoapResource {
                     for (LwM2mPath path : paths) {
                         // Workaround check if all nodes in the path are timestamped
                         for (TimestampedLwM2mNode node : response.getTimestampedLwM2mNode()) {
-                            if ((((LwM2mSingleResource) node.getNode()).getId())== path.getResourceId() ) {
+                            if ((((LwM2mSingleResource) node.getNode()).getId()) == path.getResourceId()) {
                                 currentValues.put(path, node.getNode());
                                 builder.addNodes(node.getTimestamp(), currentValues);
                                 currentValues.clear();
