@@ -105,7 +105,11 @@ public class LwM2mNodeSenMLDecoder implements TimestampedNodeDecoder, MultiNodeD
                             resolvedRecord.getPath(), path);
                 }
                 if (resolvedRecord.getTimeStamp() != null) {
-                    throw new CodecException("Unable to decode node[path:%s] : value should not be timestamped", path);
+                    // JL test
+                    resolvedRecords.add(resolvedRecord);
+                    break;
+                    // throw new CodecException("Unable to decode node[path:%s] : value should not be timestamped",
+                    // path);
                 }
                 resolvedRecords.add(resolvedRecord);
             }
