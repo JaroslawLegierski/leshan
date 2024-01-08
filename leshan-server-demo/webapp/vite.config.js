@@ -13,6 +13,15 @@ const outputDir = process.env.MAVEN_OUTPUT_DIR
   ? process.env.MAVEN_OUTPUT_DIR
   : "../target/dist";
 
+console.log("dirname: "+__dirname);
+console.log("MAVEN_OUTPUT_DIR: "+process.env.MAVEN_OUTPUT_DIR);
+console.log("outputDir: "+outputDir);
+console.log("@: "+path.resolve(__dirname, "./src"));
+console.log("@leshan-server-core-demo: "+path.join(__dirname,"../../leshan-server-core-demo/webapp/src"));
+console.log("./node_modules: "+ path.resolve("./node_modules"));
+console.log("path: "+ path.resolve("."));
+console.log("path1: "+path.join(__dirname,"../../leshan-server-core-demo/webapp/src"));
+
 // https://vitejs.dev/config/
 export default defineConfig({
   base: "./",
