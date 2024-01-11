@@ -151,6 +151,7 @@ public class ObjectResource extends LwM2mClientCoapResource implements ObjectLis
                 // TODO handle active cancel observe, we must call : notificationManager.clear(server, observeRequest);
                 if (exchange.advanced().getRelation() == null || !exchange.advanced().getRelation().isEstablished()) {
                     // Handle observe request
+                    notificationManager.clear(server, observeRequest);
                     ObserveResponse response = requestReceiver.requestReceived(server, observeRequest).getResponse();
                     if (response.getCode() == org.eclipse.leshan.core.ResponseCode.CONTENT) {
                         LwM2mPath path = getPath(URI);

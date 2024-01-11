@@ -15,12 +15,17 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.notification;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 
 import org.eclipse.leshan.client.servers.LwM2mServer;
 import org.eclipse.leshan.core.link.lwm2m.attributes.LwM2mAttributeSet;
+import org.eclipse.leshan.core.link.lwm2m.attributes.LwM2mAttributes;
 import org.eclipse.leshan.core.node.LwM2mNode;
+import org.eclipse.leshan.core.node.LwM2mPath;
 import org.eclipse.leshan.core.request.ObserveRequest;
+import org.eclipse.leshan.core.response.ObserveResponse;
 
 /**
  * This class store information needed to handle write attributes behavior.
@@ -32,6 +37,21 @@ public class NotificationDataStore {
     // TODO create a real data structure
     // for testing purpose we only store 1 NotificationData
     private NotificationData data;
+
+    private Map<LwM2mPath, NotificationData> collectedData = new HashMap<>();
+
+    public Map<LwM2mPath, NotificationData> getCollectedData(ObserveResponse response) {
+        LwM2mPath lwM2mPath = new LwM2mPath(6, 0, 1);
+        LwM2mAttributeSet attributes = new LwM2mAttributeSet( //
+                LwM2mAttributes.create(LwM2mAttributes.MINIMUM_PERIOD, 5l),
+                LwM2mAttributes.create(LwM2mAttributes.MAXIMUM_PERIOD, 10l));
+
+        LwM2mNode lwM2mNode = response.getContent();
+        NotificationData notificationData = new NotificationData(attributes, 0L, lwM2mNode, null);
+
+        collectedData.put(lwM2mPath, notificationData);
+        return collectedData;
+    }
 
     public NotificationData getNotificationData(LwM2mServer server, ObserveRequest request) {
         return data;

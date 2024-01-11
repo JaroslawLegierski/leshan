@@ -15,6 +15,7 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.notification;
 
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -59,12 +60,14 @@ public class NotificationManager {
         objectTree.addListener(new ObjectsListenerAdapter() {
             @Override
             public void objectInstancesRemoved(LwM2mObjectEnabler object, int... instanceIds) {
-                // TODO cleaning remove data
+                object.getAvailableInstanceIds().forEach(id -> objectTree.removeObjectEnabler(id));
+                LOG.info("{} instances disabled", instanceIds.length);
             }
 
             @Override
             public void objectRemoved(LwM2mObjectEnabler object) {
-                // TODO cleaning remove data
+                objectTree.removeObjectEnabler(object.getId());
+                LOG.info("Object {} v{} disabled.", object.getId(), object.getObjectModel().version);
             }
         });
     }
@@ -86,14 +89,9 @@ public class NotificationManager {
     }
 
     protected LwM2mAttributeSet getAttributes(LwM2mServer server, ObserveRequest request) {
-        // TODO use objectTree to get attribute;
-        // for testing, we return hardcoded value for resource 6/0/1
-        if (request.getPath().equals(new LwM2mPath(6, 0, 1))) {
-            return new LwM2mAttributeSet( //
-                    LwM2mAttributes.create(LwM2mAttributes.MINIMUM_PERIOD, 5l),
-                    LwM2mAttributes.create(LwM2mAttributes.MAXIMUM_PERIOD, 10l));
-        }
-        return null;
+        ObserveResponse response = createResponse(server, request);
+        Map<LwM2mPath, NotificationData> collectedData = store.getCollectedData(response);
+        return collectedData.get(new LwM2mPath(6, 0, 1)).getAttributes();
     }
 
     // TODO an optimization could be to synchronize by observe relation (identify by server / request)
@@ -120,6 +118,9 @@ public class NotificationManager {
 
         // TODO use case where PMIN == PMAX
         // If PMIN is used
+        Long pmin = attributes.get(LwM2mAttributes.MINIMUM_PERIOD).getValue();
+        Long pmax = attributes.get(LwM2mAttributes.MAXIMUM_PERIOD).getValue();
+
         if (notificationData.usePmin()) {
             LOG.trace("handle pmin for observe relation of {} / {}", server, request);
 
@@ -131,7 +132,7 @@ public class NotificationManager {
             // calculate time since last notification
             Long timeSinceLastNotification = TimeUnit.SECONDS
                     .convert(System.nanoTime() - notificationData.getLastSendingTime(), TimeUnit.NANOSECONDS);
-            Long pmin = attributes.get(LwM2mAttributes.MINIMUM_PERIOD).getValue();
+
             if (timeSinceLastNotification < pmin) {
                 ScheduledFuture<Void> pminTask = executor.schedule(new Callable<Void>() {
                     @Override
@@ -144,14 +145,22 @@ public class NotificationManager {
                 store.addNotificationData(server, request, new NotificationData(notificationData, pminTask));
                 return;
             }
+        } else if (pmin == pmax) {
+            executor.schedule(() -> {
+                sendNotification(server, request, attributes, sender);
+                return null;
+            }, pmax, TimeUnit.SECONDS);
+            return;
+        } else {
+            return;
         }
 
         sendNotification(server, request, attributes, sender);
     }
 
-    // TODO an optimization could be to synchronize by observe relation (identify by server / request)
     public synchronized void clear(LwM2mServer server, ObserveRequest request) {
-        // remove all data about observe relation for given server / request.
+        LwM2mPath lwM2mPath = request.getPath();
+        objectTree.removeObjectEnabler(lwM2mPath.getObjectId());
     }
 
     // TODO an optimization could be to synchronize by observe relation (identify by server / request)
@@ -215,8 +224,9 @@ public class NotificationManager {
     }
 
     protected ObserveResponse createResponse(LwM2mServer server, ObserveRequest request) {
-        // TODO maybe we can remove "receiver" dependencie and directly use ObjectTree ?
-        return receiver.requestReceived(server, request).getResponse();
+        LwM2mPath path = request.getPath();
+        LwM2mObjectEnabler objectEnabler = objectTree.getObjectEnabler(path.getObjectId());
+        return objectEnabler.observe(server, request);
     }
 
     public void destroy() {

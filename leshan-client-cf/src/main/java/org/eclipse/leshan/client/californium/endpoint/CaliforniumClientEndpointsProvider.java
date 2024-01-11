@@ -318,12 +318,15 @@ public class CaliforniumClientEndpointsProvider implements LwM2mClientEndpointsP
         private InetAddress clientAddress;
 
         public Builder(ClientProtocolProvider... protocolProviders) {
-            // TODO TL : handle duplicate ?
-            this.protocolProviders = new ArrayList<ClientProtocolProvider>();
+            // handle duplicate
+            this.protocolProviders = new ArrayList<>();
             if (protocolProviders.length == 0) {
                 this.protocolProviders.add(new CoapClientProtocolProvider());
             } else {
-                this.protocolProviders.addAll(Arrays.asList(protocolProviders));
+                for (ClientProtocolProvider clientProvider : protocolProviders) {
+                    if (!this.protocolProviders.contains(clientProvider))
+                        this.protocolProviders.add(clientProvider);
+                }
             }
 
             this.endpointsFactory = new ArrayList<>();
@@ -373,8 +376,9 @@ public class CaliforniumClientEndpointsProvider implements LwM2mClientEndpointsP
             }
             if (endpointsFactory.isEmpty()) {
                 for (ClientProtocolProvider protocolProvider : protocolProviders) {
-                    // TODO TL : handle duplicates
-                    endpointsFactory.add(protocolProvider.createDefaultEndpointFactory());
+                    // handle duplicates
+                    if (!endpointsFactory.contains(protocolProvider.createDefaultEndpointFactory()))
+                        endpointsFactory.add(protocolProvider.createDefaultEndpointFactory());
                 }
             }
             return this;
