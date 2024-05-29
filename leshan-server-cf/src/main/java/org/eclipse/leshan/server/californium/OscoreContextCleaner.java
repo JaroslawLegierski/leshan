@@ -17,6 +17,7 @@ package org.eclipse.leshan.server.californium;
 
 import java.util.Collection;
 
+import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.oscore.OSCoreCtx;
 import org.eclipse.californium.oscore.OSCoreCtxDB;
 import org.eclipse.leshan.core.observation.Observation;
@@ -76,7 +77,7 @@ public class OscoreContextCleaner implements RegistrationListener, SecurityStore
         OSCoreCtx context = oscoreCtxDB.getContext(rid);
         if (context != null)
             // JL test
-            if (!oscoreCtxDB.getContext(rid).getContextRederivationEnabled()) {
+            if (context.getCoAPCode() != CoAP.Code.POST) {
                 oscoreCtxDB.removeContext(context);
             }
     }
