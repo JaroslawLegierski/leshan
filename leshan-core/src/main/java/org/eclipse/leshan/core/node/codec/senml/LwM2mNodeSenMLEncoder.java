@@ -152,7 +152,7 @@ public class LwM2mNodeSenMLEncoder implements TimestampedNodeEncoder, MultiNodeE
             internalEncoder.records = new ArrayList<>();
             timestampedLwM2mNode.getNode().accept(internalEncoder);
             BigDecimal timestampInSeconds = TimestampUtil.fromInstant(timestampedLwM2mNode.getTimestamp());
-            internalEncoder.records.get(0).setBaseTime(timestampInSeconds);
+            internalEncoder.records.get(0).setTime(timestampInSeconds);
             pack.addRecords(internalEncoder.records);
         }
 

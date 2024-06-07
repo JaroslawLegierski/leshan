@@ -499,6 +499,7 @@ public class LwM2mResponseBuilder<T extends LwM2mResponse> implements DownlinkRe
         try {
             timestampedNodes = decoder.decodeTimestampedData(coapResponse.getPayload(), getContentFormat(coapResponse),
                     path, model);
+            // ToDo
             if (timestampedNodes.size() != 1) {
                 throw new InvalidResponseException(
                         "Unable to decode response payload of request [%s] from client [%s] : should receive only 1 timestamped node but received %s",
