@@ -113,6 +113,7 @@ public class LwM2mResponseBuilder<T extends LwM2mResponse> implements DownlinkRe
         this.linkParser = linkParser;
     }
 
+// Read response
     @Override
     public void visit(ReadRequest request) {
         if (coapResponse.isError()) {
