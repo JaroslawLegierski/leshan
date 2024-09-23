@@ -114,6 +114,11 @@ public class RegisterRequest extends AbstractLwM2mRequest<RegisterResponse>
             this.queueMode = queueMode == null ? false : queueMode;
         }
 
+        // handle client's LWM2M version not supported by the server
+        if (!LwM2mVersion.isSupported(version.toString())) {
+            throw new InvalidRequestException("Client's version of LWM2M Enabler isn't supported by the server");
+        }
+
         this.endpointName = endpointName;
         this.lifetime = lifetime;
         this.lwVersion = lwVersion;
