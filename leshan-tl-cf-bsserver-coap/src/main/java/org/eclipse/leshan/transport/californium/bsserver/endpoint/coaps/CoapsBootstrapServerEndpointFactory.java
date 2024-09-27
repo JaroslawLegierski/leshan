@@ -16,7 +16,6 @@
 package org.eclipse.leshan.transport.californium.bsserver.endpoint.coaps;
 
 import java.net.InetSocketAddress;
-import java.net.URI;
 import java.security.Principal;
 import java.security.PublicKey;
 import java.util.Arrays;
@@ -66,6 +65,7 @@ import org.eclipse.leshan.core.peer.X509Identity;
 import org.eclipse.leshan.core.request.exception.TimeoutException;
 import org.eclipse.leshan.core.request.exception.TimeoutException.Type;
 import org.eclipse.leshan.core.security.certificate.util.X509CertUtil;
+import org.eclipse.leshan.core.util.EndpointURI;
 import org.eclipse.leshan.servers.security.ServerSecurityInfo;
 import org.eclipse.leshan.transport.californium.DefaultExceptionTranslator;
 import org.eclipse.leshan.transport.californium.ExceptionTranslator;
@@ -99,17 +99,17 @@ public class CoapsBootstrapServerEndpointFactory implements CaliforniumBootstrap
                 DtlsConfig.DEFINITIONS);
     }
 
-    protected final URI endpointUri;
+    protected final EndpointURI endpointUri;
     protected final String loggingTagPrefix;
     protected final Configuration configuration;
     protected final Consumer<DtlsConnectorConfig.Builder> dtlsConnectorConfigInitializer;
     protected final Consumer<CoapEndpoint.Builder> coapEndpointConfigInitializer;
 
-    public CoapsBootstrapServerEndpointFactory(URI uri) {
+    public CoapsBootstrapServerEndpointFactory(EndpointURI uri) {
         this(uri, null, null, null, null);
     }
 
-    public CoapsBootstrapServerEndpointFactory(URI uri, String loggingTagPrefix, Configuration configuration,
+    public CoapsBootstrapServerEndpointFactory(EndpointURI uri, String loggingTagPrefix, Configuration configuration,
             Consumer<org.eclipse.californium.scandium.config.DtlsConnectorConfig.Builder> dtlsConnectorConfigInitializer,
             Consumer<Builder> coapEndpointConfigInitializer) {
         EndpointUriUtil.validateURI(uri);
@@ -127,7 +127,7 @@ public class CoapsBootstrapServerEndpointFactory implements CaliforniumBootstrap
     }
 
     @Override
-    public URI getUri() {
+    public EndpointURI getUri() {
         return endpointUri;
     }
 

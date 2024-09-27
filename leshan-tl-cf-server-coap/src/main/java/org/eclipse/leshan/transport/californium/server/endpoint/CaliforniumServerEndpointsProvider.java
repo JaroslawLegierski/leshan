@@ -16,7 +16,6 @@
 package org.eclipse.leshan.transport.californium.server.endpoint;
 
 import java.net.InetSocketAddress;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -46,6 +45,7 @@ import org.eclipse.leshan.core.peer.LwM2mPeer;
 import org.eclipse.leshan.core.response.AbstractLwM2mResponse;
 import org.eclipse.leshan.core.response.ObserveCompositeResponse;
 import org.eclipse.leshan.core.response.ObserveResponse;
+import org.eclipse.leshan.core.util.EndpointURI;
 import org.eclipse.leshan.core.util.NamedThreadFactory;
 import org.eclipse.leshan.server.LeshanServer;
 import org.eclipse.leshan.server.endpoint.LwM2mServerEndpoint;
@@ -99,7 +99,7 @@ public class CaliforniumServerEndpointsProvider implements LwM2mServerEndpointsP
     }
 
     @Override
-    public LwM2mServerEndpoint getEndpoint(URI uri) {
+    public LwM2mServerEndpoint getEndpoint(EndpointURI uri) {
         for (CaliforniumServerEndpoint endpoint : endpoints) {
             if (endpoint.getURI().equals(uri))
                 return endpoint;
@@ -325,7 +325,7 @@ public class CaliforniumServerEndpointsProvider implements LwM2mServerEndpointsP
             return addEndpoint(EndpointUriUtil.createUri(uri));
         }
 
-        public Builder addEndpoint(URI uri) {
+        public Builder addEndpoint(EndpointURI uri) {
             for (ServerProtocolProvider protocolProvider : protocolProviders) {
                 // TODO TL : validate URI
                 if (protocolProvider.getProtocol().getUriScheme().equals(uri.getScheme())) {

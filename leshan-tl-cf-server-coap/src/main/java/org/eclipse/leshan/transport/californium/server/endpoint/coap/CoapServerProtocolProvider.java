@@ -16,7 +16,6 @@
 package org.eclipse.leshan.transport.californium.server.endpoint.coap;
 
 import java.net.InetSocketAddress;
-import java.net.URI;
 import java.util.List;
 
 import org.eclipse.californium.core.config.CoapConfig;
@@ -24,6 +23,7 @@ import org.eclipse.californium.elements.config.Configuration;
 import org.eclipse.californium.elements.config.Configuration.ModuleDefinitionsProvider;
 import org.eclipse.leshan.core.endpoint.EndpointUriUtil;
 import org.eclipse.leshan.core.endpoint.Protocol;
+import org.eclipse.leshan.core.util.EndpointURI;
 import org.eclipse.leshan.transport.californium.server.endpoint.CaliforniumServerEndpointFactory;
 import org.eclipse.leshan.transport.californium.server.endpoint.ServerProtocolProvider;
 
@@ -45,12 +45,12 @@ public class CoapServerProtocolProvider implements ServerProtocolProvider {
     }
 
     @Override
-    public CaliforniumServerEndpointFactory createDefaultEndpointFactory(URI uri) {
+    public CaliforniumServerEndpointFactory createDefaultEndpointFactory(EndpointURI uri) {
         return new CoapServerEndpointFactory(uri);
     }
 
     @Override
-    public URI getDefaultUri(Configuration configuration) {
+    public EndpointURI getDefaultUri(Configuration configuration) {
         return EndpointUriUtil.createUri(getProtocol().getUriScheme(),
                 new InetSocketAddress(configuration.get(CoapConfig.COAP_PORT)));
     }

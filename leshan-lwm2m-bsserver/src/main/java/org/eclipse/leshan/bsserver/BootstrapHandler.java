@@ -15,12 +15,11 @@
  *******************************************************************************/
 package org.eclipse.leshan.bsserver;
 
-import java.net.URI;
-
 import org.eclipse.leshan.core.peer.LwM2mPeer;
 import org.eclipse.leshan.core.request.BootstrapRequest;
 import org.eclipse.leshan.core.response.BootstrapResponse;
 import org.eclipse.leshan.core.response.SendableResponse;
+import org.eclipse.leshan.core.util.EndpointURI;
 
 /**
  * Handle the bootstrap logic at Server side. Check if the client is allowed to bootstrap, with the wanted security
@@ -31,5 +30,6 @@ import org.eclipse.leshan.core.response.SendableResponse;
 
 public interface BootstrapHandler {
 
-    SendableResponse<BootstrapResponse> bootstrap(LwM2mPeer sender, BootstrapRequest request, URI serverEndpointUri);
+    SendableResponse<BootstrapResponse> bootstrap(LwM2mPeer sender, BootstrapRequest request,
+            EndpointURI serverEndpointUri);
 }

@@ -18,7 +18,6 @@ package org.eclipse.leshan.transport.californium.bsserver;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.net.InetSocketAddress;
-import java.net.URI;
 
 import org.eclipse.leshan.bsserver.BootstrapConfig;
 import org.eclipse.leshan.bsserver.BootstrapConfigStore;
@@ -36,6 +35,7 @@ import org.eclipse.leshan.core.peer.IpPeer;
 import org.eclipse.leshan.core.request.BootstrapRequest;
 import org.eclipse.leshan.core.response.BootstrapResponse;
 import org.eclipse.leshan.core.response.SendableResponse;
+import org.eclipse.leshan.core.util.EndpointURI;
 import org.eclipse.leshan.transport.californium.bsserver.endpoint.CaliforniumBootstrapServerEndpointsProvider;
 import org.junit.jupiter.api.Test;
 
@@ -117,7 +117,7 @@ public class LeshanBootstrapServerTest {
         assertEquals(numberOfThreadbefore, Thread.activeCount(), "All news created threads must be destroyed");
     }
 
-    private void forceThreadsCreation(URI endpointURI) {
+    private void forceThreadsCreation(EndpointURI endpointURI) {
         SendableResponse<BootstrapResponse> bootstrap = bsHandler.bootstrap(new IpPeer(new InetSocketAddress(5683)),
                 new BootstrapRequest("test"), endpointURI);
         bootstrap.sent();

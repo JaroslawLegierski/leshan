@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.net.InetSocketAddress;
-import java.net.URI;
 import java.security.cert.Certificate;
 import java.util.List;
 import java.util.stream.Stream;
@@ -55,6 +54,7 @@ import org.eclipse.leshan.core.endpoint.Protocol;
 import org.eclipse.leshan.core.request.ReadRequest;
 import org.eclipse.leshan.core.request.exception.SendFailedException;
 import org.eclipse.leshan.core.response.ReadResponse;
+import org.eclipse.leshan.core.util.EndpointURI;
 import org.eclipse.leshan.integration.tests.util.LeshanTestClient;
 import org.eclipse.leshan.integration.tests.util.LeshanTestClientBuilder;
 import org.eclipse.leshan.integration.tests.util.LeshanTestServer;
@@ -210,7 +210,7 @@ public class ServerOnlySecurityTest {
         request.setMID(0);
         byte[] ping = new UdpDataSerializer().getByteArray(request);
         // sent it
-        URI destinationUri = server.getEndpoint(Protocol.COAPS).getURI();
+        EndpointURI destinationUri = server.getEndpoint(Protocol.COAPS).getURI();
         connector.send(RawData.outbound(ping,
                 new AddressEndpointContext(destinationUri.getHost(), destinationUri.getPort()), callback, false));
         // Wait until new handshake DTLS is done

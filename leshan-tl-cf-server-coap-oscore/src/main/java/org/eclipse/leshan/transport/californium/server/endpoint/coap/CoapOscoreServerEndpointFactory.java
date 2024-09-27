@@ -16,7 +16,6 @@
 package org.eclipse.leshan.transport.californium.server.endpoint.coap;
 
 import java.net.InetSocketAddress;
-import java.net.URI;
 import java.security.Principal;
 
 import org.eclipse.californium.core.coap.Message;
@@ -30,6 +29,7 @@ import org.eclipse.californium.oscore.OSCoreEndpointContextInfo;
 import org.eclipse.leshan.core.peer.IpPeer;
 import org.eclipse.leshan.core.peer.LwM2mPeer;
 import org.eclipse.leshan.core.peer.OscoreIdentity;
+import org.eclipse.leshan.core.util.EndpointURI;
 import org.eclipse.leshan.core.util.Hex;
 import org.eclipse.leshan.server.LeshanServer;
 import org.eclipse.leshan.server.observation.LwM2mNotificationReceiver;
@@ -45,7 +45,7 @@ public class CoapOscoreServerEndpointFactory extends CoapServerEndpointFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(CoapOscoreServerEndpointFactory.class);
 
-    public CoapOscoreServerEndpointFactory(URI uri) {
+    public CoapOscoreServerEndpointFactory(EndpointURI uri) {
         super(uri);
     }
 

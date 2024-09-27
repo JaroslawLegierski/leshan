@@ -33,7 +33,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
@@ -77,6 +76,7 @@ import org.eclipse.leshan.core.response.ErrorCallback;
 import org.eclipse.leshan.core.response.ObserveResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.response.ResponseCallback;
+import org.eclipse.leshan.core.util.EndpointURI;
 import org.eclipse.leshan.integration.tests.util.LeshanTestServer;
 import org.eclipse.leshan.integration.tests.util.LeshanTestServerBuilder;
 import org.eclipse.leshan.integration.tests.util.junit5.extensions.BeforeEachParameterizedResolver;
@@ -175,7 +175,7 @@ public class LockStepTest {
 
         // create a register request without the list of supported object
         Request invalidRegisterRequest = new Request(Code.POST);
-        URI destinationURI = server.getEndpoint(Protocol.COAP).getURI();
+        EndpointURI destinationURI = server.getEndpoint(Protocol.COAP).getURI();
         invalidRegisterRequest
                 .setDestinationContext(new AddressEndpointContext(destinationURI.getHost(), destinationURI.getPort()));
         invalidRegisterRequest.getOptions().setContentFormat(ContentFormat.LINK.getCode());

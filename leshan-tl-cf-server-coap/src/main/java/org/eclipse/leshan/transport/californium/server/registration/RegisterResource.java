@@ -40,6 +40,7 @@ import org.eclipse.leshan.core.response.DeregisterResponse;
 import org.eclipse.leshan.core.response.RegisterResponse;
 import org.eclipse.leshan.core.response.SendableResponse;
 import org.eclipse.leshan.core.response.UpdateResponse;
+import org.eclipse.leshan.core.util.EndpointURI;
 import org.eclipse.leshan.server.registration.RegistrationService;
 import org.eclipse.leshan.server.request.UplinkDeviceManagementRequestReceiver;
 import org.eclipse.leshan.transport.californium.LwM2mCoapResource;
@@ -182,7 +183,7 @@ public class RegisterResource extends LwM2mCoapResource {
         // Handle request
         // -------------------------------
         final SendableResponse<RegisterResponse> sendableResponse = receiver.requestReceived(sender, null,
-                registerRequest, exchange.advanced().getEndpoint().getUri());
+                registerRequest, new EndpointURI(exchange.advanced().getEndpoint().getUri().toString()));
         RegisterResponse response = sendableResponse.getResponse();
 
         // Create CoAP Response from LwM2m request
@@ -235,7 +236,7 @@ public class RegisterResource extends LwM2mCoapResource {
 
         // Handle request
         final SendableResponse<UpdateResponse> sendableResponse = receiver.requestReceived(sender, null, updateRequest,
-                exchange.advanced().getEndpoint().getUri());
+                new EndpointURI(exchange.advanced().getEndpoint().getUri().toString()));
         UpdateResponse updateResponse = sendableResponse.getResponse();
 
         // Create CoAP Response from LwM2m request
@@ -257,7 +258,7 @@ public class RegisterResource extends LwM2mCoapResource {
 
         // Handle request
         final SendableResponse<DeregisterResponse> sendableResponse = receiver.requestReceived(sender, null,
-                deregisterRequest, exchange.advanced().getEndpoint().getUri());
+                deregisterRequest, new EndpointURI(exchange.advanced().getEndpoint().getUri().toString()));
         DeregisterResponse deregisterResponse = sendableResponse.getResponse();
 
         // Create CoAP Response from LwM2m request

@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -43,6 +42,7 @@ import org.eclipse.leshan.core.request.DownlinkDeviceManagementRequest;
 import org.eclipse.leshan.core.response.ErrorCallback;
 import org.eclipse.leshan.core.response.LwM2mResponse;
 import org.eclipse.leshan.core.response.ResponseCallback;
+import org.eclipse.leshan.core.util.EndpointURI;
 import org.eclipse.leshan.server.LeshanServer;
 import org.eclipse.leshan.server.endpoint.LwM2mServerEndpoint;
 import org.eclipse.leshan.server.endpoint.LwM2mServerEndpointsProvider;
@@ -210,7 +210,7 @@ public class ObservationServiceTest {
             }
 
             @Override
-            public URI getURI() {
+            public EndpointURI getURI() {
                 return null;
             }
 
@@ -240,7 +240,7 @@ public class ObservationServiceTest {
         }
 
         @Override
-        public LwM2mServerEndpoint getEndpoint(URI uri) {
+        public LwM2mServerEndpoint getEndpoint(EndpointURI uri) {
             return dummyEndpoint;
         }
 

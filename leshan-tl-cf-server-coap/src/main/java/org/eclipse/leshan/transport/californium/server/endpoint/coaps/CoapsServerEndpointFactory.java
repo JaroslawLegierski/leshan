@@ -16,7 +16,6 @@
 package org.eclipse.leshan.transport.californium.server.endpoint.coaps;
 
 import java.net.InetSocketAddress;
-import java.net.URI;
 import java.security.Principal;
 import java.security.PublicKey;
 import java.util.Arrays;
@@ -67,6 +66,7 @@ import org.eclipse.leshan.core.peer.X509Identity;
 import org.eclipse.leshan.core.request.exception.TimeoutException;
 import org.eclipse.leshan.core.request.exception.TimeoutException.Type;
 import org.eclipse.leshan.core.security.certificate.util.X509CertUtil;
+import org.eclipse.leshan.core.util.EndpointURI;
 import org.eclipse.leshan.server.LeshanServer;
 import org.eclipse.leshan.server.observation.LwM2mNotificationReceiver;
 import org.eclipse.leshan.servers.security.EditableSecurityStore;
@@ -112,17 +112,17 @@ public class CoapsServerEndpointFactory implements CaliforniumServerEndpointFact
                 DtlsConfig.DEFINITIONS);
     }
 
-    protected final URI endpointUri;
+    protected final EndpointURI endpointUri;
     protected final String loggingTagPrefix;
     protected final Configuration configuration;
     protected final Consumer<DtlsConnectorConfig.Builder> dtlsConnectorConfigInitializer;
     protected final Consumer<CoapEndpoint.Builder> coapEndpointConfigInitializer;
 
-    public CoapsServerEndpointFactory(URI uri) {
+    public CoapsServerEndpointFactory(EndpointURI uri) {
         this(uri, null, null, null, null);
     }
 
-    public CoapsServerEndpointFactory(URI uri, String loggingTagPrefix, Configuration configuration,
+    public CoapsServerEndpointFactory(EndpointURI uri, String loggingTagPrefix, Configuration configuration,
             Consumer<DtlsConnectorConfig.Builder> dtlsConnectorConfigInitializer,
             Consumer<Builder> coapEndpointConfigInitializer) {
         EndpointUriUtil.validateURI(uri);
@@ -140,7 +140,7 @@ public class CoapsServerEndpointFactory implements CaliforniumServerEndpointFact
     }
 
     @Override
-    public URI getUri() {
+    public EndpointURI getUri() {
         return endpointUri;
     }
 

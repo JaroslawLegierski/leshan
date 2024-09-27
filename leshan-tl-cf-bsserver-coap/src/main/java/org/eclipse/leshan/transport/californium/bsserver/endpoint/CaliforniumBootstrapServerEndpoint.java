@@ -15,7 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.transport.californium.bsserver.endpoint;
 
-import java.net.URI;
 import java.util.SortedMap;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -36,6 +35,7 @@ import org.eclipse.leshan.core.request.DownlinkBootstrapRequest;
 import org.eclipse.leshan.core.response.ErrorCallback;
 import org.eclipse.leshan.core.response.LwM2mResponse;
 import org.eclipse.leshan.core.response.ResponseCallback;
+import org.eclipse.leshan.core.util.EndpointURI;
 import org.eclipse.leshan.core.util.Validate;
 import org.eclipse.leshan.transport.californium.AsyncRequestObserver;
 import org.eclipse.leshan.transport.californium.ExceptionTranslator;
@@ -77,7 +77,7 @@ public class CaliforniumBootstrapServerEndpoint implements LwM2mBootstrapServerE
     }
 
     @Override
-    public URI getURI() {
+    public EndpointURI getURI() {
         return EndpointUriUtil.createUri(protocol.getUriScheme(), endpoint.getAddress());
     }
 

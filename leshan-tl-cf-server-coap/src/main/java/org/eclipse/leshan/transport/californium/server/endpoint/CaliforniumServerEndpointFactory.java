@@ -15,11 +15,10 @@
  *******************************************************************************/
 package org.eclipse.leshan.transport.californium.server.endpoint;
 
-import java.net.URI;
-
 import org.eclipse.californium.core.network.CoapEndpoint;
 import org.eclipse.californium.elements.config.Configuration;
 import org.eclipse.leshan.core.endpoint.Protocol;
+import org.eclipse.leshan.core.util.EndpointURI;
 import org.eclipse.leshan.server.LeshanServer;
 import org.eclipse.leshan.server.observation.LwM2mNotificationReceiver;
 import org.eclipse.leshan.servers.security.ServerSecurityInfo;
@@ -30,7 +29,7 @@ public interface CaliforniumServerEndpointFactory {
 
     Protocol getProtocol();
 
-    URI getUri();
+    EndpointURI getUri();
 
     String getEndpointDescription();
 

@@ -22,7 +22,6 @@ import static org.eclipse.leshan.bsserver.BootstrapFailureCause.NO_BOOTSTRAP_CON
 import static org.eclipse.leshan.bsserver.BootstrapFailureCause.REQUEST_FAILED;
 import static org.eclipse.leshan.bsserver.BootstrapFailureCause.UNAUTHORIZED;
 
-import java.net.URI;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.leshan.bsserver.BootstrapSessionManager.BootstrapPolicy;
@@ -36,6 +35,7 @@ import org.eclipse.leshan.core.response.ErrorCallback;
 import org.eclipse.leshan.core.response.LwM2mResponse;
 import org.eclipse.leshan.core.response.ResponseCallback;
 import org.eclipse.leshan.core.response.SendableResponse;
+import org.eclipse.leshan.core.util.EndpointURI;
 import org.eclipse.leshan.core.util.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +82,8 @@ public class DefaultBootstrapHandler implements BootstrapHandler {
     }
 
     @Override
-    public SendableResponse<BootstrapResponse> bootstrap(LwM2mPeer sender, BootstrapRequest request, URI endpointUsed) {
+    public SendableResponse<BootstrapResponse> bootstrap(LwM2mPeer sender, BootstrapRequest request,
+            EndpointURI endpointUsed) {
         String endpoint = request.getEndpointName();
 
         // Start session, checking the BS credentials

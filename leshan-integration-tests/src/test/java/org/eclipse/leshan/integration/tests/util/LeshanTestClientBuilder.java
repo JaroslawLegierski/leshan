@@ -18,7 +18,6 @@ package org.eclipse.leshan.integration.tests.util;
 import static org.eclipse.leshan.core.LwM2mId.OSCORE;
 
 import java.net.InetSocketAddress;
-import java.net.URI;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
@@ -73,6 +72,7 @@ import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.core.request.argument.Arguments;
 import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.eclipse.leshan.core.security.certificate.util.X509CertUtil;
+import org.eclipse.leshan.core.util.EndpointURI;
 import org.eclipse.leshan.core.util.TestLwM2mId;
 import org.eclipse.leshan.server.LeshanServer;
 import org.eclipse.leshan.server.endpoint.LwM2mServerEndpoint;
@@ -135,7 +135,7 @@ public class LeshanTestClientBuilder extends LeshanClientBuilder {
         try {
             // connect to LWM2M Server
             if (server != null) {
-                URI uri = getServerUri();
+                EndpointURI uri = getServerUri();
 
                 int serverID = 12345;
 
@@ -166,7 +166,7 @@ public class LeshanTestClientBuilder extends LeshanClientBuilder {
             // connect to LWM2M Bootstrap Server
             else if (bootstrapServer != null) {
                 LwM2mBootstrapServerEndpoint endpoint = bootstrapServer.getEndpoint(protocolToUse);
-                URI uri = endpoint.getURI();
+                EndpointURI uri = endpoint.getURI();
                 Security securityEnabler = null;
 
                 if (pskIdentity != null && pskKey != null) {
@@ -458,9 +458,9 @@ public class LeshanTestClientBuilder extends LeshanClientBuilder {
         return this;
     }
 
-    private URI getServerUri() {
+    private EndpointURI getServerUri() {
         LwM2mServerEndpoint endpoint = server.getEndpoint(protocolToUse);
-        URI serverUri = endpoint.getURI();
+        EndpointURI serverUri = endpoint.getURI();
         // we force usage of "localhost" as hostname to be sure that X.509 test works.
         // see : https://github.com/eclipse-leshan/leshan/issues/1461#issuecomment-1631143202
         if (proxy != null) {

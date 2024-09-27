@@ -15,8 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.bsserver.request;
 
-import java.net.URI;
-
 import org.eclipse.leshan.bsserver.BootstrapHandler;
 import org.eclipse.leshan.core.peer.LwM2mPeer;
 import org.eclipse.leshan.core.request.BootstrapRequest;
@@ -25,6 +23,7 @@ import org.eclipse.leshan.core.request.UplinkBootstrapRequestVisitor;
 import org.eclipse.leshan.core.request.UplinkRequest;
 import org.eclipse.leshan.core.response.LwM2mResponse;
 import org.eclipse.leshan.core.response.SendableResponse;
+import org.eclipse.leshan.core.util.EndpointURI;
 
 public class DefaultBootstrapUplinkRequestReceiver implements BootstrapUplinkRequestReceiver {
 
@@ -36,12 +35,12 @@ public class DefaultBootstrapUplinkRequestReceiver implements BootstrapUplinkReq
 
     @Override
     public void onError(LwM2mPeer sender, Exception exception,
-            Class<? extends UplinkRequest<? extends LwM2mResponse>> requestType, URI serverEndpointUri) {
+            Class<? extends UplinkRequest<? extends LwM2mResponse>> requestType, EndpointURI serverEndpointUri) {
     }
 
     @Override
     public <T extends LwM2mResponse> SendableResponse<T> requestReceived(LwM2mPeer sender,
-            UplinkBootstrapRequest<T> request, URI serverEndpointUri) {
+            UplinkBootstrapRequest<T> request, EndpointURI serverEndpointUri) {
 
         RequestHandler<T> requestHandler = new RequestHandler<T>(sender, serverEndpointUri);
         request.accept(requestHandler);
@@ -51,10 +50,10 @@ public class DefaultBootstrapUplinkRequestReceiver implements BootstrapUplinkReq
     public class RequestHandler<T extends LwM2mResponse> implements UplinkBootstrapRequestVisitor {
 
         private final LwM2mPeer sender;
-        private final URI serverEndpointUri;
+        private final EndpointURI serverEndpointUri;
         private SendableResponse<? extends LwM2mResponse> response;
 
-        public RequestHandler(LwM2mPeer sender, URI serverEndpointUri) {
+        public RequestHandler(LwM2mPeer sender, EndpointURI serverEndpointUri) {
             this.sender = sender;
             this.serverEndpointUri = serverEndpointUri;
         }

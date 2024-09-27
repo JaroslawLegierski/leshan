@@ -15,12 +15,12 @@
  *******************************************************************************/
 package org.eclipse.leshan.transport.californium.bsserver.endpoint;
 
-import java.net.URI;
 import java.util.List;
 
 import org.eclipse.californium.elements.config.Configuration;
 import org.eclipse.californium.elements.config.Configuration.ModuleDefinitionsProvider;
 import org.eclipse.leshan.core.endpoint.Protocol;
+import org.eclipse.leshan.core.util.EndpointURI;
 
 public interface BootstrapServerProtocolProvider {
 
@@ -30,7 +30,7 @@ public interface BootstrapServerProtocolProvider {
 
     void applyDefaultValue(Configuration configuration);
 
-    CaliforniumBootstrapServerEndpointFactory createDefaultEndpointFactory(URI uri);
+    CaliforniumBootstrapServerEndpointFactory createDefaultEndpointFactory(EndpointURI uri);
 
-    URI getDefaultUri(Configuration configuration);
+    EndpointURI getDefaultUri(Configuration configuration);
 }

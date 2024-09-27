@@ -16,7 +16,6 @@
 package org.eclipse.leshan.transport.californium.bsserver.endpoint;
 
 import java.net.InetSocketAddress;
-import java.net.URI;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -25,10 +24,11 @@ import org.eclipse.californium.elements.config.Configuration;
 import org.eclipse.californium.elements.config.Configuration.ModuleDefinitionsProvider;
 import org.eclipse.leshan.core.endpoint.EndpointUriUtil;
 import org.eclipse.leshan.core.endpoint.Protocol;
+import org.eclipse.leshan.core.util.EndpointURI;
 
 public abstract class AbstractEndpointFactoryBuilder<SELF extends AbstractEndpointFactoryBuilder<SELF, TTarget>, TTarget> {
 
-    protected URI uri;
+    protected EndpointURI uri;
     protected String loggingTagPrefix;
     protected Configuration configuration;
     protected Consumer<CoapEndpoint.Builder> coapEndpointConfigInitializer;
@@ -46,7 +46,7 @@ public abstract class AbstractEndpointFactoryBuilder<SELF extends AbstractEndpoi
 
     public abstract TTarget build();
 
-    public SELF setURI(URI uri) {
+    public SELF setURI(EndpointURI uri) {
         EndpointUriUtil.validateURI(uri);
         this.uri = uri;
         return self();
@@ -62,7 +62,7 @@ public abstract class AbstractEndpointFactoryBuilder<SELF extends AbstractEndpoi
     }
 
     public SELF setURI(String uriAsString) {
-        URI uri = EndpointUriUtil.createUri(uriAsString);
+        EndpointURI uri = EndpointUriUtil.createUri(uriAsString);
         EndpointUriUtil.validateURI(uri);
 
         if (!getSupportedProtocol().getUriScheme().equals(uri.getScheme())) {

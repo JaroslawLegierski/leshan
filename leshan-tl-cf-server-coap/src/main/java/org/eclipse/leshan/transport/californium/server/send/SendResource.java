@@ -29,6 +29,7 @@ import org.eclipse.leshan.core.request.SendRequest;
 import org.eclipse.leshan.core.request.exception.InvalidRequestException;
 import org.eclipse.leshan.core.response.SendResponse;
 import org.eclipse.leshan.core.response.SendableResponse;
+import org.eclipse.leshan.core.util.EndpointURI;
 import org.eclipse.leshan.server.profile.ClientProfile;
 import org.eclipse.leshan.server.profile.ClientProfileProvider;
 import org.eclipse.leshan.server.request.UplinkDeviceManagementRequestReceiver;
@@ -74,7 +75,7 @@ public class SendResource extends LwM2mCoapResource {
                 receiver.onError(sender, clientProfile,
                         new InvalidRequestException("Unsupported content format [%s] in [%s] from [%s]", contentFormat,
                                 coapRequest, sender),
-                        SendRequest.class, exchange.advanced().getEndpoint().getUri());
+                        SendRequest.class, new EndpointURI(exchange.advanced().getEndpoint().getUri().toString()));
                 return;
             }
 
@@ -84,7 +85,7 @@ public class SendResource extends LwM2mCoapResource {
             // Handle "send op request
             SendRequest sendRequest = new SendRequest(contentFormat, data, coapRequest);
             SendableResponse<SendResponse> sendableResponse = receiver.requestReceived(sender, clientProfile,
-                    sendRequest, exchange.advanced().getEndpoint().getUri());
+                    sendRequest, new EndpointURI(exchange.advanced().getEndpoint().getUri().toString()));
             SendResponse response = sendableResponse.getResponse();
 
             // send reponse
@@ -101,10 +102,11 @@ public class SendResource extends LwM2mCoapResource {
             exchange.respond(ResponseCode.BAD_REQUEST, "Invalid Payload");
             receiver.onError(sender, clientProfile,
                     new InvalidRequestException(e, "Invalid payload in [%s] from [%s]", coapRequest, sender),
-                    SendRequest.class, exchange.advanced().getEndpoint().getUri());
+                    SendRequest.class, new EndpointURI(exchange.advanced().getEndpoint().getUri().toString()));
             return;
         } catch (RuntimeException e) {
-            receiver.onError(sender, clientProfile, e, SendRequest.class, exchange.advanced().getEndpoint().getUri());
+            receiver.onError(sender, clientProfile, e, SendRequest.class,
+                    new EndpointURI(exchange.advanced().getEndpoint().getUri().toString()));
             throw e;
         }
     }

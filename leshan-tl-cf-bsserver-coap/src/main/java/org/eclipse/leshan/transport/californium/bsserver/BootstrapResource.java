@@ -30,6 +30,7 @@ import org.eclipse.leshan.core.request.BootstrapRequest;
 import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.core.response.BootstrapResponse;
 import org.eclipse.leshan.core.response.SendableResponse;
+import org.eclipse.leshan.core.util.EndpointURI;
 import org.eclipse.leshan.transport.californium.LwM2mCoapResource;
 import org.eclipse.leshan.transport.californium.identity.IdentityHandlerProvider;
 import org.slf4j.Logger;
@@ -94,7 +95,7 @@ public class BootstrapResource extends LwM2mCoapResource {
         Request coapRequest = exchange.advanced().getRequest();
         SendableResponse<BootstrapResponse> sendableResponse = receiver.requestReceived(clientIdentity,
                 new BootstrapRequest(endpoint, preferredContentFomart, additionalParams, coapRequest),
-                exchange.advanced().getEndpoint().getUri());
+                new EndpointURI(exchange.advanced().getEndpoint().getUri().toString()));
         BootstrapResponse response = sendableResponse.getResponse();
         if (response.isSuccess()) {
             exchange.respond(toCoapResponseCode(response.getCode()));

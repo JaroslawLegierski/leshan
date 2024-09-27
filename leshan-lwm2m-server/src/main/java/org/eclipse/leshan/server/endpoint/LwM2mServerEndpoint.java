@@ -15,14 +15,13 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.endpoint;
 
-import java.net.URI;
-
 import org.eclipse.leshan.core.endpoint.Protocol;
 import org.eclipse.leshan.core.observation.Observation;
 import org.eclipse.leshan.core.request.DownlinkDeviceManagementRequest;
 import org.eclipse.leshan.core.response.ErrorCallback;
 import org.eclipse.leshan.core.response.LwM2mResponse;
 import org.eclipse.leshan.core.response.ResponseCallback;
+import org.eclipse.leshan.core.util.EndpointURI;
 import org.eclipse.leshan.server.profile.ClientProfile;
 import org.eclipse.leshan.server.request.LowerLayerConfig;
 
@@ -30,7 +29,7 @@ public interface LwM2mServerEndpoint {
 
     Protocol getProtocol();
 
-    URI getURI();
+    EndpointURI getURI();
 
     String getDescription();
 

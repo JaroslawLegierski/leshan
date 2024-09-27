@@ -40,6 +40,7 @@ import org.eclipse.leshan.core.peer.IpPeer;
 import org.eclipse.leshan.core.peer.LwM2mPeer;
 import org.eclipse.leshan.core.request.BindingMode;
 import org.eclipse.leshan.core.request.ContentFormat;
+import org.eclipse.leshan.core.util.EndpointURI;
 import org.eclipse.leshan.core.util.StringUtils;
 import org.eclipse.leshan.core.util.Validate;
 import org.eclipse.leshan.server.security.Authorizer;
@@ -90,7 +91,7 @@ public class Registration {
 
     private final Map<String, String> applicationData;
 
-    private final URI lastEndpointUsed;
+    private final EndpointURI lastEndpointUsed;
 
     protected Registration(Builder builder) {
 
@@ -358,7 +359,7 @@ public class Registration {
      *         <p>
      *         This can be changed in next milestones : https://github.com/eclipse/leshan/issues/1415
      */
-    public URI getLastEndpointUsed() {
+    public EndpointURI getLastEndpointUsed() {
         return lastEndpointUsed;
     }
 
@@ -491,7 +492,7 @@ public class Registration {
         private final String registrationId;
         private final String endpoint;
         private final LwM2mPeer clientTransportData;
-        private final URI lastEndpointUsed;
+        private final EndpointURI lastEndpointUsed;
 
         private Date registrationDate;
         private Date lastUpdate;
@@ -536,7 +537,8 @@ public class Registration {
             applicationData = registration.applicationData;
         }
 
-        public Builder(String registrationId, String endpoint, LwM2mPeer clientTransportData, URI lastEndpointUsed) {
+        public Builder(String registrationId, String endpoint, LwM2mPeer clientTransportData,
+                EndpointURI lastEndpointUsed) {
 
             Validate.notNull(registrationId);
             Validate.notEmpty(endpoint);

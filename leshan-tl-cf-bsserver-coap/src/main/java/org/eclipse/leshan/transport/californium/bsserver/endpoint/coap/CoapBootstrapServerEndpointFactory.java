@@ -16,7 +16,6 @@
 package org.eclipse.leshan.transport.californium.bsserver.endpoint.coap;
 
 import java.net.InetSocketAddress;
-import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
@@ -34,6 +33,7 @@ import org.eclipse.californium.elements.config.UdpConfig;
 import org.eclipse.leshan.bsserver.LeshanBootstrapServer;
 import org.eclipse.leshan.core.endpoint.EndpointUriUtil;
 import org.eclipse.leshan.core.endpoint.Protocol;
+import org.eclipse.leshan.core.util.EndpointURI;
 import org.eclipse.leshan.servers.security.ServerSecurityInfo;
 import org.eclipse.leshan.transport.californium.DefaultExceptionTranslator;
 import org.eclipse.leshan.transport.californium.ExceptionTranslator;
@@ -55,16 +55,16 @@ public class CoapBootstrapServerEndpointFactory implements CaliforniumBootstrapS
         return Arrays.asList(SystemConfig.DEFINITIONS, CoapConfig.DEFINITIONS, UdpConfig.DEFINITIONS);
     }
 
-    protected final URI endpointUri;
+    protected final EndpointURI endpointUri;
     protected final String loggingTagPrefix;
     protected final Configuration configuration;
     protected final Consumer<CoapEndpoint.Builder> coapEndpointConfigInitializer;
 
-    public CoapBootstrapServerEndpointFactory(URI uri) {
+    public CoapBootstrapServerEndpointFactory(EndpointURI uri) {
         this(uri, null, null, null);
     }
 
-    public CoapBootstrapServerEndpointFactory(URI uri, String loggingTagPrefix, Configuration configuration,
+    public CoapBootstrapServerEndpointFactory(EndpointURI uri, String loggingTagPrefix, Configuration configuration,
             Consumer<Builder> coapEndpointConfigInitializer) {
         EndpointUriUtil.validateURI(uri);
 
@@ -81,7 +81,7 @@ public class CoapBootstrapServerEndpointFactory implements CaliforniumBootstrapS
     }
 
     @Override
-    public URI getUri() {
+    public EndpointURI getUri() {
         return endpointUri;
     }
 

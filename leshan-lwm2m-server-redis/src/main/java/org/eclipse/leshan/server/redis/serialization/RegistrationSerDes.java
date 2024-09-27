@@ -16,8 +16,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.redis.serialization;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -44,6 +42,7 @@ import org.eclipse.leshan.core.link.lwm2m.attributes.MixedLwM2mAttributeSet;
 import org.eclipse.leshan.core.node.LwM2mPath;
 import org.eclipse.leshan.core.request.BindingMode;
 import org.eclipse.leshan.core.request.ContentFormat;
+import org.eclipse.leshan.core.util.EndpointURI;
 import org.eclipse.leshan.server.registration.Registration;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -165,10 +164,10 @@ public class RegistrationSerDes {
     }
 
     public Registration deserialize(JsonNode jObj) {
-        URI lastEndpointUsed;
+        EndpointURI lastEndpointUsed;
         try {
-            lastEndpointUsed = new URI(jObj.get("epUri").asText());
-        } catch (URISyntaxException e1) {
+            lastEndpointUsed = new EndpointURI(jObj.get("epUri").asText());
+        } catch (IllegalArgumentException e1) {
             throw new IllegalStateException(
                     String.format("Unable to deserialize last endpoint used URI %s of registration %s/%s",
                             jObj.get("epUri").asText(), jObj.get("regId").asText(), jObj.get("ep").asText()));
@@ -178,7 +177,7 @@ public class RegistrationSerDes {
 //        Registration.Builder b = new Registration.Builder(jObj.get("regId").asText(), jObj.get("ep").asText(),
 //                IdentitySerDes.deserialize(jObj.get("identity")), lastEndpointUsed);
         Registration.Builder b = new Registration.Builder(jObj.get("regId").asText(), jObj.get("ep").asText(),
-                peerSerDes.deserialize(jObj.get("transportdata")), lastEndpointUsed);
+                peerSerDes.deserialize(jObj.get("transportdata")), new EndpointURI(lastEndpointUsed.toString()));
 
         b.bindingMode(BindingMode.parse(jObj.get("bnd").asText()));
         if (jObj.get("qm") != null)

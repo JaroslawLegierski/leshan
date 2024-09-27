@@ -15,20 +15,19 @@
  *******************************************************************************/
 package org.eclipse.leshan.bsserver.endpoint;
 
-import java.net.URI;
-
 import org.eclipse.leshan.bsserver.BootstrapSession;
 import org.eclipse.leshan.core.endpoint.Protocol;
 import org.eclipse.leshan.core.request.DownlinkBootstrapRequest;
 import org.eclipse.leshan.core.response.ErrorCallback;
 import org.eclipse.leshan.core.response.LwM2mResponse;
 import org.eclipse.leshan.core.response.ResponseCallback;
+import org.eclipse.leshan.core.util.EndpointURI;
 
 public interface LwM2mBootstrapServerEndpoint {
 
     Protocol getProtocol();
 
-    URI getURI();
+    EndpointURI getURI();
 
     String getDescription();
 

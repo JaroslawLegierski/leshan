@@ -16,14 +16,14 @@
 package org.eclipse.leshan.integration.tests.util;
 
 import java.net.InetSocketAddress;
-import java.net.URI;
 
 import org.eclipse.leshan.core.endpoint.Protocol;
+import org.eclipse.leshan.core.util.EndpointURI;
 
 public class LeshanProxyBuilder {
 
     public static ReverseProxy givenReverseProxyFor(LeshanTestServer server, Protocol protocol) {
-        URI serverEndpointUri = server.getEndpoint(protocol).getURI();
+        EndpointURI serverEndpointUri = server.getEndpoint(protocol).getURI();
         return new ReverseProxy(new InetSocketAddress("localhost", 0),
                 new InetSocketAddress(serverEndpointUri.getHost(), serverEndpointUri.getPort()));
     }

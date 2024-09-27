@@ -17,7 +17,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.registration;
 
-import java.net.URI;
 import java.util.Date;
 
 import org.eclipse.leshan.core.LwM2m.LwM2mVersion;
@@ -29,6 +28,7 @@ import org.eclipse.leshan.core.response.DeregisterResponse;
 import org.eclipse.leshan.core.response.RegisterResponse;
 import org.eclipse.leshan.core.response.SendableResponse;
 import org.eclipse.leshan.core.response.UpdateResponse;
+import org.eclipse.leshan.core.util.EndpointURI;
 import org.eclipse.leshan.server.registration.RegistrationDataExtractor.RegistrationData;
 import org.eclipse.leshan.server.security.Authorizer;
 import org.eclipse.leshan.servers.security.Authorization;
@@ -57,7 +57,7 @@ public class RegistrationHandler {
     }
 
     public SendableResponse<RegisterResponse> register(LwM2mPeer sender, RegisterRequest registerRequest,
-            URI endpointUsed) {
+            EndpointURI endpointUsed) {
 
         // Extract data from object link
         LwM2mVersion lwM2mVersion = LwM2mVersion.get(registerRequest.getLwVersion());

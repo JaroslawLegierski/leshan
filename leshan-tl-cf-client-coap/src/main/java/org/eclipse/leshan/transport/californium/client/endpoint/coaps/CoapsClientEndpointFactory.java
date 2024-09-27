@@ -17,7 +17,6 @@ package org.eclipse.leshan.transport.californium.client.endpoint.coaps;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.URI;
 import java.security.Principal;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
@@ -71,6 +70,7 @@ import org.eclipse.leshan.core.request.exception.TimeoutException;
 import org.eclipse.leshan.core.request.exception.TimeoutException.Type;
 import org.eclipse.leshan.core.security.certificate.util.X509CertUtil;
 import org.eclipse.leshan.core.security.certificate.verifier.X509CertificateVerifier;
+import org.eclipse.leshan.core.util.EndpointURI;
 import org.eclipse.leshan.transport.californium.DefaultExceptionTranslator;
 import org.eclipse.leshan.transport.californium.ExceptionTranslator;
 import org.eclipse.leshan.transport.californium.Lwm2mEndpointContextMatcher;
@@ -107,7 +107,7 @@ public class CoapsClientEndpointFactory extends CoapClientEndpointFactory {
     }
 
     @Override
-    protected String getLoggingTag(URI uri) {
+    protected String getLoggingTag(EndpointURI uri) {
         if (loggingTagPrefix != null) {
             return String.format("[%s-%s]", loggingTagPrefix, uri);
         } else {

@@ -15,12 +15,11 @@
  *******************************************************************************/
 package org.eclipse.leshan.transport.californium.bsserver.endpoint;
 
-import java.net.URI;
-
 import org.eclipse.californium.core.network.CoapEndpoint;
 import org.eclipse.californium.elements.config.Configuration;
 import org.eclipse.leshan.bsserver.LeshanBootstrapServer;
 import org.eclipse.leshan.core.endpoint.Protocol;
+import org.eclipse.leshan.core.util.EndpointURI;
 import org.eclipse.leshan.servers.security.ServerSecurityInfo;
 import org.eclipse.leshan.transport.californium.ExceptionTranslator;
 import org.eclipse.leshan.transport.californium.identity.IdentityHandler;
@@ -29,7 +28,7 @@ public interface CaliforniumBootstrapServerEndpointFactory {
 
     Protocol getProtocol();
 
-    URI getUri();
+    EndpointURI getUri();
 
     String getEndpointDescription();
 

@@ -16,7 +16,6 @@
 package org.eclipse.leshan.transport.californium.bsserver.endpoint;
 
 import java.net.InetSocketAddress;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,6 +39,7 @@ import org.eclipse.leshan.bsserver.endpoint.LwM2mBootstrapServerEndpointsProvide
 import org.eclipse.leshan.bsserver.request.BootstrapUplinkRequestReceiver;
 import org.eclipse.leshan.core.endpoint.EndpointUriUtil;
 import org.eclipse.leshan.core.endpoint.Protocol;
+import org.eclipse.leshan.core.util.EndpointURI;
 import org.eclipse.leshan.core.util.NamedThreadFactory;
 import org.eclipse.leshan.servers.security.ServerSecurityInfo;
 import org.eclipse.leshan.transport.californium.ExceptionTranslator;
@@ -84,7 +84,7 @@ public class CaliforniumBootstrapServerEndpointsProvider implements LwM2mBootstr
     }
 
     @Override
-    public LwM2mBootstrapServerEndpoint getEndpoint(URI uri) {
+    public LwM2mBootstrapServerEndpoint getEndpoint(EndpointURI uri) {
         for (CaliforniumBootstrapServerEndpoint endpoint : endpoints) {
             if (endpoint.getURI().equals(uri))
                 return endpoint;
@@ -264,7 +264,7 @@ public class CaliforniumBootstrapServerEndpointsProvider implements LwM2mBootstr
             return addEndpoint(EndpointUriUtil.createUri(uri));
         }
 
-        public Builder addEndpoint(URI uri) {
+        public Builder addEndpoint(EndpointURI uri) {
             for (BootstrapServerProtocolProvider protocolProvider : protocolProviders) {
                 // TODO TL : validate URI
                 if (protocolProvider.getProtocol().getUriScheme().equals(uri.getScheme())) {

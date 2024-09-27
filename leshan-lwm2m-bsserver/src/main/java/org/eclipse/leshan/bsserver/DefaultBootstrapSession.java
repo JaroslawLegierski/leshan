@@ -15,7 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.bsserver;
 
-import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +26,7 @@ import org.eclipse.leshan.core.request.BootstrapRequest;
 import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.core.request.DownlinkBootstrapRequest;
 import org.eclipse.leshan.core.response.LwM2mResponse;
+import org.eclipse.leshan.core.util.EndpointURI;
 import org.eclipse.leshan.core.util.RandomStringUtils;
 import org.eclipse.leshan.core.util.Validate;
 
@@ -42,7 +42,7 @@ public class DefaultBootstrapSession implements BootstrapSession {
     private final ContentFormat contentFormat;
     private final Map<String, String> applicationData;
     private final long creationTime;
-    private final URI endpointUsed;
+    private final EndpointURI endpointUsed;
     private final BootstrapRequest request;
 
     private volatile LwM2mModel model;
@@ -62,7 +62,7 @@ public class DefaultBootstrapSession implements BootstrapSession {
      * @param applicationData Data that could be attached to a session.
      */
     public DefaultBootstrapSession(BootstrapRequest request, LwM2mPeer client, boolean authorized,
-            Map<String, String> applicationData, URI endpointUsed) {
+            Map<String, String> applicationData, EndpointURI endpointUsed) {
         this(request, client, authorized, null, applicationData, endpointUsed);
     }
 
@@ -76,7 +76,7 @@ public class DefaultBootstrapSession implements BootstrapSession {
      * @param applicationData Data that could be attached to a session.
      */
     public DefaultBootstrapSession(BootstrapRequest request, LwM2mPeer client, boolean authorized,
-            ContentFormat contentFormat, Map<String, String> applicationData, URI endpointUsed) {
+            ContentFormat contentFormat, Map<String, String> applicationData, EndpointURI endpointUsed) {
         this(request, client, authorized, contentFormat, applicationData, System.currentTimeMillis(), endpointUsed);
     }
 
@@ -91,7 +91,8 @@ public class DefaultBootstrapSession implements BootstrapSession {
      * @param creationTime The creation time of this session in ms.
      */
     public DefaultBootstrapSession(BootstrapRequest request, LwM2mPeer client, boolean authorized,
-            ContentFormat contentFormat, Map<String, String> applicationData, long creationTime, URI endpointUsed) {
+            ContentFormat contentFormat, Map<String, String> applicationData, long creationTime,
+            EndpointURI endpointUsed) {
         Validate.notNull(request);
         this.id = RandomStringUtils.random(10, true, true);
         this.request = request;
@@ -132,7 +133,7 @@ public class DefaultBootstrapSession implements BootstrapSession {
     }
 
     @Override
-    public URI getEndpointUsed() {
+    public EndpointURI getEndpointUsed() {
         return endpointUsed;
     }
 

@@ -15,7 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.bsserver;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +29,7 @@ import org.eclipse.leshan.core.request.BootstrapRequest;
 import org.eclipse.leshan.core.request.DownlinkBootstrapRequest;
 import org.eclipse.leshan.core.request.SimpleDownlinkRequest;
 import org.eclipse.leshan.core.response.LwM2mResponse;
+import org.eclipse.leshan.core.util.EndpointURI;
 import org.eclipse.leshan.core.util.Validate;
 import org.eclipse.leshan.servers.security.Authorization;
 import org.eclipse.leshan.servers.security.SecurityChecker;
@@ -74,7 +74,7 @@ public class DefaultBootstrapSessionManager implements BootstrapSessionManager {
     }
 
     @Override
-    public BootstrapSession begin(BootstrapRequest request, LwM2mPeer client, URI endpointUsed) {
+    public BootstrapSession begin(BootstrapRequest request, LwM2mPeer client, EndpointURI endpointUsed) {
         Authorization authorization = authorizer.isAuthorized(request, client);
         DefaultBootstrapSession session = new DefaultBootstrapSession(request, client, authorization.isApproved(),
                 authorization.getApplicationData(), endpointUsed);
