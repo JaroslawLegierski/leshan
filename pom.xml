@@ -138,8 +138,8 @@ Contributors:
     <javacoap.version>6.21.0</javacoap.version>
     <netty.version>4.1.109.Final</netty.version>
     <slf4j.api.version>2.0.13</slf4j.api.version>
-    <!-- stuck to 9.4.x for java8 compliance -->
-    <jetty.version>9.4.56.v20240826</jetty.version>
+    <!-- test Jetty 12  -->
+    <jetty.version>12.0.14</jetty.version>
     <jackson.version>2.15.3</jackson.version>
     <picocli.version>4.7.5</picocli.version>
     <junit.version>5.10.1</junit.version>
@@ -362,13 +362,13 @@ Contributors:
         <version>${picocli.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-webapp</artifactId>
+        <groupId>org.eclipse.jetty.ee10</groupId>
+        <artifactId>jetty-ee10-webapp</artifactId>
         <version>${jetty.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-servlets</artifactId>
+        <groupId>org.eclipse.jetty.ee10</groupId>
+        <artifactId>jetty-ee10-servlets</artifactId>
         <version>${jetty.version}</version>
       </dependency>
       <dependency>
@@ -710,7 +710,7 @@ Contributors:
         <!-- Default value is minimal supported version, but another version can be used with : 
             mvn clean install -PuseToolchain -Dtoolchain.version=11
         -->
-        <toolchain.version>1.8</toolchain.version>
+        <toolchain.version>17</toolchain.version>
       </properties>
       <build>
         <plugins>
