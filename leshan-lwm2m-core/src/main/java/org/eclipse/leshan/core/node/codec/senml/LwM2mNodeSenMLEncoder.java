@@ -324,7 +324,8 @@ public class LwM2mNodeSenMLEncoder implements TimestampedNodeEncoder, MultiNodeE
 
         private void addSenMLRecord(String recordName, Type valueType, Type expectedType, Object value) {
             // Create SenML record
-            SenMLRecord record = new SenMLRecord();
+            String recordbasename = null;
+            String recordname = null;
 
             // Compute baseName and name for SenML record
             String bn = requestPath.toString();
@@ -337,48 +338,55 @@ public class LwM2mNodeSenMLEncoder implements TimestampedNodeEncoder, MultiNodeE
 
             // Set basename only for first record
             if (records.isEmpty()) {
-                record.setBaseName(rootPath != null ? rootPath + bn : bn);
+                recordbasename = (rootPath != null ? rootPath + bn : bn);
             }
-            record.setName(n);
+            recordname = n;
 
             // Convert value using expected type
             LwM2mPath lwM2mResourcePath = new LwM2mPath(bn + n);
             Object convertedValue = converter.convertValue(value, valueType, expectedType, lwM2mResourcePath);
-            setResourceValue(convertedValue, expectedType, lwM2mResourcePath, record);
+            SenMLRecord record = setResourceValue(convertedValue, expectedType, lwM2mResourcePath, recordbasename,
+                    recordname);
 
+            // SenMLRecord record = new SenMLRecord(recordbasename,null,recordname,null,null,null,null,null,null);
             // Add record to the List
             records.add(record);
         }
 
-        private void setResourceValue(Object value, Type type, LwM2mPath resourcePath, SenMLRecord record) {
+        private SenMLRecord setResourceValue(Object value, Type type, LwM2mPath resourcePath, String recordBaseName,
+                String recordName) {
             LOG.trace("Encoding resource value {} in SenML", value);
 
             if (type == null || type == Type.NONE) {
                 throw new CodecException(
                         "Unable to encode value for resource {} without type(probably a executable one)", resourcePath);
             }
+            String recordStringValue = null;
+            Number recordNumberValue = null;
+            Boolean recordBooleanValue = null;
+            byte[] recordopaqueValue = null;
 
             switch (type) {
             case STRING:
-                record.setStringValue((String) value);
+                recordStringValue = (String) value;
                 break;
             case INTEGER:
             case UNSIGNED_INTEGER:
             case FLOAT:
-                record.setNumberValue((Number) value);
+                recordNumberValue = (Number) value;
                 break;
             case BOOLEAN:
-                record.setBooleanValue((Boolean) value);
+                recordBooleanValue = (Boolean) value;
                 break;
             case TIME:
-                record.setNumberValue((((Date) value).getTime() / 1000L));
+                recordNumberValue = (((Date) value).getTime() / 1000L);
                 break;
             case OPAQUE:
-                record.setOpaqueValue((byte[]) value);
+                recordopaqueValue = (byte[]) value;
                 break;
             case OBJLNK:
                 try {
-                    record.setStringValue(((ObjectLink) value).encodeToString());
+                    recordStringValue = ((ObjectLink) value).encodeToString();
                 } catch (IllegalArgumentException e) {
                     throw new CodecException(e, "Invalid value [%s] for objectLink resource [%s] ", value,
                             resourcePath);
@@ -386,11 +394,13 @@ public class LwM2mNodeSenMLEncoder implements TimestampedNodeEncoder, MultiNodeE
                 break;
 
             case CORELINK:
-                record.setStringValue(linkSerializer.serializeCoreLinkFormat((Link[]) value));
+                recordStringValue = linkSerializer.serializeCoreLinkFormat((Link[]) value);
                 break;
             default:
                 throw new CodecException("Invalid value type %s for %s", type, resourcePath);
             }
+            return new SenMLRecord(recordBaseName, null, recordName, null, recordNumberValue, recordBooleanValue, null,
+                    recordStringValue, recordopaqueValue);
         }
     }
 }
