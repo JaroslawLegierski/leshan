@@ -156,7 +156,12 @@ public class LwM2mNodeSenMLEncoder implements TimestampedNodeEncoder, MultiNodeE
             internalEncoder.records = new ArrayList<>();
             timestampedLwM2mNode.getNode().accept(internalEncoder);
             BigDecimal timestampInSeconds = TimestampUtil.fromInstant(timestampedLwM2mNode.getTimestamp());
-            internalEncoder.records.get(0).setBaseTime(timestampInSeconds);
+
+            SenMLRecord record = internalEncoder.records.get(0);
+            SenMLRecord timestampedrecord = new SenMLRecord(record.getBaseName(), timestampInSeconds, record.getName(),
+                    record.getTime(), record.getNumberValue(), record.getBooleanValue(), record.getObjectLinkValue(),
+                    record.getStringValue(), record.getOpaqueValue());
+            internalEncoder.records.set(0, timestampedrecord);
             pack.addRecords(internalEncoder.records);
         }
 
@@ -190,7 +195,13 @@ public class LwM2mNodeSenMLEncoder implements TimestampedNodeEncoder, MultiNodeE
 
                     List<SenMLRecord> records = internalEncoder.records;
                     if (!records.isEmpty()) {
-                        records.get(0).setBaseTime(TimestampUtil.fromInstant(timestamp));
+                        SenMLRecord record = internalEncoder.records.get(0);
+                        SenMLRecord timestampedrecord = new SenMLRecord(record.getBaseName(),
+                                TimestampUtil.fromInstant(timestamp), record.getName(), record.getTime(),
+                                record.getNumberValue(), record.getBooleanValue(), record.getObjectLinkValue(),
+                                record.getStringValue(), record.getOpaqueValue());
+                        internalEncoder.records.set(0, timestampedrecord);
+
                         pack.addRecords(records);
                     }
                 }

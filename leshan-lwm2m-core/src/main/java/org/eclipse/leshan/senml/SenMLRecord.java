@@ -31,11 +31,11 @@ public class SenMLRecord {
         STRING, NUMBER, BOOLEAN, OPAQUE, OBJLNK
     }
 
-    private String baseName;
-    private BigDecimal baseTime;
+    private final String baseName;
+    private final BigDecimal baseTime;
 
-    private String name;
-    private BigDecimal time;
+    private final String name;
+    private final BigDecimal time;
 
     private final Number numberValue;
     private final Boolean booleanValue;
@@ -75,10 +75,6 @@ public class SenMLRecord {
         return null;
     }
 
-    public void setTime(BigDecimal time) {
-        this.time = time;
-    }
-
     public BigDecimal getTime() {
         return time;
     }
@@ -87,45 +83,21 @@ public class SenMLRecord {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public Number getNumberValue() {
         return numberValue;
     }
-
-//    public void setNumberValue(Number numberValue) {
-//        this.numberValue = numberValue;
-//    }
 
     public Boolean getBooleanValue() {
         return booleanValue;
     }
 
-//    public void setBooleanValue(Boolean booleanValue) {
-//        this.booleanValue = booleanValue;
-//    }
-
     public String getObjectLinkValue() {
         return objectLinkValue;
     }
 
-//    public void setObjectLinkValue(String objectLinkValue) {
-//        this.objectLinkValue = objectLinkValue;
-//    }
-
     public String getStringValue() {
         return stringValue;
     }
-
-//    public void setStringValue(String stringValue) {
-//        this.stringValue = stringValue;
-//    }
-//
-//    public void setOpaqueValue(byte[] opaqueValue) {
-//        this.opaqueValue = opaqueValue;
-//    }
 
     public byte[] getOpaqueValue() {
         return opaqueValue;
@@ -135,16 +107,8 @@ public class SenMLRecord {
         return baseName;
     }
 
-    public void setBaseName(String baseName) {
-        this.baseName = baseName;
-    }
-
     public BigDecimal getBaseTime() {
         return baseTime;
-    }
-
-    public void setBaseTime(BigDecimal baseTime) {
-        this.baseTime = baseTime;
     }
 
     public Object getResourceValue() {
