@@ -50,7 +50,7 @@ public class ReadCompositeResponse extends AbstractLwM2mResponse {
             TimestampedLwM2mNodes timestampedContent, String errorMessage, Object coapResponse) {
         super(responseCode, errorMessage, coapResponse);
 
-        if (timestampedContent != null) {
+        if (timestampedContent != null && isSuccess()) {
             // Handle if timestamped value is passed
 
             // check that we don't pass content too.
@@ -78,7 +78,7 @@ public class ReadCompositeResponse extends AbstractLwM2mResponse {
             // handle if content (not timestamped) value is passed
 
             // check content is not null
-            if (content == null) {
+            if (content == null && isSuccess()) {
                 throw new IllegalArgumentException("content OR timestampedValue should be not null");
             }
 
