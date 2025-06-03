@@ -24,16 +24,9 @@
       <v-container v-if="add36050">
         <v-text-field v-model="ConnectionIdentity.ID" label="ID" @input="updateConfig"></v-text-field>
         <v-text-field v-model="ConnectionIdentity.PSKIdentity" label="PSK Identity" @input="updateConfig"></v-text-field>
-        <v-text-field
-          v-model="ConnectionIdentity.PSKSecretKey"
-          label="PSK Secret Key"
-          type="password"
-          :rules="[rules.required, rules.hex]"
-          hint="Must be a hexadecimal string (e.g., a1b2c3...)"
-          persistent-hint
-          @input="updateConfig"
-        />
-
+        <v-text-field v-model="ConnectionIdentity.PSKSecretKey" label="PSK Secret Key" type="password"
+        :rules="[rules.required, rules.hex]" hint="Must be a hexadecimal string (e.g., a1b2c3...)" persistent-hint
+          @input="updateConfig" />
       </v-container>
 
       <v-switch v-model="add36051" label="Add Object 36051" @change="updateConfig"></v-switch>
@@ -43,16 +36,9 @@
              <v-text-field v-model="conn.Payload" label="Payload" @input="updateConfig"></v-text-field>
              <v-text-field v-model="conn.ServiceURI" label="Service URI" @input="updateConfig"></v-text-field>
              <v-text-field v-model="conn.TopicRoot" label="Topic Root" @input="updateConfig"></v-text-field>
-             <v-textarea
-               v-model="conn.ServerPublicKey"
-               label="Server Public Key"
-               :rules="[rules.required, rules.base64]"
-               hint="Required. Must be in Base64 format."
-               persistent-hint
-               spellcheck="false"
-               rows="2"
-               @input="updateConfig"
-             />
+             <v-textarea  v-model="conn.ServerPublicKey" label="Server Public Key" :rules="[rules.required, rules.base64]"
+               hint="Required. Must be in Base64 format."persistent-hint spellcheck="false" rows="2"
+             @input="updateConfig"/>
              <v-btn color="error" @click="removeConnection(index)">Remove</v-btn>
            </div>
            <v-btn color="primary" @click="addConnection">Add Another Connection</v-btn>

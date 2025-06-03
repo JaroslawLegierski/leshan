@@ -19,7 +19,6 @@ import org.eclipse.leshan.client.servers.LwM2mServer;
 import org.eclipse.leshan.core.node.LwM2mResource;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.response.WriteResponse;
-import org.eclipse.leshan.core.util.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +30,7 @@ public class ConnectionServiceEndpoint extends BaseInstanceEnabler {
     private String Payload = "Payload";
     private String ServiceURI = "ServiceURI";
     private String TopicRoot = "Topic Root";
-    private byte[] ServerPublicKey = {}; //Server Public Key Base64 encoded
+    private byte[] ServerPublicKey = {}; // Server Public Key Base64 encoded
 
     @Override
     public synchronized ReadResponse read(LwM2mServer server, int resourceId) {
