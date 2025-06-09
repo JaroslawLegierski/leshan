@@ -31,6 +31,7 @@ import org.eclipse.jetty.ee10.servlet.DefaultServlet;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.leshan.bsserver.BootstrapTaskProvider;
 import org.eclipse.leshan.bsserver.EditableBootstrapConfigStore;
 import org.eclipse.leshan.bsserver.LeshanBootstrapServer;
 import org.eclipse.leshan.bsserver.LeshanBootstrapServerBuilder;
@@ -91,7 +92,9 @@ public class LeshanBootstrapServerDemo {
 
         try {
             // Create Stores
+
             EditableBootstrapConfigStore bsConfigStore = new JSONFileBootstrapStore(cli.main.configFilename);
+
             EditableSecurityStore securityStore = new FileSecurityStore("data/bssecurity.data");
 
             // Create LWM2M Server
@@ -128,7 +131,8 @@ public class LeshanBootstrapServerDemo {
             models.addAll(ObjectLoader.loadObjectsFromDir(cli.main.modelsFolder, true));
         }
         builder.setObjectModelProvider(new VersionedBootstrapModelProvider(models));
-
+        BootstrapTaskProvider customTaskProvider = new CustomBootstrapConfigStoreTaskProvider(bsConfigStore);
+        builder.setTaskProvider(customTaskProvider); // Set the custom provider
         builder.setConfigStore(bsConfigStore);
         builder.setSecurityStore(new BootstrapSecurityStoreAdapter(securityStore));
 
