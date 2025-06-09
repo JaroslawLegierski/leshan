@@ -13,16 +13,17 @@
 
 // convert config from rest API format to UI format :
 // we regroup security and server data
+console.log("bsconfigutil.js loaded");
 var configFromRestToUI = function (config) {
   var newConfig = { dm: [], bs: [] };
   for (var i in config.security) {
     var security = config.security[i];
     if (security.bootstrapServer) {
       let bs = { security: security };
-
+      console.log("JSON config in bsconfigutil:", JSON.stringify(config, null, 2));
       // add oscore object (if any) to bs
       let oscoreObjectInstanceId = security.oscoreSecurityMode;
-      let oscore = config.oscore[oscoreObjectInstanceId];
+      let oscore = config.oscore?.[oscoreObjectInstanceId];
       if (oscore) {
         bs.oscore = oscore;
       }
@@ -47,6 +48,17 @@ var configFromRestToUI = function (config) {
       }
     }
   }
+// Optional object config support
+  if (config.connectionidentity?.[0]) {
+    newConfig.ConnectionIdentity = [config.connectionidentity[0]];
+  }
+
+if (config.connectionserviceendpoint && Object.keys(config.connectionserviceendpoint).length > 0) {
+  const connectionArray = Object.keys(config.connectionserviceendpoint)
+    .sort()
+    .map(key => config.connectionserviceendpoint[key]);
+  newConfig.ConnectionServiceEndpoint = connectionArray;
+}
   newConfig.toDelete = config.toDelete;
   newConfig.autoIdForSecurityObject = config.autoIdForSecurityObject;
   return newConfig;
@@ -61,12 +73,12 @@ var configsFromRestToUI = function (configs) {
   return newConfigs;
 };
 
-//convert config from UI to rest API format:
+// convert config from UI to rest API format:
 var configFromUIToRest = function (c) {
-  // do a deep copy
-  // we should maybe rather use cloneDeep from lodashz
+  console.log("Config received in bsconfigutil - configFromUIToRest:", c);
   let config = JSON.parse(JSON.stringify(c));
-  var newConfig = { servers: {}, security: {}, oscore: {} };
+  console.log("Config received in bsconfigutil - configFromUIToRest JSON:", JSON.parse(JSON.stringify(c)));
+  var newConfig = { servers: {}, security: {}, oscore: {}, connectionidentity: {}, connectionserviceendpoint: {}, };
   for (var i = 0; i < config.bs.length; i++) {
     var bs = config.bs[i];
     newConfig.security[i] = bs.security;
@@ -91,9 +103,22 @@ var configFromUIToRest = function (c) {
     }
     newConfig.servers[j] = dm;
   }
+  // Optional object config support
+  if (config.ConnectionIdentity && config.ConnectionIdentity.length > 0) {
+    newConfig.connectionidentity[0] = config.ConnectionIdentity[0];
+  }
+    if (config.ConnectionServiceEndpoint && config.ConnectionServiceEndpoint.length > 0) {
+      const connectionObject = {};
+      config.ConnectionServiceEndpoint.forEach((conn, index) => {
+        connectionObject[index] = conn;
+      });
+      newConfig.connectionserviceendpoint = connectionObject;
+}
   newConfig.toDelete = config.toDelete;
   newConfig.autoIdForSecurityObject = config.autoIdForSecurityObject;
+  console.log("connectionserviceendpoint before sending:", JSON.stringify(newConfig.connectionserviceendpoint, null, 2));
   return newConfig;
+
 };
 
 export { configsFromRestToUI, configFromUIToRest };

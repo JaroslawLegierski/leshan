@@ -55,6 +55,12 @@
             :value="5"
             title="LWM2M Bootstrap Server Configuration"
           />
+          <v-divider></v-divider>
+          <v-stepper-item
+            :complete="currentStep > 6"
+            :value="6"
+            title="Optional Objects Configuration"
+          />
         </v-stepper-header>
 
         <v-stepper-window v-model="currentStep">
@@ -99,6 +105,13 @@
               :defaultx509="defaultx509"
               :defaultrpk="defaultrpk"
             />
+           </v-stepper-window-item>
+           <v-stepper-window-item :value="6">
+            <optional-object-step
+              ref="step6"
+              v-model:valid="valid[6]"
+              v-model="config.optionalobject"
+            />
           </v-stepper-window-item>
         </v-stepper-window>
       </v-stepper>
@@ -141,6 +154,7 @@ import SecurityStep from "./SecurityStep.vue";
 import DeleteStep from "./DeleteStep.vue";
 import ServerStep from "./ServerStep.vue";
 import BootstrapServerStep from "./BootstrapServerStep.vue";
+import OptionalObjectStep from "./OptionalObjectStep.vue";
 
 export default {
   components: {
@@ -149,11 +163,12 @@ export default {
     ServerStep,
     BootstrapServerStep,
     DeleteStep,
+    OptionalObjectStep,
   },
   props: { modelValue: Boolean /*open/close dialog*/ },
   data() {
     return {
-      nbSteps: 5,
+      nbSteps: 6,
       config: {}, // local state for current config
       valid: [],
       currentStep: 1,
@@ -220,6 +235,7 @@ export default {
           bs: null,
           toDelete: ["/0", "/1", "/21"],
           autoIdForSecurityObject: false,
+          optionalobject: null,
         };
         this.currentStep = 1;
         for (let i = 1; i <= this.nbSteps; i++) {
@@ -229,8 +245,12 @@ export default {
         }
       }
     },
+  // new watcher:
+  currentStep(newStep) {
+    console.log("Step changed:", newStep);
+    console.log("config.optionalobject:", this.config.optionalobject);
   },
-
+},
   methods: {
     applyDefault(c) {
       // do a deep copy
@@ -277,6 +297,17 @@ export default {
         res.security.endpoint = res.endpoint;
       }
 
+      // Optional objects support
+     console.log("Optionalobject:", res.optionalobject);
+      if (res.optionalobject) {
+        if (res.optionalobject.add36050) {
+          res.ConnectionIdentity = res.optionalobject.ConnectionIdentity;
+        }
+        if (res.optionalobject.add36051) {
+          res.ConnectionServiceEndpoint = res.optionalobject.ConnectionServiceEndpoint;
+        }
+      }
+     console.log("Final payload before sending:", JSON.stringify(res, null, 2));
       return res;
     },
     close() {

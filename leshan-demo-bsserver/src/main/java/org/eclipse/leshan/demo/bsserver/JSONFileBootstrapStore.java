@@ -151,10 +151,10 @@ public class JSONFileBootstrapStore extends InMemoryBootstrapConfigStore {
             File file = new File(filename);
             if (file.exists()) {
                 try (InputStreamReader in = new InputStreamReader(new FileInputStream(file))) {
-                    TypeReference<Map<String, BootstrapConfig>> bootstrapConfigTypeRef = new TypeReference<Map<String, BootstrapConfig>>() {
+                    TypeReference<Map<String, CustomBootstrapConfig>> bootstrapConfigTypeRef = new TypeReference<Map<String, CustomBootstrapConfig>>() {
                     };
-                    Map<String, BootstrapConfig> configs = mapper.readValue(in, bootstrapConfigTypeRef);
-                    for (Map.Entry<String, BootstrapConfig> config : configs.entrySet()) {
+                    Map<String, CustomBootstrapConfig> configs = mapper.readValue(in, bootstrapConfigTypeRef);
+                    for (Map.Entry<String, CustomBootstrapConfig> config : configs.entrySet()) {
                         addToStore(config.getKey(), config.getValue());
                     }
 
