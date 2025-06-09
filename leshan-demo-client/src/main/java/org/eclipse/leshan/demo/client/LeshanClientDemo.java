@@ -100,6 +100,9 @@ public class LeshanClientDemo {
     private static final Logger LOG = LoggerFactory.getLogger(LeshanClientDemo.class);
     private static final int OBJECT_ID_TEMPERATURE_SENSOR = 3303;
     private static final int OBJECT_ID_LWM2M_TEST_OBJECT = 3442;
+    private static final int OBJECT_ID_CONNECTIONIDENTITY_OBJECT = 36050;
+    private static final int OBJECT_ID_CONNECTIONSERVICEENDPOINT_OBJECT = 36051;
+
     private static final String CF_CONFIGURATION_FILENAME = "Californium3.client.properties";
     private static final String CF_CONFIGURATION_HEADER = "Leshan Client Demo - " + Configuration.DEFAULT_HEADER;
 
@@ -154,9 +157,11 @@ public class LeshanClientDemo {
     private static LwM2mModelRepository createModel(LeshanClientDemoCLI cli) throws Exception {
 
         List<ObjectModel> models = ObjectLoader.loadAllDefault();
+
         models.addAll(ObjectLoader.loadDdfResources("/models", LwM2mDemoConstant.modelPaths));
         if (cli.main.modelsFolder != null) {
             models.addAll(ObjectLoader.loadObjectsFromDir(cli.main.modelsFolder, true));
+
         }
 
         return new LwM2mModelRepository(models);
@@ -245,6 +250,8 @@ public class LeshanClientDemo {
         initializer.setInstancesForObject(LOCATION, locationInstance);
         initializer.setInstancesForObject(OBJECT_ID_TEMPERATURE_SENSOR, new RandomTemperatureSensor());
         initializer.setInstancesForObject(OBJECT_ID_LWM2M_TEST_OBJECT, new LwM2mTestObject());
+        initializer.setInstancesForObject(OBJECT_ID_CONNECTIONIDENTITY_OBJECT, new ConnectionIdentity());
+        initializer.setInstancesForObject(OBJECT_ID_CONNECTIONSERVICEENDPOINT_OBJECT, new ConnectionServiceEndpoint());
 
         List<LwM2mObjectEnabler> enablers = initializer.createAll();
 
@@ -340,6 +347,7 @@ public class LeshanClientDemo {
         }
         builder.setAdditionalAttributes(cli.main.additionalAttributes);
         builder.setBootstrapAdditionalAttributes(cli.main.bsAdditionalAttributes);
+
         final LeshanClient client = builder.build();
 
         // Handle Factory Bootstrap option

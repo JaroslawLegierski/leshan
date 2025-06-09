@@ -1,10 +1,10 @@
 <!-----------------------------------------------------------------------------
  * Copyright (c) 2021 Sierra Wireless and others.
- * 
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * and Eclipse Distribution License v1.0 which accompany this distribution.
- * 
+ *
  * The Eclipse Public License is available at
  *    http://www.eclipse.org/legal/epl-v20.html
  * and the Eclipse Distribution License is available at
@@ -137,6 +137,8 @@
 </template>
 <script>
 import { configsFromRestToUI, configFromUIToRest } from "../js/bsconfigutil.js";
+console.log("configsFromRestToUI:", configsFromRestToUI);
+console.log("configFromUIToRest:", configFromUIToRest);
 import {
   fromHex,
   fromAscii,
@@ -265,6 +267,8 @@ export default {
         endpoint: config.endpoint,
         dm: [],
         bs: [],
+        ConnectionIdentity:[],
+        ConnectionServiceEndpoint: []
       };
 
       if (config.dm) {
@@ -339,7 +343,26 @@ export default {
       if (config.autoIdForSecurityObject) {
         c.autoIdForSecurityObject = config.autoIdForSecurityObject;
       }
-
+        console.log("config JSON:", config);
+        if (config.ConnectionIdentity) {
+        c.ConnectionIdentity = [ { ...config.ConnectionIdentity } ];
+        }
+    if (config.ConnectionServiceEndpoint) {
+      const conn = config.ConnectionServiceEndpoint;
+      if (
+        typeof conn === "object" &&
+        Object.keys(conn).length === 1 &&
+        Object.values(conn)[0] &&
+        typeof Object.values(conn)[0] === "object" &&
+        Object.keys(Object.values(conn)[0]).every(k => !isNaN(k))
+      ) {
+        // Correction of JSON structure (e.g. { "0": { "0": {}, "1": {} } })
+        c.ConnectionServiceEndpoint = Object.values(conn)[0];
+      } else {
+        c.ConnectionServiceEndpoint = conn;
+      }
+    }
+        console.log("c JSON:", c);
       this.axios
         .post(
           "api/bootstrap/" + encodeURIComponent(config.endpoint),
