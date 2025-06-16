@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LWM2M xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.openmobilealliance.org/tech/profiles/LWM2M-v1_1.xsd">
 	<Object ObjectType="MODefinition">
-		<Name>Identity</Name>
-		<Description1><![CDATA[This object describes the Identity]]></Description1>
+		<Name>IoT3 Identity</Name>
+		<Description1><![CDATA[This object describes the IoT3 Identity of a User Equipment or a Low-Latency Application after it has been bootstrapped.]]></Description1>
 		<ObjectID>36050</ObjectID>
 		<ObjectURN>urn:oma:lwm2m:x:36050</ObjectURN>
 		<LWM2MVersion>1.1</LWM2MVersion>
@@ -11,14 +11,14 @@
 		<Mandatory>Optional</Mandatory>
 		<Resources>
 			<Item ID="0">
-				<Name>ID</Name>
+				<Name>IoT3 ID</Name>
 				<Operations>R</Operations>
 				<MultipleInstances>Single</MultipleInstances>
 				<Mandatory>Mandatory</Mandatory>
 				<Type>String</Type>
 				<RangeEnumeration></RangeEnumeration>
 				<Units></Units>
-				<Description><![CDATA[This identifier uniquely distinguishes the user equipment.]]></Description>
+				<Description><![CDATA[This identifier uniquely distinguishes the user equipment or low-latency application within the IoT3 system.]]></Description>
 			</Item>
 			<Item ID="1">
 				<Name>PSK Identity</Name>
@@ -28,7 +28,7 @@
 				<Type>String</Type>
 				<RangeEnumeration></RangeEnumeration>
 				<Units></Units>
-				<Description><![CDATA[Public part of a PSK to be used for client authentication.]]></Description>
+				<Description><![CDATA[Public part of a PSK to be used for client authentication on an IoT3 service.]]></Description>
 			</Item>
 			<Item ID="2">
 				<Name>PSK Secret Key</Name>
@@ -38,7 +38,7 @@
 				<Type>Opaque</Type>
 				<RangeEnumeration></RangeEnumeration>
 				<Units></Units>
-				<Description><![CDATA[Secret part of a PSK to be used for client authentication.]]></Description>
+				<Description><![CDATA[Secret part of a PSK to be used for client authentication on an IoT3 service.]]></Description>
 			</Item>
 			
 		</Resources>

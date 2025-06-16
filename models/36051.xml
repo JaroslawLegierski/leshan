@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LWM2M xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.openmobilealliance.org/tech/profiles/LWM2M-v1_1.xsd">
 	<Object ObjectType="MODefinition">
-		<Name>Service Endpoint</Name>
-		<Description1><![CDATA[This object describes Service Endpoint that can be used by a User Equipment.]]></Description1>
+		<Name>IoT3 Service Endpoint</Name>
+		<Description1><![CDATA[This object describes an IoT3 Service Endpoint that can be used by a User Equipment or a Low-Latency Application after it has been bootstrapped.]]></Description1>
 		<ObjectID>36051</ObjectID>
 		<ObjectURN>urn:oma:lwm2m:x:36051</ObjectURN>
 		<LWM2MVersion>1.1</LWM2MVersion>
@@ -18,7 +18,7 @@
 				<Type>String</Type>
 				<RangeEnumeration></RangeEnumeration>
 				<Units></Units>
-				<Description><![CDATA[Name or category for this  Service Endpoint.]]></Description>
+				<Description><![CDATA[Name or category for this IoT3 Service Endpoint.]]></Description>
 			</Item>
 			<Item ID="1">
 				<Name>Payload</Name>
@@ -28,7 +28,7 @@
 				<Type>String</Type>
 				<RangeEnumeration></RangeEnumeration>
 				<Units></Units>
-				<Description><![CDATA[The type of payload that is expected by the Service Endpoint.For example: json, asn1, otlp/json, logstash, jaeger, grafana, etc.]]></Description>
+				<Description><![CDATA[The type of payload that is expected by the IoT3 Service Endpoint.For example: json, asn1, otlp/json, logstash, jaeger, grafana, etc.]]></Description>
 			</Item>
 			<Item ID="2">
 				<Name>Service URI</Name>
@@ -38,7 +38,7 @@
 				<Type>String</Type>
 				<RangeEnumeration></RangeEnumeration>
 				<Units></Units>
-				<Description><![CDATA[URI of the Service Endpoint.]]></Description>
+				<Description><![CDATA[URI of the IoT3 Service Endpoint.]]></Description>
 			</Item>
 			<Item ID="3">
 				<Name>Topic Root</Name>
@@ -48,7 +48,7 @@
 				<Type>String</Type>
 				<RangeEnumeration></RangeEnumeration>
 				<Units></Units>
-				<Description><![CDATA[Root topic to be used when connecting to an MQTT Broker Endpoint.]]></Description>
+				<Description><![CDATA[Root topic to be used when connecting to an IoT3 MQTT Broker Endpoint.]]></Description>
 			</Item>
 			<Item ID="4">
 				<Name>Server Public Key</Name>
