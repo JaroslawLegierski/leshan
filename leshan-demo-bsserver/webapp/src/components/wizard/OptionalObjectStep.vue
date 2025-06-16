@@ -38,7 +38,7 @@
              <v-text-field v-model="conn.ServiceURI" label="Service URI" @input="updateConfig"></v-text-field>
              <v-text-field v-model="conn.TopicRoot" label="Topic Root" @input="updateConfig"></v-text-field>
              <v-textarea  v-model="conn.ServerPublicKey" label="Server Public Key" :rules="[rules.optional, rules.base64]"
-               hint="Required. Must be in Base64 format."persistent-hint spellcheck="false" rows="2"
+               hint="Optional Must be in Base64 format."persistent-hint spellcheck="false" rows="2"
              @input="updateConfig"/>
              <v-btn color="error" @click="removeConnection(index)">Remove</v-btn>
            </div>
