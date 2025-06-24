@@ -14,8 +14,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.demo.client;
 
-import java.util.Random;
-
 import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
 import org.eclipse.leshan.client.servers.LwM2mServer;
 import org.eclipse.leshan.core.node.LwM2mResource;
@@ -33,10 +31,9 @@ public class ConnectionIdentity extends BaseInstanceEnabler {
     private String PSKIdentity = "PSKIdentity";
     private byte[] PSKSecretKey = Hex.decodeHex("1234567890".toCharArray());
 
-    private final Random random = new Random();
-
     @Override
     public synchronized ReadResponse read(LwM2mServer server, int resourceId) {
+        LOG.info("Read on Device resource /{}/{}/{}", getModel().id, getId(), resourceId);
         switch (resourceId) {
         case 0:
             return ReadResponse.success(resourceId, ID);

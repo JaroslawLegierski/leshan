@@ -34,6 +34,7 @@ public class ConnectionServiceEndpoint extends BaseInstanceEnabler {
 
     @Override
     public synchronized ReadResponse read(LwM2mServer server, int resourceId) {
+        LOG.info("Read on Device resource /{}/{}/{}", getModel().id, getId(), resourceId);
         switch (resourceId) {
         case 0:
             return ReadResponse.success(resourceId, ServiceName);
@@ -51,6 +52,7 @@ public class ConnectionServiceEndpoint extends BaseInstanceEnabler {
     }
 
     public synchronized WriteResponse write(LwM2mServer server, boolean replace, int resourceId, LwM2mResource value) {
+        LOG.info("Write on Device resource /{}/{}/{}", getModel().id, getId(), resourceId);
         switch (resourceId) {
         case 0:
             ServiceName = (String) value.getValue();
