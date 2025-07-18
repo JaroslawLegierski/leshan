@@ -339,7 +339,10 @@ public class Security extends BaseInstanceEnabler {
             return ReadResponse.success(resourceid, publicKeyOrIdentity);
 
         case SEC_SERVER_PUBKEY: // server public key
-            return ReadResponse.success(resourceid, serverPublicKey);
+            if (serverPublicKey != null)
+                return ReadResponse.success(resourceid, serverPublicKey);
+            else
+                return ReadResponse.notFound();
 
         case SEC_SECRET_KEY: // secret key
             return ReadResponse.success(resourceid, secretKey);
