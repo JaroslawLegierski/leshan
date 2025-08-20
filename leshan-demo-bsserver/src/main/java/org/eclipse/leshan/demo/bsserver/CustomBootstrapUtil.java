@@ -40,6 +40,9 @@ import org.eclipse.leshan.core.request.DownlinkBootstrapRequest;
 import org.eclipse.leshan.core.response.LwM2mResponse;
 import org.eclipse.leshan.core.util.datatype.ULong;
 
+/**
+ * CustomBootstrapUtil class supporting non standard LwM2M Objects
+ */
 public class CustomBootstrapUtil {
     public static LwM2mObjectInstance toSecurityInstance(int instanceId,
             BootstrapConfig.ServerSecurity securityConfig) {

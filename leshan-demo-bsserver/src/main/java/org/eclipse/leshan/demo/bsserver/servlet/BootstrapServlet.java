@@ -23,9 +23,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.EnumSet;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.leshan.bsserver.BootstrapConfig;
 import org.eclipse.leshan.bsserver.EditableBootstrapConfigStore;
 import org.eclipse.leshan.bsserver.InvalidConfigurationException;
+import org.eclipse.leshan.demo.bsserver.CustomBootstrapConfig;
 import org.eclipse.leshan.demo.bsserver.json.ByteArraySerializer;
 import org.eclipse.leshan.demo.bsserver.json.EnumSetDeserializer;
 import org.eclipse.leshan.demo.bsserver.json.EnumSetSerializer;
@@ -136,8 +136,9 @@ public class BootstrapServlet extends LeshanDemoServlet {
     private void addBootstrapConfig(HttpServletRequest req, HttpServletResponse resp, String endpoint) {
         executeSafely(req, resp, () -> {
             try {
-                BootstrapConfig cfg = mapper.readValue(new InputStreamReader(req.getInputStream()),
-                        BootstrapConfig.class);
+                // Usage CustomBootstrapConfig supported custom Objects instead standard BootstrapConfig
+                CustomBootstrapConfig cfg = mapper.readValue(new InputStreamReader(req.getInputStream()),
+                        CustomBootstrapConfig.class);
 
                 if (cfg == null) {
                     safelySendError(req, resp, HttpServletResponse.SC_BAD_REQUEST, "no content");

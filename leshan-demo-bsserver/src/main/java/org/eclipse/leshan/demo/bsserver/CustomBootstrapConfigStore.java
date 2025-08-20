@@ -19,6 +19,9 @@ import org.eclipse.leshan.bsserver.BootstrapConfig;
 import org.eclipse.leshan.bsserver.BootstrapConfigStore;
 import org.eclipse.leshan.bsserver.BootstrapSession;
 
+/**
+ * CustomBootstrapConfigStore class supporting non standard LwM2M Objects
+ */
 public class CustomBootstrapConfigStore implements BootstrapConfigStore {
 
     private final BootstrapConfigStore delegate;

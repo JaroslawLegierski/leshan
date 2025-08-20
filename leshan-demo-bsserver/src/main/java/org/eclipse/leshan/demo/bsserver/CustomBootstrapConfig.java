@@ -25,6 +25,9 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * CustomBootstrapConfig class supporting non standard LwM2M Objects
+ */
 public class CustomBootstrapConfig extends BootstrapConfig {
 
     private static final Logger LOG = LoggerFactory.getLogger(CustomBootstrapConfig.class);

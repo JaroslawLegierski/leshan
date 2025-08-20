@@ -28,6 +28,9 @@ import org.eclipse.leshan.core.response.LwM2mResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * CustomBootstrapConfigStoreTaskProvider class supporting non standard LwM2M Objects
+ */
 public class CustomBootstrapConfigStoreTaskProvider extends BootstrapConfigStoreTaskProvider {
 
     private static final Logger LOG = LoggerFactory.getLogger(CustomBootstrapConfigStoreTaskProvider.class);
