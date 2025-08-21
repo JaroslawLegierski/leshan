@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.eclipse.leshan.core.peer.OscoreIdentity;
+import org.eclipse.leshan.core.util.Hex;
 import org.eclipse.leshan.server.redis.serialization.SecurityInfoSerDes;
 import org.eclipse.leshan.servers.security.EditableSecurityStore;
 import org.eclipse.leshan.servers.security.NonUniqueSecurityInfoException;
@@ -43,6 +44,7 @@ public class RedisSecurityStore implements EditableSecurityStore {
 
     private final String securityInfoByEndpointPrefix;
     private final String endpointByPskIdKey;
+    private final String endpointByOscoreRecipientIdKey;
     private final Pool<Jedis> pool;
 
     private final List<SecurityStoreListener> listeners = new CopyOnWriteArrayList<>();
@@ -55,6 +57,7 @@ public class RedisSecurityStore implements EditableSecurityStore {
         this.pool = builder.pool;
         this.securityInfoByEndpointPrefix = builder.securityInfoByEndpointPrefix;
         this.endpointByPskIdKey = builder.endpointByPskIdKey;
+        this.endpointByOscoreRecipientIdKey = builder.endpointByOscoreRecipientIdKey;
     }
 
     @Override
@@ -87,9 +90,23 @@ public class RedisSecurityStore implements EditableSecurityStore {
     }
 
     @Override
-    public SecurityInfo getByOscoreIdentity(OscoreIdentity pskIdentity) {
+    public SecurityInfo getByOscoreIdentity(OscoreIdentity identity) {
         // TODO OSCORE to be implemented
-        return null;
+        // return null;
+        try (Jedis j = pool.getResource()) {
+            String recipientHex = Hex.encodeHexString(identity.getRecipientId());
+            String ep = j.hget(endpointByOscoreRecipientIdKey, recipientHex);
+            if (ep == null) {
+                return null;
+            } else {
+                byte[] data = j.get((securityInfoByEndpointPrefix + ep).getBytes());
+                if (data == null) {
+                    return null;
+                } else {
+                    return deserialize(data);
+                }
+            }
+        }
     }
 
     @Override
@@ -123,7 +140,16 @@ public class RedisSecurityStore implements EditableSecurityStore {
                 }
                 j.hset(endpointByPskIdKey.getBytes(), info.getPskIdentity().getBytes(), info.getEndpoint().getBytes());
             }
-
+            if (info.getOscoreSetting() != null && info.getOscoreSetting().getRecipientId() != null) {
+                String recipientHex = Hex.encodeHexString(info.getOscoreSetting().getRecipientId());
+                String oldEndpoint = j.hget(endpointByOscoreRecipientIdKey, recipientHex);
+                if (oldEndpoint != null && !oldEndpoint.equals(info.getEndpoint())) {
+                    throw new NonUniqueSecurityInfoException(
+                            "RecipientId " + recipientHex + " is already used by endpoint " + oldEndpoint);
+                }
+                j.hset(endpointByOscoreRecipientIdKey.getBytes(), recipientHex.getBytes(),
+                        info.getEndpoint().getBytes());
+            }
             byte[] previousData = j.getSet((securityInfoByEndpointPrefix + info.getEndpoint()).getBytes(), data);
             SecurityInfo previous = previousData == null ? null : deserialize(previousData);
             String previousIdentity = previous == null ? null : previous.getPskIdentity();
@@ -144,6 +170,10 @@ public class RedisSecurityStore implements EditableSecurityStore {
                 SecurityInfo info = deserialize(data);
                 if (info.getPskIdentity() != null) {
                     j.hdel(endpointByPskIdKey.getBytes(), info.getPskIdentity().getBytes());
+                }
+                if (info.getOscoreSetting() != null && info.getOscoreSetting().getRecipientId() != null) {
+                    String recipientHex = Hex.encodeHexString(info.getOscoreSetting().getRecipientId());
+                    j.hdel(endpointByOscoreRecipientIdKey.getBytes(), recipientHex.getBytes());
                 }
                 j.del((securityInfoByEndpointPrefix + endpoint).getBytes());
                 for (SecurityStoreListener listener : listeners) {
@@ -186,6 +216,7 @@ public class RedisSecurityStore implements EditableSecurityStore {
         private String securityInfoByEndpointPrefix;
         private String endpointByPskIdKey;
         private String prefix;
+        private String endpointByOscoreRecipientIdKey;
 
         /**
          * Set the key prefix for security info lookup by endpoint.
@@ -194,6 +225,12 @@ public class RedisSecurityStore implements EditableSecurityStore {
          */
         public Builder setSecurityInfoByEndpointPrefix(String securityInfoByEndpointPrefix) {
             this.securityInfoByEndpointPrefix = securityInfoByEndpointPrefix;
+            return this;
+        }
+
+        // Additional index for OSCORE
+        public Builder setEndpointByOscoreRecipientIdKey(String endpointByOscoreRecipientIdKey) {
+            this.endpointByOscoreRecipientIdKey = endpointByOscoreRecipientIdKey;
             return this;
         }
 
@@ -223,6 +260,7 @@ public class RedisSecurityStore implements EditableSecurityStore {
             this.prefix = "SECSTORE#";
             this.securityInfoByEndpointPrefix = "SEC#EP#";
             this.endpointByPskIdKey = "EP#PSKID";
+            this.endpointByOscoreRecipientIdKey = "EP#OSCOREID";
         }
 
         /**
