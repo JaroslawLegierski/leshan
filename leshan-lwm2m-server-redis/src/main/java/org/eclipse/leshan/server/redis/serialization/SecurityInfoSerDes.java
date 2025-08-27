@@ -31,8 +31,6 @@ import java.security.spec.InvalidParameterSpecException;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
 
-import org.eclipse.californium.cose.AlgorithmID;
-import org.eclipse.californium.cose.CoseException;
 import org.eclipse.leshan.core.oscore.OscoreSetting;
 import org.eclipse.leshan.core.util.Hex;
 import org.eclipse.leshan.servers.security.SecurityInfo;
@@ -42,7 +40,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.upokecenter.cbor.CBORObject;
 
 /**
  * Functions for serialize and deserialize security information in JSON for storage.
@@ -95,7 +92,9 @@ public class SecurityInfoSerDes {
             oscore.put("masterSecret", Hex.encodeHexString(oscoreObject.getMasterSecret()));
             oscore.put("aeadAlgorithm", oscoreObject.getAeadAlgorithm().getValue());
             oscore.put("hmacAlgorithm", oscoreObject.getHkdfAlgorithm().getValue());
-            //oscore.put("masterSalt", Hex.encodeHexString(oscoreObject.getMasterSalt()));
+            if (oscoreObject.getMasterSalt() != null) {
+                oscore.put("masterSalt", Hex.encodeHexString(oscoreObject.getMasterSalt()));
+            }
 
             o.set("oscore", oscore);
         }
@@ -119,8 +118,11 @@ public class SecurityInfoSerDes {
                 byte[] senderId = Hex.decodeHex(oscore.get("senderId").asText().toCharArray());
                 byte[] recipientId = Hex.decodeHex(oscore.get("recipientId").asText().toCharArray());
                 byte[] masterSecret = Hex.decodeHex(oscore.get("masterSecret").asText().toCharArray());
-                //byte[] masterSalt =  Hex.decodeHex(oscore.get("masterSalt").asText().toCharArray());
                 byte[] masterSalt = null;
+                if (oscore.has("masterSalt")) {
+                    masterSalt = Hex.decodeHex(oscore.get("masterSalt").asText().toCharArray());
+                }
+
                 int aeadAlgId = oscore.get("aeadAlgorithm").asInt();
                 int hmacAlgId = oscore.get("hmacAlgorithm").asInt();
 

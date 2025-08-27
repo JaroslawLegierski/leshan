@@ -27,7 +27,6 @@ import java.security.spec.ECPoint;
 import java.security.spec.ECPublicKeySpec;
 import java.security.spec.KeySpec;
 
-import org.eclipse.californium.oscore.OSException;
 import org.eclipse.leshan.core.oscore.AeadAlgorithm;
 import org.eclipse.leshan.core.oscore.HkdfAlgorithm;
 import org.eclipse.leshan.core.oscore.OscoreSetting;
@@ -76,7 +75,7 @@ public class SecurityInfoSerDesTest {
 
     @Test
 
-    public void security_info_oscore_ser_des_then_equal() throws OSException {
+    public void security_info_oscore_ser_des_then_equal() {
 
         final String OSCORE_MASTER_SECRET = "1234567890";
         final String OSCORE_MASTER_SALT = "0987654321";
