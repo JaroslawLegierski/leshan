@@ -45,13 +45,6 @@ Contributors:
       <groupId>org.eclipse.leshan</groupId>
       <artifactId>leshan-demo-servers-shared</artifactId>
     </dependency>
-
-    <!-- runtime dependencies -->
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <scope>runtime</scope>
-    </dependency>
   </dependencies>
 
   <build>

@@ -128,7 +128,7 @@ Contributors:
     <project.reporting.outputEncoding>${leshan.encoding}</project.reporting.outputEncoding>
 
     <!-- configure line separator -->
-    <leshan.lineEnding>LF</leshan.lineEnding>
+    <leshan.lineEnding>CRLF</leshan.lineEnding>
     <leshan.lineseparator>\n</leshan.lineseparator>
 
     <!-- we use properties for version when there are used more than once -->
@@ -328,17 +328,19 @@ Contributors:
 
       <!-- Demos, examples and tests dependencies -->
       <dependency>
-        <groupId>ch.qos.logback</groupId>
-        <artifactId>logback-classic</artifactId>
-        <version>${logback.version}</version>
-        <exclusions>
-          <exclusion>
-            <!-- we exclude servlet-api dependencies because of dependency convergence issue with jetty
-            See: https://github.com/eclipse/leshan/issues/1339#issuecomment-1293221705 -->
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-          </exclusion>
-        </exclusions>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-api</artifactId>
+        <version>2.23.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-core</artifactId>
+        <version>2.23.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-slf4j2-impl</artifactId>
+        <version>2.23.1</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
